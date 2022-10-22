@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/gin-contrib/sessions v0.0.5
+	github.com/gin-gonic/contrib v0.0.0-20201101042839-6a891bf89f19
 	github.com/gin-gonic/gin v1.8.1
 	github.com/joho/godotenv v1.4.0
 	github.com/solovev/steam_go v0.0.0-20170222182106-48eb5aae6c50
