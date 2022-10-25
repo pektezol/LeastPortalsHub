@@ -3,9 +3,12 @@ package controllers
 import (
 	"log"
 	"net/http"
+	"os"
+	"time"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/pektezol/leastportals/backend/database"
 	"github.com/solovev/steam_go"
 )
 
@@ -15,7 +18,7 @@ func Home(c *gin.Context) {
 		c.JSON(200, "no id, not auth")
 	} else {
 		var user *steam_go.PlayerSummaries
-		user, err := steam_go.GetPlayerSummaries(session.Get("id").(string), GetEnvKey("API_KEY"))
+		user, err := steam_go.GetPlayerSummaries(session.Get("id").(string), os.Getenv("API_KEY"))
 		if err != nil {
 			c.JSON(200, "authenticated, but err")
 			log.Panic(err)
@@ -38,6 +41,17 @@ func Login(c *gin.Context) {
 		steamId, err := opId.ValidateAndGetId()
 		if err != nil {
 			http.Error(c.Writer, err.Error(), http.StatusInternalServerError)
+		}
+		// Create user if new
+		var checkSteamID int64
+		database.DB.QueryRow("SELECT steam_id FROM users WHERE steamid = $1", steamId).Scan(&checkSteamID)
+		if checkSteamID == 0 { // User does not exist
+			user, err := steam_go.GetPlayerSummaries(steamId, os.Getenv("API_KEY"))
+			if err != nil {
+				log.Panic(err)
+			}
+			database.DB.Exec(`INSERT INTO users (steam_id, username, avatar_link, country_code, created_at, updated_at, user_type)
+			VALUES ($1, $2, $3, $4, $5, $6, $7)`, steamId, user.PersonaName, user.Avatar, user.LocCountryCode, time.Now().UTC(), time.Now().UTC(), 0)
 		}
 		session := sessions.Default(c)
 		session.Set("id", steamId)
