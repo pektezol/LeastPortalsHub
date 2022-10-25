@@ -1,16 +1,23 @@
 package main
 
 import (
+	"log"
+	"os"
+
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
-	"github.com/pektezol/leastportals/backend/controllers"
+	"github.com/joho/godotenv"
 	"github.com/pektezol/leastportals/backend/database"
 	"github.com/pektezol/leastportals/backend/routes"
 )
 
 func main() {
-	if controllers.GetEnvKey("ENV") == "PROD" {
+	if os.Getenv("ENV") == "PROD" {
 		gin.SetMode(gin.ReleaseMode)
+	}
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
 	}
 	router := gin.Default()
 	database.ConnectDB()
