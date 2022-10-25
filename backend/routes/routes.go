@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"os"
+
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
@@ -8,7 +10,7 @@ import (
 )
 
 func InitRoutes(router *gin.Engine) {
-	store := cookie.NewStore([]byte(controllers.GetEnvKey("SESSION_KEY")))
+	store := cookie.NewStore([]byte(os.Getenv("SESSION_KEY")))
 	router.Use(sessions.Sessions("session", store))
 	api := router.Group("/api")
 	{
