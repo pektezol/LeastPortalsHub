@@ -7,6 +7,7 @@ import (
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/pektezol/leastportals/backend/controllers"
+	"github.com/pektezol/leastportals/middleware"
 )
 
 func InitRoutes(router *gin.Engine) {
@@ -17,6 +18,7 @@ func InitRoutes(router *gin.Engine) {
 		v1 := api.Group("/v1")
 		v1.GET("/", controllers.Home)
 		v1.GET("/login", controllers.Login)
-		v1.GET("/logout", controllers.Logout)
+		v1.GET("/logout", middleware.RequireAuth, controllers.Logout)
+		v1.GET("/validate", middleware.RequireAuth, controllers.Validate)
 	}
 }
