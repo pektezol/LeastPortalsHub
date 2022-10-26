@@ -10,7 +10,7 @@ require (
 	github.com/solovev/steam_go v0.0.0-20170222182106-48eb5aae6c50
 )
 
-require github.com/golang-jwt/jwt/v4 v4.4.2 // indirect
+require github.com/golang-jwt/jwt/v4 v4.4.2
 
 require (
 	github.com/gin-contrib/sse v0.1.0 // indirect
