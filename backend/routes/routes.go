@@ -7,7 +7,7 @@ import (
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 	"github.com/pektezol/leastportals/backend/controllers"
-	"github.com/pektezol/leastportals/middleware"
+	"github.com/pektezol/leastportals/backend/middleware"
 )
 
 func InitRoutes(router *gin.Engine) {
