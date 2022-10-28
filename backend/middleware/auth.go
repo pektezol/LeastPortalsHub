@@ -2,8 +2,6 @@ package middleware
 
 import (
 	"fmt"
-	"log"
-	"net/http"
 	"os"
 	"time"
 
@@ -13,12 +11,11 @@ import (
 	"github.com/pektezol/leastportals/backend/models"
 )
 
-func RequireAuth(c *gin.Context) {
+func CheckAuth(c *gin.Context) {
 	// Get auth cookie
 	tokenString, err := c.Cookie("auth")
 	if err != nil {
-		log.Println("RequireAuth: Err getting cookie")
-		c.AbortWithStatus(http.StatusUnauthorized)
+		c.Next()
 		return
 	}
 	// Validate token
@@ -31,8 +28,7 @@ func RequireAuth(c *gin.Context) {
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
 		// Check exp
 		if float64(time.Now().Unix()) > claims["exp"].(float64) {
-			log.Println("RequireAuth: Token expired")
-			c.AbortWithStatus(http.StatusUnauthorized) // Expired
+			c.Next()
 			return
 		}
 		// Get user from DB
@@ -41,16 +37,13 @@ func RequireAuth(c *gin.Context) {
 			&user.SteamID, &user.Username, &user.AvatarLink, &user.CountryCode,
 			&user.CreatedAt, &user.UpdatedAt, &user.UserType)
 		if user.SteamID == 0 {
-			log.Println("RequireAuth: No user found on database")
-			c.AbortWithStatus(http.StatusUnauthorized)
+			c.Next()
 			return
 		}
-		// Attach user to request
 		c.Set("user", user)
 		c.Next()
 	} else {
-		log.Println("RequireAuth: Invalid token")
-		c.AbortWithStatus(http.StatusUnauthorized)
+		c.Next()
 		return
 	}
 }

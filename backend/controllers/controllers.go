@@ -6,7 +6,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/pektezol/leastportals/backend/database"
@@ -14,20 +13,13 @@ import (
 )
 
 func Home(c *gin.Context) {
-	session := sessions.Default(c)
-	if session.Get("id") == nil {
+	user, exists := c.Get("user")
+	if !exists {
 		c.JSON(200, "no id, not auth")
 	} else {
-		var user *steam_go.PlayerSummaries
-		user, err := steam_go.GetPlayerSummaries(session.Get("id").(string), os.Getenv("API_KEY"))
-		if err != nil {
-			c.JSON(200, "authenticated, but err")
-			log.Panic(err)
-		} else {
-			c.JSON(200, gin.H{
-				"output": user,
-			})
-		}
+		c.JSON(200, gin.H{
+			"output": user,
+		})
 	}
 }
 
@@ -94,11 +86,4 @@ func Logout(c *gin.Context) {
 		})
 		//c.Redirect(http.StatusPermanentRedirect, "/")
 	}
-}
-
-func Validate(c *gin.Context) {
-	user, _ := c.Get("user")
-	c.JSON(http.StatusOK, gin.H{
-		"output": user,
-	})
 }
