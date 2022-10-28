@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -23,5 +24,5 @@ func main() {
 	database.ConnectDB()
 	router.Use(static.Serve("/", static.LocalFile("./frontend/dist", true)))
 	routes.InitRoutes(router)
-	router.Run(":4000")
+	router.Run(fmt.Sprintf(":%s", os.Getenv("PORT")))
 }
