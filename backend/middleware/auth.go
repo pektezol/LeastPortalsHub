@@ -36,7 +36,7 @@ func CheckAuth(c *gin.Context) {
 		database.DB.QueryRow(`SELECT * FROM users WHERE steam_id = $1;`, claims["sub"]).Scan(
 			&user.SteamID, &user.Username, &user.AvatarLink, &user.CountryCode,
 			&user.CreatedAt, &user.UpdatedAt, &user.UserType)
-		if user.SteamID == 0 {
+		if user.SteamID == "" {
 			c.Next()
 			return
 		}
