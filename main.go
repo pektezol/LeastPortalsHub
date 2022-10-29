@@ -10,8 +10,18 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/pektezol/leastportals/backend/database"
 	"github.com/pektezol/leastportals/backend/routes"
+	_ "github.com/pektezol/leastportals/docs"
 )
 
+// @title       Least Portals Database API
+// @version     1.0
+// @description Backend API endpoints for Least Portals Database.
+
+// @license.name GNU General Public License, Version 2
+// @license.url  https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+
+// @host localhost:4000
+// @BasePath
 func main() {
 	if os.Getenv("ENV") == "PROD" {
 		gin.SetMode(gin.ReleaseMode)
