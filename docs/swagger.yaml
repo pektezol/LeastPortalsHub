@@ -1,0 +1,11 @@
+host: localhost:4000
+info:
+  contact: {}
+  description: Backend API endpoints for Least Portals Database.
+  license:
+    name: GNU General Public License, Version 2
+    url: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+  title: Least Portals Database API
+  version: "1.0"
+paths: {}
+swagger: "2.0"
