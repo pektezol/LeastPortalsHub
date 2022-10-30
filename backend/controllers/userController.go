@@ -83,7 +83,7 @@ func FetchUser(c *gin.Context) {
 	return
 }
 
-func UpdateUserCountry(c *gin.Context) {
+/*func UpdateUserCountry(c *gin.Context) {
 	id := c.Param("id")
 	cc := c.Param("country")
 	// Check if id is all numbers and 17 length
@@ -170,4 +170,4 @@ func UpdateUserCountry(c *gin.Context) {
 		},
 	})
 	return
-}
+}*/

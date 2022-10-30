@@ -18,6 +18,6 @@ func InitRoutes(router *gin.Engine) {
 		v1.GET("/logout", middleware.CheckAuth, controllers.Logout)
 		v1.GET("/profile", middleware.CheckAuth, controllers.Profile)
 		v1.GET("/user/:id", middleware.CheckAuth, controllers.FetchUser)
-		v1.PUT("user/:id/:country", middleware.CheckAuth, controllers.UpdateUserCountry)
+		//v1.PUT("user/:id/:country", middleware.CheckAuth, controllers.UpdateUserCountry)
 	}
 }
