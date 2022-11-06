@@ -37,7 +37,7 @@ func Login(c *gin.Context) {
 		}
 		// Create user if new
 		var checkSteamID int64
-		database.DB.QueryRow("SELECT steam_id FROM users WHERE steamid = $1", steamID).Scan(&checkSteamID)
+		database.DB.QueryRow("SELECT steam_id FROM users WHERE steam_id = $1", steamID).Scan(&checkSteamID)
 		// User does not exist
 		if checkSteamID == 0 {
 			user, err := steam_go.GetPlayerSummaries(steamID, os.Getenv("API_KEY"))
