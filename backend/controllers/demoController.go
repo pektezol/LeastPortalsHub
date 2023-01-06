@@ -40,7 +40,7 @@ func UploadDemo(c *gin.Context) {
 		})
 		return
 	}*/
-	f, err := os.Open("test.txt")
+	f, err := os.Open("pgun_2280.dem")
 	if err != nil {
 		panic(fmt.Sprintf("cannot open file: %v", err))
 	}
