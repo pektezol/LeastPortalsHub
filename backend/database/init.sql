@@ -19,6 +19,7 @@ CREATE TABLE maps (
   map_name TEXT NOT NULL,
   wr_score SMALLINT NOT NULL,
   is_coop BOOLEAN NOT NULL,
+  is_disabled BOOLEAN NOT NULL DEFAULT false,
   PRIMARY KEY (id)
 );
 
