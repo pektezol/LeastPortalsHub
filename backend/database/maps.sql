@@ -40,10 +40,8 @@ INSERT INTO maps (map_name, wr_score, is_coop, is_disabled) VALUES
 ('Turret Factory',5,false,false),
 ('Turret Sabotage',4,false,false),
 ('Neurotoxin Sabotage',0,false,false),
-('Tube Ride',0,false,true),
 ('Core',2,false,false),
 -- 6
-('Long Fall',0,false,true),
 ('Underground',4,false,false),
 ('Cave Johnson',4,false,false),
 ('Repulsion Intro',0,false,false),
