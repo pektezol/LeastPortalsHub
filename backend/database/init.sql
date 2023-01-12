@@ -25,12 +25,14 @@ CREATE TABLE maps (
 
 CREATE TABLE records (
   id SERIAL,
-  map_id SMALLINT,
+  map_id SMALLINT NOT NULL,
   host_id TEXT NOT NULL,
   score_count SMALLINT NOT NULL,
   score_time INTEGER NOT NULL,
   is_coop BOOLEAN NOT NULL DEFAULT false,
   partner_id TEXT NOT NULL DEFAULT '',
+  demo_id TEXT NOT NULL,
+  record_date TIMESTAMP NOT NULL DEFAULT now(),
   PRIMARY KEY (id),
   FOREIGN KEY (map_id) REFERENCES maps(id),
   FOREIGN KEY (host_id) REFERENCES users(steam_id),
@@ -42,11 +44,4 @@ CREATE TABLE titles (
   title_name TEXT NOT NULL,
   PRIMARY KEY (user_id),
   FOREIGN KEY (user_id) REFERENCES users(steam_id)
-);
-
-CREATE TABLE showcases (
-  record_id INT,
-  video_id TEXT NOT NULL,
-  PRIMARY KEY (record_id),
-  FOREIGN KEY (record_id) REFERENCES records(id)
 );
