@@ -33,21 +33,21 @@ func Login(c *gin.Context) {
 	default:
 		steamID, err := openID.ValidateAndGetId()
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))
+			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
 		// Create user if new
 		var checkSteamID int64
 		err = database.DB.QueryRow("SELECT steam_id FROM users WHERE steam_id = $1", steamID).Scan(&checkSteamID)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))
+			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
 		// User does not exist
 		if checkSteamID == 0 {
 			user, err := steam_go.GetPlayerSummaries(steamID, os.Getenv("API_KEY"))
 			if err != nil {
-				c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))
+				c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 				return
 			}
 			// Insert new user to database

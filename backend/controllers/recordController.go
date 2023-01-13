@@ -3,14 +3,14 @@ package controllers
 import (
 	"context"
 	b64 "encoding/base64"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
-	"time"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/pektezol/leastportals/backend/database"
 	"github.com/pektezol/leastportals/backend/models"
 	"golang.org/x/oauth2/google"
@@ -23,73 +23,125 @@ func CreateRecordWithDemo(c *gin.Context) {
 	// Check if user exists
 	user, exists := c.Get("user")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"code": http.StatusUnauthorized,
-			"output": gin.H{
-				"error": "User not logged in. Could be invalid token.",
-			},
-		})
+		c.JSON(http.StatusUnauthorized, models.ErrorResponse("User not logged in."))
 		return
 	}
+	// Check if map is sp or mp
+	var isCoop bool
+	err := database.DB.QueryRow(`SELECT is_coop FROM maps WHERE id = $1;`, mapId).Scan(&isCoop)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	// Get record request
 	var record models.Record
-	err := c.Bind(&record)
+	score_count, err := strconv.Atoi(c.PostForm("score_count"))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	var recordCount int
-	err = database.DB.QueryRow(`SELECT COUNT(id) FROM records;`).Scan(&recordCount)
+	score_time, err := strconv.Atoi(c.PostForm("score_time"))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	// var mapName string
-	// err = database.DB.QueryRow(`SELECT map_name FROM maps WHERE id = $1;`, mapId).Scan(&mapName)
-	// if err != nil {
-	// 	c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))
-	// 	return
-	// }
-	outputDemoName := fmt.Sprintf("%s_%s_%d", time.Now().UTC().Format("2006-01-02"), user.(models.User).SteamID, recordCount)
-	header, err := c.FormFile("file")
+	is_partner_orange, err := strconv.ParseBool(c.PostForm("is_partner_orange"))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	err = c.SaveUploadedFile(header, "docs/"+header.Filename)
+	record.ScoreCount = score_count
+	record.ScoreTime = score_time
+	record.PartnerID = c.PostForm("partner_id")
+	record.IsPartnerOrange = is_partner_orange
+	// Multipart form
+	form, err := c.MultipartForm()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))
+		c.String(http.StatusBadRequest, "get form err: %s", err.Error())
 		return
 	}
-	f, err := os.Open("docs/" + header.Filename)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))
+	files := form.File["demos"]
+	if len(files) != 2 && isCoop {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse("Not enough demos for coop submission."))
 		return
 	}
-	defer f.Close()
-	client := serviceAccount()
-	srv, err := drive.New(client)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))
+	if len(files) != 1 && !isCoop {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse("Too many demos for singleplayer submission."))
 		return
 	}
-	file, err := createFile(srv, outputDemoName, "application/octet-stream", f, os.Getenv("GOOGLE_FOLDER_ID"))
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))
-		return
+	var hostDemoUUID string
+	var partnerDemoUUID string
+	for i, header := range files {
+		uuid := uuid.New().String()
+		// Upload & insert into demos
+		err = c.SaveUploadedFile(header, "docs/"+header.Filename)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			return
+		}
+		f, err := os.Open("docs/" + header.Filename)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			return
+		}
+		defer f.Close()
+		client := serviceAccount()
+		srv, err := drive.New(client)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			return
+		}
+		file, err := createFile(srv, uuid, "application/octet-stream", f, os.Getenv("GOOGLE_FOLDER_ID"))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			return
+		}
+		if i == 0 {
+			hostDemoUUID = uuid
+		}
+		if i == 1 {
+			partnerDemoUUID = uuid
+		}
+		_, err = database.DB.Exec(`INSERT INTO demos (id,location_id) VALUES ($1,$2)`, uuid, file.Id)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			return
+		}
+		os.Remove("docs/" + header.Filename)
 	}
-	os.Remove("docs/" + header.Filename)
-	// Demo upload success
-	// Insert record into database
-	sql := `INSERT INTO records(map_id,host_id,score_count,score_time,is_coop,partner_id,demo_id) 
-	VALUES ($1, $2, $3, $4, $5, $6, $7);`
-	_, err = database.DB.Exec(sql, mapId, user.(models.User).SteamID, record.ScoreCount, record.ScoreTime, record.IsCoop, record.PartnerID, file.Id)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))
-		return
+	// Insert into records
+	if isCoop {
+		sql := `INSERT INTO records_mp(map_id,score_count,score_time,host_id,partner_id,host_demo_id,partner_demo_id) 
+		VALUES($1, $2, $3, $4, $5, $6, $7);`
+		var hostID string
+		var partnerID string
+		if record.IsPartnerOrange {
+			hostID = user.(models.User).SteamID
+			partnerID = record.PartnerID
+		} else {
+			partnerID = user.(models.User).SteamID
+			hostID = record.PartnerID
+		}
+		_, err := database.DB.Exec(sql, mapId, record.ScoreCount, record.ScoreTime, hostID, partnerID, hostDemoUUID, partnerDemoUUID)
+		if err != nil {
+			_, err = database.DB.Exec(`DELETE FROM demos WHERE id = $1 OR id = $2;`, hostDemoUUID, partnerDemoUUID)
+			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			return
+		}
+	} else {
+		sql := `INSERT INTO records_sp(map_id,score_count,score_time,user_id,demo_id) 
+		VALUES($1, $2, $3, $4, $5);`
+		_, err := database.DB.Exec(sql, mapId, record.ScoreCount, record.ScoreTime, user.(models.User).SteamID, hostDemoUUID)
+		if err != nil {
+			_, err = database.DB.Exec(`DELETE FROM demos WHERE id = $1;`, hostDemoUUID)
+			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			return
+		}
 	}
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully created record.",
+		Data:    record,
 	})
 	return
 }
