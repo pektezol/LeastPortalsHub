@@ -167,6 +167,7 @@ func DownloadDemoWithID(c *gin.Context) {
 	url := "https://drive.google.com/uc?export=download&id=" + locationID
 	fileName := uuid + ".dem"
 	output, err := os.Create(fileName)
+	defer os.Remove(fileName)
 	defer output.Close()
 	response, err := http.Get(url)
 	if err != nil {
