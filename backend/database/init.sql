@@ -4,6 +4,7 @@ DROP TABLE IF EXISTS records_sp;
 DROP TABLE IF EXISTS records_mp;
 DROP TABLE IF EXISTS maps;
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS countries;
 
 DROP TABLE IF EXISTS demos;
 
@@ -69,4 +70,10 @@ CREATE TABLE titles (
   title_name TEXT NOT NULL,
   PRIMARY KEY (user_id),
   FOREIGN KEY (user_id) REFERENCES users(steam_id)
+);
+
+CREATE TABLE countries (
+  country_code CHAR(2),
+  country_name TEXT NOT NULL,
+  PRIMARY KEY (country_code)
 );

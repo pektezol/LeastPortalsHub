@@ -67,3 +67,33 @@ func FetchUser(c *gin.Context) {
 	})
 	return
 }
+
+func UpdateCountryCode(c *gin.Context) {
+	// Check if user exists
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, models.ErrorResponse("User not logged in."))
+		return
+	}
+	code := c.Query("country_code")
+	if code == "" {
+		c.JSON(http.StatusNotFound, models.ErrorResponse("Enter a valid country code."))
+		return
+	}
+	var validCode string
+	err := database.DB.QueryRow(`SELECT country_code FROM countries WHERE country_code = $1;`, code).Scan(&validCode)
+	if err != nil {
+		c.JSON(http.StatusNotFound, models.ErrorResponse(err.Error()))
+		return
+	}
+	// Valid code, update profile
+	_, err = database.DB.Exec(`UPDATE users SET country_code = $1 WHERE steam_id = $2`, validCode, user.(models.User).SteamID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, models.ErrorResponse(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, models.Response{
+		Success: true,
+		Message: "Successfully updated country code.",
+	})
+}
