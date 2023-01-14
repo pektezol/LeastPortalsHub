@@ -54,10 +54,14 @@ func CreateRecordWithDemo(c *gin.Context) {
 	record.ScoreTime = score_time
 	record.PartnerID = c.PostForm("partner_id")
 	record.IsPartnerOrange = is_partner_orange
+	if record.PartnerID == "" {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse("No partner id given."))
+		return
+	}
 	// Multipart form
 	form, err := c.MultipartForm()
 	if err != nil {
-		c.String(http.StatusBadRequest, "get form err: %s", err.Error())
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
 	files := form.File["demos"]
@@ -91,7 +95,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
-		file, err := createFile(srv, uuid, "application/octet-stream", f, os.Getenv("GOOGLE_FOLDER_ID"))
+		file, err := createFile(srv, uuid+".dem", "application/octet-stream", f, os.Getenv("GOOGLE_FOLDER_ID"))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
@@ -124,7 +128,6 @@ func CreateRecordWithDemo(c *gin.Context) {
 		}
 		_, err := database.DB.Exec(sql, mapId, record.ScoreCount, record.ScoreTime, hostID, partnerID, hostDemoUUID, partnerDemoUUID)
 		if err != nil {
-			_, err = database.DB.Exec(`DELETE FROM demos WHERE id = $1 OR id = $2;`, hostDemoUUID, partnerDemoUUID)
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
@@ -133,7 +136,6 @@ func CreateRecordWithDemo(c *gin.Context) {
 		VALUES($1, $2, $3, $4, $5);`
 		_, err := database.DB.Exec(sql, mapId, record.ScoreCount, record.ScoreTime, user.(models.User).SteamID, hostDemoUUID)
 		if err != nil {
-			_, err = database.DB.Exec(`DELETE FROM demos WHERE id = $1;`, hostDemoUUID)
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
@@ -144,6 +146,46 @@ func CreateRecordWithDemo(c *gin.Context) {
 		Data:    record,
 	})
 	return
+}
+
+func DownloadDemoWithID(c *gin.Context) {
+	uuid := c.Query("uuid")
+	var locationID string
+	if uuid == "" {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse("Invalid id given."))
+		return
+	}
+	err := database.DB.QueryRow(`SELECT location_id FROM demos WHERE id = $1;`, uuid).Scan(&locationID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	if locationID == "" {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse("Invalid id given."))
+		return
+	}
+	url := "https://drive.google.com/uc?export=download&id=" + locationID
+	fileName := uuid + ".dem"
+	output, err := os.Create(fileName)
+	defer output.Close()
+	response, err := http.Get(url)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	defer response.Body.Close()
+	_, err = io.Copy(output, response.Body)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	// Downloaded file
+	c.Header("Content-Description", "File Transfer")
+	c.Header("Content-Transfer-Encoding", "binary")
+	c.Header("Content-Disposition", "attachment; filename="+fileName)
+	c.Header("Content-Type", "application/octet-stream")
+	c.File(fileName)
+	// c.FileAttachment()
 }
 
 // Use Service account
