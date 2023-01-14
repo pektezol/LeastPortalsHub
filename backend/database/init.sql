@@ -22,6 +22,7 @@ CREATE TABLE maps (
   id SMALLSERIAL,
   map_name TEXT NOT NULL,
   wr_score SMALLINT NOT NULL,
+  wr_time INTEGER NOT NULL,
   is_coop BOOLEAN NOT NULL,
   is_disabled BOOLEAN NOT NULL DEFAULT false,
   PRIMARY KEY (id)
