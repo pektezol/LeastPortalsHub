@@ -4,6 +4,16 @@ import (
 	"time"
 )
 
+type Response struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+	Data    any    `json:"data"`
+}
+
+type LoginResponse struct {
+	Token string `json:"token"`
+}
+
 type User struct {
 	SteamID     string    `json:"steam_id"`
 	Username    string    `json:"username"`
@@ -47,4 +57,27 @@ type RecordRequest struct {
 	ScoreTime       int    `json:"score_time" form:"score_time" binding:"required"`
 	PartnerID       string `json:"partner_id" form:"partner_id" binding:"required"`
 	IsPartnerOrange bool   `json:"is_partner_orange" form:"is_partner_orange" binding:"required"`
+}
+
+type ProfileResponse struct {
+	Profile     bool            `json:"profile"`
+	SteamID     string          `json:"steam_id"`
+	Username    string          `json:"username"`
+	AvatarLink  string          `json:"avatar_link"`
+	CountryCode string          `json:"country_code"`
+	ScoresSP    []ScoreResponse `json:"scores_sp"`
+	ScoresMP    []ScoreResponse `json:"scores_mp"`
+}
+
+type ScoreResponse struct {
+	MapID   int `json:"map_id"`
+	Records any `json:"records"`
+}
+
+func ErrorResponse(message string) Response {
+	return Response{
+		Success: false,
+		Message: message,
+		Data:    nil,
+	}
 }

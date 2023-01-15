@@ -16,15 +16,88 @@ func Profile(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, models.ErrorResponse("User not logged in."))
 		return
 	}
+	// Retrieve singleplayer records
+	var scoresSP []models.ScoreResponse
+	sql := `SELECT id, map_id, score_count, score_time, demo_id, record_date FROM records_sp WHERE user_id = $1 ORDER BY map_id;`
+	rows, err := database.DB.Query(sql, user.(models.User).SteamID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	i := 0
+	var recordsSP []models.RecordSP
+	for rows.Next() {
+		var mapID int
+		var record models.RecordSP
+		rows.Scan(&record.RecordID, &mapID, &record.ScoreCount, &record.ScoreTime, &record.DemoID, &record.RecordDate)
+		if i == 0 {
+			recordsSP = append(recordsSP, record)
+			scoresSP = append(scoresSP, models.ScoreResponse{
+				MapID:   mapID,
+				Records: recordsSP,
+			})
+			continue
+		}
+		// More than one record in one map
+		if mapID == scoresSP[i-1].MapID {
+			scoresSP[i-1].Records = append(scoresSP[i-1].Records.([]models.RecordSP), record)
+			continue
+		}
+		// New map
+		recordsSP = append(recordsSP, record)
+		scoresSP = append(scoresSP, models.ScoreResponse{
+			MapID:   mapID,
+			Records: recordsSP,
+		})
+		i++
+	}
+	// Retrieve multiplayer records
+	var scoresMP []models.ScoreResponse
+	sql = `SELECT id, map_id, host_id, partner_id, score_count, score_time, host_demo_id, partner_demo_id, record_date FROM records_mp
+	WHERE host_id = $1 OR partner_id = $2 ORDER BY map_id;`
+	rows, err = database.DB.Query(sql, user.(models.User).SteamID, user.(models.User).SteamID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	j := 0
+	var recordsMP []models.RecordMP
+	for rows.Next() {
+		var mapID int
+		var record models.RecordMP
+		rows.Scan(&record.RecordID, &mapID, &record.HostID, &record.PartnerID, &record.ScoreCount, &record.ScoreTime, &record.HostDemoID, &record.PartnerDemoID, &record.RecordDate)
+		if j == 0 {
+			recordsMP = append(recordsMP, record)
+			scoresMP = append(scoresMP, models.ScoreResponse{
+				MapID:   mapID,
+				Records: recordsMP,
+			})
+			continue
+		}
+		// More than one record in one map
+		if mapID == scoresMP[j-1].MapID {
+			scoresMP[j-1].Records = append(scoresMP[j-1].Records.([]models.RecordMP), record)
+			continue
+		}
+		// New map
+		recordsMP = append(recordsMP, record)
+		scoresMP = append(scoresMP, models.ScoreResponse{
+			MapID:   mapID,
+			Records: recordsMP,
+		})
+		j++
+	}
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
-		Message: "",
+		Message: "Successfully retrieved user scores.",
 		Data: models.ProfileResponse{
 			Profile:     true,
 			SteamID:     user.(models.User).SteamID,
 			Username:    user.(models.User).Username,
 			AvatarLink:  user.(models.User).AvatarLink,
 			CountryCode: user.(models.User).CountryCode,
+			ScoresSP:    scoresSP,
+			ScoresMP:    scoresMP,
 		},
 	})
 	return
@@ -52,17 +125,88 @@ func FetchUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	// Target user exists
-	_, exists := c.Get("user")
+	// Retrieve singleplayer records
+	var scoresSP []models.ScoreResponse
+	sql := `SELECT id, map_id, score_count, score_time, demo_id, record_date FROM records_sp WHERE user_id = $1 ORDER BY map_id;`
+	rows, err := database.DB.Query(sql, user.SteamID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	i := 0
+	var recordsSP []models.RecordSP
+	for rows.Next() {
+		var mapID int
+		var record models.RecordSP
+		rows.Scan(&record.RecordID, &mapID, &record.ScoreCount, &record.ScoreTime, &record.DemoID, &record.RecordDate)
+		if i == 0 {
+			recordsSP = append(recordsSP, record)
+			scoresSP = append(scoresSP, models.ScoreResponse{
+				MapID:   mapID,
+				Records: recordsSP,
+			})
+			continue
+		}
+		// More than one record in one map
+		if mapID == scoresSP[i-1].MapID {
+			scoresSP[i-1].Records = append(scoresSP[i-1].Records.([]models.RecordSP), record)
+			continue
+		}
+		// New map
+		recordsSP = append(recordsSP, record)
+		scoresSP = append(scoresSP, models.ScoreResponse{
+			MapID:   mapID,
+			Records: recordsSP,
+		})
+		i++
+	}
+	// Retrieve multiplayer records
+	var scoresMP []models.ScoreResponse
+	sql = `SELECT id, map_id, host_id, partner_id, score_count, score_time, host_demo_id, partner_demo_id, record_date FROM records_mp
+	WHERE host_id = $1 OR partner_id = $2 ORDER BY map_id;`
+	rows, err = database.DB.Query(sql, user.SteamID, user.SteamID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	j := 0
+	var recordsMP []models.RecordMP
+	for rows.Next() {
+		var mapID int
+		var record models.RecordMP
+		rows.Scan(&record.RecordID, &mapID, &record.HostID, &record.PartnerID, &record.ScoreCount, &record.ScoreTime, &record.HostDemoID, &record.PartnerDemoID, &record.RecordDate)
+		if j == 0 {
+			recordsMP = append(recordsMP, record)
+			scoresMP = append(scoresMP, models.ScoreResponse{
+				MapID:   mapID,
+				Records: recordsMP,
+			})
+			continue
+		}
+		// More than one record in one map
+		if mapID == scoresMP[j-1].MapID {
+			scoresMP[j-1].Records = append(scoresMP[j-1].Records.([]models.RecordMP), record)
+			continue
+		}
+		// New map
+		recordsMP = append(recordsMP, record)
+		scoresMP = append(scoresMP, models.ScoreResponse{
+			MapID:   mapID,
+			Records: recordsMP,
+		})
+		j++
+	}
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
-		Message: "",
+		Message: "Successfully retrieved user scores.",
 		Data: models.ProfileResponse{
-			Profile:     exists,
+			Profile:     true,
 			SteamID:     user.SteamID,
 			Username:    user.Username,
 			AvatarLink:  user.AvatarLink,
 			CountryCode: user.CountryCode,
+			ScoresSP:    scoresSP,
+			ScoresMP:    scoresMP,
 		},
 	})
 	return
