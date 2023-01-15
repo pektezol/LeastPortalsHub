@@ -28,13 +28,18 @@ func CreateRecordWithDemo(c *gin.Context) {
 	}
 	// Check if map is sp or mp
 	var isCoop bool
-	err := database.DB.QueryRow(`SELECT is_coop FROM maps WHERE id = $1;`, mapId).Scan(&isCoop)
+	var isDisabled bool
+	err := database.DB.QueryRow(`SELECT is_coop, is_disabled FROM maps WHERE id = $1;`, mapId).Scan(&isCoop, &isDisabled)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
+	if isDisabled {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse("Map is not available for competitive boards."))
+		return
+	}
 	// Get record request
-	var record models.Record
+	var record models.RecordRequest
 	score_count, err := strconv.Atoi(c.PostForm("score_count"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
