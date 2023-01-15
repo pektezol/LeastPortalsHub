@@ -19,6 +19,7 @@ func InitRoutes(router *gin.Engine) {
 		v1.PUT("/profile", middleware.CheckAuth, controllers.UpdateCountryCode)
 		v1.GET("/user/:id", middleware.CheckAuth, controllers.FetchUser)
 		v1.GET("/demo", controllers.DownloadDemoWithID)
+		v1.GET("/maps/:id", middleware.CheckAuth, controllers.FetchMap)
 		v1.POST("/maps/:id/record", middleware.CheckAuth, controllers.CreateRecordWithDemo)
 	}
 }
