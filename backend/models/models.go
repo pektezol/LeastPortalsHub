@@ -34,6 +34,7 @@ type Map struct {
 
 type RecordSP struct {
 	RecordID   int       `json:"record_id"`
+	Placement  int       `json:"placement"`
 	UserID     string    `json:"user_id"`
 	ScoreCount int       `json:"score_count"`
 	ScoreTime  int       `json:"score_time"`
@@ -43,6 +44,7 @@ type RecordSP struct {
 
 type RecordMP struct {
 	RecordID      int       `json:"record_id"`
+	Placement     int       `json:"placement"`
 	HostID        string    `json:"host_id"`
 	PartnerID     string    `json:"partner_id"`
 	ScoreCount    int       `json:"score_count"`

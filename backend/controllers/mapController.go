@@ -34,12 +34,14 @@ func FetchMap(c *gin.Context) {
 	if mapData.IsCoop {
 		var records []models.RecordMP
 		sql = `SELECT id, host_id, partner_id, score_count, score_time, host_demo_id, partner_demo_id, record_date
-		FROM records_mp WHERE map_id = $1;`
+		FROM records_mp WHERE map_id = $1 ORDER BY score_count, score_time;`
 		rows, err := database.DB.Query(sql, id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
+		placement := 1
+		ties := 0
 		for rows.Next() {
 			var record models.RecordMP
 			err := rows.Scan(&record.RecordID, &record.HostID, &record.PartnerID, &record.ScoreCount, &record.ScoreTime, &record.HostDemoID, &record.PartnerDemoID, &record.RecordDate)
@@ -47,18 +49,27 @@ func FetchMap(c *gin.Context) {
 				c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 				return
 			}
+			if len(records) != 0 && records[len(records)-1].ScoreTime == record.ScoreTime {
+				ties++
+				record.Placement = placement - ties
+			} else {
+				record.Placement = placement
+			}
 			records = append(records, record)
+			placement++
 		}
 		mapData.Records = records
 	} else {
 		var records []models.RecordSP
 		sql = `SELECT id, user_id, score_count, score_time, demo_id, record_date
-		FROM records_sp WHERE map_id = $1;`
+		FROM records_sp WHERE map_id = $1 ORDER BY score_count, score_time;`
 		rows, err := database.DB.Query(sql, id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
+		placement := 1
+		ties := 0
 		for rows.Next() {
 			var record models.RecordSP
 			err := rows.Scan(&record.RecordID, &record.UserID, &record.ScoreCount, &record.ScoreTime, &record.DemoID, &record.RecordDate)
@@ -66,7 +77,14 @@ func FetchMap(c *gin.Context) {
 				c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 				return
 			}
+			if len(records) != 0 && records[len(records)-1].ScoreTime == record.ScoreTime {
+				ties++
+				record.Placement = placement - ties
+			} else {
+				record.Placement = placement
+			}
 			records = append(records, record)
+			placement++
 		}
 		mapData.Records = records
 	}
