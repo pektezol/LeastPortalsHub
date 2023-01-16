@@ -24,32 +24,23 @@ func Profile(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	i := 0
 	var recordsSP []models.RecordSP
 	for rows.Next() {
 		var mapID int
 		var record models.RecordSP
 		rows.Scan(&record.RecordID, &mapID, &record.ScoreCount, &record.ScoreTime, &record.DemoID, &record.RecordDate)
-		if i == 0 {
-			recordsSP = append(recordsSP, record)
-			scoresSP = append(scoresSP, models.ScoreResponse{
-				MapID:   mapID,
-				Records: recordsSP,
-			})
-			continue
-		}
 		// More than one record in one map
-		if mapID == scoresSP[i-1].MapID {
-			scoresSP[i-1].Records = append(scoresSP[i-1].Records.([]models.RecordSP), record)
+		if len(scoresSP) != 0 && mapID == scoresSP[len(scoresSP)-1].MapID {
+			scoresSP[len(scoresSP)-1].Records = append(scoresSP[len(scoresSP)-1].Records.([]models.RecordSP), record)
 			continue
 		}
 		// New map
+		recordsSP = []models.RecordSP{}
 		recordsSP = append(recordsSP, record)
 		scoresSP = append(scoresSP, models.ScoreResponse{
 			MapID:   mapID,
 			Records: recordsSP,
 		})
-		i++
 	}
 	// Retrieve multiplayer records
 	var scoresMP []models.ScoreResponse
@@ -60,32 +51,23 @@ func Profile(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	j := 0
 	var recordsMP []models.RecordMP
 	for rows.Next() {
 		var mapID int
 		var record models.RecordMP
 		rows.Scan(&record.RecordID, &mapID, &record.HostID, &record.PartnerID, &record.ScoreCount, &record.ScoreTime, &record.HostDemoID, &record.PartnerDemoID, &record.RecordDate)
-		if j == 0 {
-			recordsMP = append(recordsMP, record)
-			scoresMP = append(scoresMP, models.ScoreResponse{
-				MapID:   mapID,
-				Records: recordsMP,
-			})
-			continue
-		}
 		// More than one record in one map
-		if mapID == scoresMP[j-1].MapID {
-			scoresMP[j-1].Records = append(scoresMP[j-1].Records.([]models.RecordMP), record)
+		if len(scoresMP) != 0 && mapID == scoresMP[len(scoresMP)-1].MapID {
+			scoresMP[len(scoresMP)-1].Records = append(scoresMP[len(scoresMP)-1].Records.([]models.RecordMP), record)
 			continue
 		}
 		// New map
+		recordsMP = []models.RecordMP{}
 		recordsMP = append(recordsMP, record)
 		scoresMP = append(scoresMP, models.ScoreResponse{
 			MapID:   mapID,
 			Records: recordsMP,
 		})
-		j++
 	}
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
@@ -133,32 +115,23 @@ func FetchUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	i := 0
 	var recordsSP []models.RecordSP
 	for rows.Next() {
 		var mapID int
 		var record models.RecordSP
 		rows.Scan(&record.RecordID, &mapID, &record.ScoreCount, &record.ScoreTime, &record.DemoID, &record.RecordDate)
-		if i == 0 {
-			recordsSP = append(recordsSP, record)
-			scoresSP = append(scoresSP, models.ScoreResponse{
-				MapID:   mapID,
-				Records: recordsSP,
-			})
-			continue
-		}
 		// More than one record in one map
-		if mapID == scoresSP[i-1].MapID {
-			scoresSP[i-1].Records = append(scoresSP[i-1].Records.([]models.RecordSP), record)
+		if len(scoresSP) != 0 && mapID == scoresSP[len(scoresSP)-1].MapID {
+			scoresSP[len(scoresSP)-1].Records = append(scoresSP[len(scoresSP)-1].Records.([]models.RecordSP), record)
 			continue
 		}
 		// New map
+		recordsSP = []models.RecordSP{}
 		recordsSP = append(recordsSP, record)
 		scoresSP = append(scoresSP, models.ScoreResponse{
 			MapID:   mapID,
 			Records: recordsSP,
 		})
-		i++
 	}
 	// Retrieve multiplayer records
 	var scoresMP []models.ScoreResponse
@@ -169,32 +142,23 @@ func FetchUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	j := 0
 	var recordsMP []models.RecordMP
 	for rows.Next() {
 		var mapID int
 		var record models.RecordMP
 		rows.Scan(&record.RecordID, &mapID, &record.HostID, &record.PartnerID, &record.ScoreCount, &record.ScoreTime, &record.HostDemoID, &record.PartnerDemoID, &record.RecordDate)
-		if j == 0 {
-			recordsMP = append(recordsMP, record)
-			scoresMP = append(scoresMP, models.ScoreResponse{
-				MapID:   mapID,
-				Records: recordsMP,
-			})
-			continue
-		}
 		// More than one record in one map
-		if mapID == scoresMP[j-1].MapID {
-			scoresMP[j-1].Records = append(scoresMP[j-1].Records.([]models.RecordMP), record)
+		if len(scoresMP) != 0 && mapID == scoresMP[len(scoresMP)-1].MapID {
+			scoresMP[len(scoresMP)-1].Records = append(scoresMP[len(scoresMP)-1].Records.([]models.RecordMP), record)
 			continue
 		}
 		// New map
+		recordsMP = []models.RecordMP{}
 		recordsMP = append(recordsMP, record)
 		scoresMP = append(scoresMP, models.ScoreResponse{
 			MapID:   mapID,
 			Records: recordsMP,
 		})
-		j++
 	}
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
