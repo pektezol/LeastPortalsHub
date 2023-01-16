@@ -61,6 +61,17 @@ type RecordRequest struct {
 	IsPartnerOrange bool   `json:"is_partner_orange" form:"is_partner_orange" binding:"required"`
 }
 
+type UserRanking struct {
+	UserID     string `json:"user_id"`
+	Username   string `json:"username"`
+	TotalScore int    `json:"total_score"`
+}
+
+type RankingsResponse struct {
+	RankingsSP []UserRanking `json:"rankings_sp"`
+	RankingsMP []UserRanking `json:"rankings_mp"`
+}
+
 type ProfileResponse struct {
 	Profile     bool            `json:"profile"`
 	SteamID     string          `json:"steam_id"`
