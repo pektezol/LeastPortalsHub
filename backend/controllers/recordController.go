@@ -82,6 +82,13 @@ func CreateRecordWithDemo(c *gin.Context) {
 	}
 	var hostDemoUUID string
 	var partnerDemoUUID string
+	client := serviceAccount()
+	srv, err := drive.New(client)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	fileID := ""
 	for i, header := range files {
 		uuid := uuid.New().String()
 		// Upload & insert into demos
@@ -96,17 +103,12 @@ func CreateRecordWithDemo(c *gin.Context) {
 			return
 		}
 		defer f.Close()
-		client := serviceAccount()
-		srv, err := drive.New(client)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
-			return
-		}
 		file, err := createFile(srv, uuid+".dem", "application/octet-stream", f, os.Getenv("GOOGLE_FOLDER_ID"))
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
+		fileID = file.Id
 		if i == 0 {
 			hostDemoUUID = uuid
 		}
@@ -115,6 +117,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 		}
 		_, err = database.DB.Exec(`INSERT INTO demos (id,location_id) VALUES ($1,$2)`, uuid, file.Id)
 		if err != nil {
+			deleteFile(srv, file.Id)
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
@@ -135,6 +138,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 		}
 		_, err := database.DB.Exec(sql, mapId, record.ScoreCount, record.ScoreTime, hostID, partnerID, hostDemoUUID, partnerDemoUUID)
 		if err != nil {
+			deleteFile(srv, fileID)
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
@@ -151,6 +155,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 		VALUES($1, $2, $3, $4, $5);`
 		_, err := database.DB.Exec(sql, mapId, record.ScoreCount, record.ScoreTime, user.(models.User).SteamID, hostDemoUUID)
 		if err != nil {
+			deleteFile(srv, fileID)
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
@@ -241,4 +246,8 @@ func createFile(service *drive.Service, name string, mimeType string, content io
 	}
 
 	return file, nil
+}
+
+func deleteFile(service *drive.Service, fileId string) {
+	service.Files.Delete(fileId)
 }
