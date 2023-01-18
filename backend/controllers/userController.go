@@ -2,7 +2,9 @@ package controllers
 
 import (
 	"net/http"
+	"os"
 	"regexp"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pektezol/leastportals/backend/database"
@@ -171,6 +173,39 @@ func FetchUser(c *gin.Context) {
 			CountryCode: user.CountryCode,
 			ScoresSP:    scoresSP,
 			ScoresMP:    scoresMP,
+		},
+	})
+	return
+}
+
+func UpdateUser(c *gin.Context) {
+	// Check if user exists
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, models.ErrorResponse("User not logged in."))
+		return
+	}
+	profile, err := GetPlayerSummaries(user.(models.User).SteamID, os.Getenv("API_KEY"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	// Update profile
+	_, err = database.DB.Exec(`UPDATE users SET username = $1, avatar_link = $2, country_code = $3, updated_at = $4
+	WHERE steam_id = $5;`, profile.PersonaName, profile.AvatarFull, profile.LocCountryCode, time.Now().UTC(), user.(models.User).SteamID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, models.Response{
+		Success: true,
+		Message: "Successfully updated user.",
+		Data: models.ProfileResponse{
+			Profile:     true,
+			SteamID:     user.(models.User).SteamID,
+			Username:    profile.PersonaName,
+			AvatarLink:  profile.AvatarFull,
+			CountryCode: profile.LocCountryCode,
 		},
 	})
 	return
