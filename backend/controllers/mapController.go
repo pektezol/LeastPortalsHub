@@ -34,7 +34,13 @@ func FetchMap(c *gin.Context) {
 	if mapData.IsCoop {
 		var records []models.RecordMP
 		sql = `SELECT id, host_id, partner_id, score_count, score_time, host_demo_id, partner_demo_id, record_date
-		FROM records_mp WHERE map_id = $1 ORDER BY score_count, score_time;`
+		FROM (
+		  SELECT id, host_id, partner_id, score_count, score_time, host_demo_id, partner_demo_id, record_date,
+				 ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY score_count, score_time) AS rn
+		  FROM records_mp
+		  WHERE map_id = $1
+		) sub
+		WHERE rn = 1;`
 		rows, err := database.DB.Query(sql, id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
@@ -62,7 +68,13 @@ func FetchMap(c *gin.Context) {
 	} else {
 		var records []models.RecordSP
 		sql = `SELECT id, user_id, score_count, score_time, demo_id, record_date
-		FROM records_sp WHERE map_id = $1 ORDER BY score_count, score_time;`
+		FROM (
+		  SELECT id, user_id, score_count, score_time, demo_id, record_date,
+				 ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY score_count, score_time) AS rn
+		  FROM records_sp
+		  WHERE map_id = $1
+		) sub
+		WHERE rn = 1;`
 		rows, err := database.DB.Query(sql, id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
@@ -94,4 +106,8 @@ func FetchMap(c *gin.Context) {
 		Message: "Successfully retrieved map data.",
 		Data:    mapData,
 	})
+}
+
+func CreateMapCommunity(c *gin.Context) {
+
 }
