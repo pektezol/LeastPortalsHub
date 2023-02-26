@@ -1,0 +1,73 @@
+#sidebar {
+    background-color: #2b2e46;
+    width: 320px;    height: 100vh;
+    min-height: 840px;
+}
+
+#sidebar>div:nth-child(1){height: 140px;} /* logo */
+
+button#side-grid {
+    border: 0;
+    background-color: #202232;
+    border-radius: 20px;
+    font-size: 18px;
+    color: #cdcfdf;
+    width: 300px;
+    
+    transition: 
+    background-color .2s, 
+    border-radius .5s,
+    width .3s;
+}
+span {
+    font-family: D-DIN;
+    opacity: 1;
+    transition: opacity .1s;
+}
+button#side-grid:hover {
+    background-color: #141520 !important;
+    border-radius: 10px !important;
+    cursor: pointer;
+}
+
+button>img{
+    height: 20px;
+    float: left;
+    padding-left: 4px;
+    filter: invert(0.8);
+    scale: 1.1;
+}
+
+#side-menu { /* just the menu button */
+    border: 0;
+    position: absolute;
+    background-color: transparent;
+    left: 6px;    top: 6px;
+    width: 40px;    height: 40px;
+    cursor: pointer;
+}
+
+#sidebar-list { /* buttons */
+    z-index: 1;
+    min-height: 700px;
+    width: 308px; height: calc(100vh - 140px); /* calc - logo */
+    position: absolute;
+    background-color: #2b2e46;
+    display: grid;
+    padding: 0 6px;
+    row-gap: 8px;
+    grid-template-rows: 
+    60px 40px 40px
+    30px 40px 40px 40px
+    30px 40px 40px;
+
+    transition: width .3s;
+}
+
+#sidebar-content { 
+    position: absolute;
+    background-color: #202232;
+    left: 52px;
+    min-height: 700px;
+    width: 268px;    height: calc(100vh - 140px); /* calc - logo */
+}
