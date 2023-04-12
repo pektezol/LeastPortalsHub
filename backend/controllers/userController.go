@@ -11,6 +11,15 @@ import (
 	"github.com/pektezol/leastportals/backend/models"
 )
 
+// GET Profile
+//
+//	@Summary	Get profile page of session user.
+//	@Accept		json
+//	@Produce	json
+//	@Success	200	{object}	models.Response{data=models.ProfileResponse}
+//	@Failure	400	{object}	models.Response
+//	@Failure	401	{object}	models.Response
+//	@Router		/profile [get]
 func Profile(c *gin.Context) {
 	// Check if user exists
 	user, exists := c.Get("user")
@@ -87,6 +96,16 @@ func Profile(c *gin.Context) {
 	return
 }
 
+// GET User
+//
+//	@Summary	Get profile page of another user.
+//	@Accept		json
+//	@Produce	json
+//	@Param		id	path		int	true	"User ID"
+//	@Success	200	{object}	models.Response{data=models.ProfileResponse}
+//	@Failure	400	{object}	models.Response
+//	@Failure	404	{object}	models.Response
+//	@Router		/user/{id} [get]
 func FetchUser(c *gin.Context) {
 	id := c.Param("id")
 	// Check if id is all numbers and 17 length
@@ -178,6 +197,15 @@ func FetchUser(c *gin.Context) {
 	return
 }
 
+// PUT Profile
+//
+//	@Summary	Update profile page of session user.
+//	@Accept		json
+//	@Produce	json
+//	@Success	200	{object}	models.Response{data=models.ProfileResponse}
+//	@Failure	400	{object}	models.Response
+//	@Failure	401	{object}	models.Response
+//	@Router		/profile [post]
 func UpdateUser(c *gin.Context) {
 	// Check if user exists
 	user, exists := c.Get("user")
@@ -208,9 +236,18 @@ func UpdateUser(c *gin.Context) {
 			CountryCode: profile.LocCountryCode,
 		},
 	})
-	return
 }
 
+// PUT Profile/CountryCode
+//
+//	@Summary	Update country code of session user.
+//	@Accept		json
+//	@Produce	json
+//	@Param		country_code	query		string	true	"Country Code [XX]"
+//	@Success	200				{object}	models.Response{data=models.ProfileResponse}
+//	@Failure	400				{object}	models.Response
+//	@Failure	401				{object}	models.Response
+//	@Router		/profile [put]
 func UpdateCountryCode(c *gin.Context) {
 	// Check if user exists
 	user, exists := c.Get("user")

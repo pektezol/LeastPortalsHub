@@ -15,6 +15,14 @@ import (
 	"github.com/solovev/steam_go"
 )
 
+// Login
+//
+//	@Summary	Get (redirect) login page for Steam auth.
+//	@Accept		json
+//	@Produce	json
+//	@Success	200	{object}	models.Response{data=models.LoginResponse}
+//	@Failure	400	{object}	models.Response
+//	@Router		/login [get]
 func Login(c *gin.Context) {
 	openID := steam_go.NewOpenId(c.Request)
 	switch openID.Mode() {
@@ -31,14 +39,16 @@ func Login(c *gin.Context) {
 		// Create user if new
 		var checkSteamID int64
 		err = database.DB.QueryRow("SELECT steam_id FROM users WHERE steam_id = $1", steamID).Scan(&checkSteamID)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
-			return
-		}
+		// if err != nil {
+		// 	fmt.Println("y1")
+		// 	c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		// 	return
+		// }
 		// User does not exist
 		if checkSteamID == 0 {
 			user, err := GetPlayerSummaries(steamID, os.Getenv("API_KEY"))
 			if err != nil {
+				fmt.Println("y2")
 				c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 				return
 			}

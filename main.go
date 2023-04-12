@@ -13,15 +13,15 @@ import (
 	_ "github.com/pektezol/leastportals/docs"
 )
 
-// @title       Least Portals Database API
-// @version     1.0
-// @description Backend API endpoints for Least Portals Database.
+//	@title			Least Portals Database API
+//	@version		1.0
+//	@description	Backend API endpoints for Least Portals Database.
 
-// @license.name GNU General Public License, Version 2
-// @license.url  https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+//	@license.name	GNU General Public License, Version 2
+//	@license.url	https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
-// @host localhost:4000
-// @BasePath
+//	@host		localhost:4000/api
+//	@BasePath	/v1
 func main() {
 	if os.Getenv("ENV") == "PROD" {
 		gin.SetMode(gin.ReleaseMode)

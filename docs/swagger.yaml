@@ -1,4 +1,46 @@
-host: localhost:4000
+basePath: /v1
+definitions:
+  models.LoginResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  models.ProfileResponse:
+    properties:
+      avatar_link:
+        type: string
+      country_code:
+        type: string
+      profile:
+        type: boolean
+      scores_mp:
+        items:
+          $ref: '#/definitions/models.ScoreResponse'
+        type: array
+      scores_sp:
+        items:
+          $ref: '#/definitions/models.ScoreResponse'
+        type: array
+      steam_id:
+        type: string
+      username:
+        type: string
+    type: object
+  models.Response:
+    properties:
+      data: {}
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  models.ScoreResponse:
+    properties:
+      map_id:
+        type: integer
+      records: {}
+    type: object
+host: localhost:4000/api
 info:
   contact: {}
   description: Backend API endpoints for Least Portals Database.
@@ -7,5 +49,136 @@ info:
     url: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
   title: Least Portals Database API
   version: "1.0"
-paths: {}
+paths:
+  /login:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.LoginResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Get (redirect) login page for Steam auth.
+  /profile:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.ProfileResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Get profile page of session user.
+    post:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.ProfileResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Update profile page of session user.
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Country Code [XX]
+        in: query
+        name: country_code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.ProfileResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Update country code of session user.
+  /user/{id}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.ProfileResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Get profile page of another user.
 swagger: "2.0"
