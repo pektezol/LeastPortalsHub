@@ -5,6 +5,20 @@ definitions:
       token:
         type: string
     type: object
+  models.Map:
+    properties:
+      id:
+        type: integer
+      is_coop:
+        type: boolean
+      name:
+        type: string
+      records: {}
+      wr_score:
+        type: integer
+      wr_time:
+        type: integer
+    type: object
   models.ProfileResponse:
     properties:
       avatar_link:
@@ -25,6 +39,22 @@ definitions:
         type: string
       username:
         type: string
+    type: object
+  models.RecordRequest:
+    properties:
+      is_partner_orange:
+        type: boolean
+      partner_id:
+        type: string
+      score_count:
+        type: integer
+      score_time:
+        type: integer
+    required:
+    - is_partner_orange
+    - partner_id
+    - score_count
+    - score_time
     type: object
   models.Response:
     properties:
@@ -50,6 +80,28 @@ info:
   title: Least Portals Database API
   version: "1.0"
 paths:
+  /demo:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Demo UUID
+        in: path
+        name: uuid
+        required: true
+        type: integer
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: Demo File
+          schema:
+            type: file
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Get demo with specified demo uuid.
   /login:
     get:
       consumes:
@@ -71,6 +123,86 @@ paths:
           schema:
             $ref: '#/definitions/models.Response'
       summary: Get (redirect) login page for Steam auth.
+  /maps/{id}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Map ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.Map'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Get map page with specified id.
+  /maps/{id}/record:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: Demos
+        in: formData
+        items:
+          type: file
+        name: demos
+        required: true
+        type: array
+      - description: Score Count
+        in: formData
+        name: score_count
+        required: true
+        type: integer
+      - description: Score Time
+        in: formData
+        name: score_time
+        required: true
+        type: integer
+      - description: Is Partner Orange
+        in: formData
+        name: is_partner_orange
+        required: true
+        type: boolean
+      - description: Partner ID
+        in: formData
+        name: partner_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.RecordRequest'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Post record with demo of a specific map.
   /profile:
     get:
       consumes:

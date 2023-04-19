@@ -9,6 +9,15 @@ import (
 	"github.com/pektezol/leastportals/backend/models"
 )
 
+// GET Map
+//
+//	@Summary	Get map page with specified id.
+//	@Accept		json
+//	@Produce	json
+//	@Param		id	path		int	true	"Map ID"
+//	@Success	200	{object}	models.Response{data=models.Map}
+//	@Failure	400	{object}	models.Response
+//	@Router		/maps/{id} [get]
 func FetchMap(c *gin.Context) {
 	id := c.Param("id")
 	// Get map data

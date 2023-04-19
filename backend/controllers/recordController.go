@@ -18,6 +18,20 @@ import (
 	"google.golang.org/api/drive/v3"
 )
 
+// POST Record
+//
+//	@Summary	Post record with demo of a specific map.
+//	@Accept		mpfd
+//	@Produce	json
+//	@Param		demos				formData	[]file	true	"Demos"
+//	@Param		score_count			formData	int		true	"Score Count"
+//	@Param		score_time			formData	int		true	"Score Time"
+//	@Param		is_partner_orange	formData	boolean	true	"Is Partner Orange"
+//	@Param		partner_id			formData	string	true	"Partner ID"
+//	@Success	200					{object}	models.Response{data=models.RecordRequest}
+//	@Failure	400					{object}	models.Response
+//	@Failure	401					{object}	models.Response
+//	@Router		/maps/{id}/record [post]
 func CreateRecordWithDemo(c *gin.Context) {
 	mapId := c.Param("id")
 	// Check if user exists
@@ -176,6 +190,15 @@ func CreateRecordWithDemo(c *gin.Context) {
 	return
 }
 
+// GET Demo
+//
+//	@Summary	Get demo with specified demo uuid.
+//	@Accept		json
+//	@Produce	octet-stream
+//	@Param		uuid	path		int		true	"Demo UUID"
+//	@Success	200		{file}		binary	"Demo File"
+//	@Failure	400		{object}	models.Response
+//	@Router		/demo [get]
 func DownloadDemoWithID(c *gin.Context) {
 	uuid := c.Query("uuid")
 	var locationID string

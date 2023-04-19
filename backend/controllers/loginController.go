@@ -40,7 +40,6 @@ func Login(c *gin.Context) {
 		var checkSteamID int64
 		err = database.DB.QueryRow("SELECT steam_id FROM users WHERE steam_id = $1", steamID).Scan(&checkSteamID)
 		// if err != nil {
-		// 	fmt.Println("y1")
 		// 	c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		// 	return
 		// }
@@ -48,7 +47,6 @@ func Login(c *gin.Context) {
 		if checkSteamID == 0 {
 			user, err := GetPlayerSummaries(steamID, os.Getenv("API_KEY"))
 			if err != nil {
-				fmt.Println("y2")
 				c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 				return
 			}

@@ -19,6 +19,14 @@ func Home(c *gin.Context) {
 	}
 }
 
+// GET Rankings
+//
+//	@Summary	Get rankings of every player.
+//	@Accept		json
+//	@Produce	json
+//	@Success	200		{object}	models.Response{data=models.RankingsResponse}
+//	@Failure	400		{object}	models.Response
+//	@Router		/demo [get]
 func Rankings(c *gin.Context) {
 	rows, err := database.DB.Query(`SELECT steam_id, username FROM users;`)
 	if err != nil {
@@ -103,8 +111,12 @@ func Rankings(c *gin.Context) {
 			mpRankings = append(mpRankings, ranking)
 		}
 	}
-	c.JSON(http.StatusOK, models.RankingsResponse{
-		RankingsSP: spRankings,
-		RankingsMP: mpRankings,
+	c.JSON(http.StatusOK, models.Response{
+		Success: true,
+		Message: "Successfully retrieved rankings.",
+		Data: models.RankingsResponse{
+			RankingsSP: spRankings,
+			RankingsMP: mpRankings,
+		},
 	})
 }
