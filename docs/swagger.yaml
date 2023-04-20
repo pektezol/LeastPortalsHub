@@ -40,6 +40,17 @@ definitions:
       username:
         type: string
     type: object
+  models.RankingsResponse:
+    properties:
+      rankings_mp:
+        items:
+          $ref: '#/definitions/models.UserRanking'
+        type: array
+      rankings_sp:
+        items:
+          $ref: '#/definitions/models.UserRanking'
+        type: array
+    type: object
   models.RecordRequest:
     properties:
       is_partner_orange:
@@ -70,7 +81,16 @@ definitions:
         type: integer
       records: {}
     type: object
-host: localhost:4000/api
+  models.UserRanking:
+    properties:
+      total_score:
+        type: integer
+      user_id:
+        type: string
+      username:
+        type: string
+    type: object
+host: lp.ardapektezol.com/api
 info:
   contact: {}
   description: Backend API endpoints for Least Portals Database.
@@ -155,7 +175,8 @@ paths:
       consumes:
       - multipart/form-data
       parameters:
-      - description: Demos
+      - collectionFormat: csv
+        description: Demos
         in: formData
         items:
           type: file

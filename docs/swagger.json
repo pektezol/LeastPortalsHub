@@ -10,7 +10,7 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:4000/api",
+    "host": "lp.ardapektezol.com/api",
     "basePath": "/v1",
     "paths": {
         "/demo": {
@@ -145,6 +145,7 @@
                         "items": {
                             "type": "file"
                         },
+                        "collectionFormat": "csv",
                         "description": "Demos",
                         "name": "demos",
                         "in": "formData",
@@ -462,6 +463,23 @@
                 }
             }
         },
+        "models.RankingsResponse": {
+            "type": "object",
+            "properties": {
+                "rankings_mp": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.UserRanking"
+                    }
+                },
+                "rankings_sp": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.UserRanking"
+                    }
+                }
+            }
+        },
         "models.RecordRequest": {
             "type": "object",
             "required": [
@@ -504,6 +522,20 @@
                     "type": "integer"
                 },
                 "records": {}
+            }
+        },
+        "models.UserRanking": {
+            "type": "object",
+            "properties": {
+                "total_score": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
             }
         }
     }
