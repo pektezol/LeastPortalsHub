@@ -50,6 +50,10 @@ func Login(c *gin.Context) {
 				c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 				return
 			}
+			// Empty country code check
+			if user.LocCountryCode == "" {
+				user.LocCountryCode = "XX"
+			}
 			// Insert new user to database
 			database.DB.Exec(`INSERT INTO users (steam_id, username, avatar_link, country_code)
 			VALUES ($1, $2, $3, $4)`, steamID, user.PersonaName, user.AvatarFull, user.LocCountryCode)

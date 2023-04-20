@@ -12,7 +12,7 @@ CREATE TABLE users (
   steam_id TEXT,
   username TEXT NOT NULL,
   avatar_link TEXT NOT NULL,
-  country_code CHAR(2) NOT NULL DEFAULT 'XX',
+  country_code CHAR(2) NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT now(),
   updated_at TIMESTAMP NOT NULL DEFAULT now(),
   PRIMARY KEY (steam_id)
