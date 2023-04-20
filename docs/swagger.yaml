@@ -93,7 +93,7 @@ definitions:
 host: lp.ardapektezol.com/api
 info:
   contact: {}
-  description: Backend API endpoints for Least Portals Database.
+  description: Backend API endpoints for the Least Portals Database.
   license:
     name: GNU General Public License, Version 2
     url: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
@@ -175,8 +175,12 @@ paths:
       consumes:
       - multipart/form-data
       parameters:
-      - collectionFormat: csv
-        description: Demos
+      - description: JWT Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Demos
         in: formData
         items:
           type: file
@@ -228,6 +232,12 @@ paths:
     get:
       consumes:
       - application/json
+      parameters:
+      - description: JWT Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -252,6 +262,12 @@ paths:
     post:
       consumes:
       - application/json
+      parameters:
+      - description: JWT Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -277,6 +293,11 @@ paths:
       consumes:
       - application/json
       parameters:
+      - description: JWT Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Country Code [XX]
         in: query
         name: country_code

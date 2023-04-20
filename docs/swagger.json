@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "Backend API endpoints for Least Portals Database.",
+        "description": "Backend API endpoints for the Least Portals Database.",
         "title": "Least Portals Database API",
         "contact": {},
         "license": {
@@ -141,11 +141,17 @@
                 "summary": "Post record with demo of a specific map.",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "JWT Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "array",
                         "items": {
                             "type": "file"
                         },
-                        "collectionFormat": "csv",
                         "description": "Demos",
                         "name": "demos",
                         "in": "formData",
@@ -223,6 +229,15 @@
                     "application/json"
                 ],
                 "summary": "Get profile page of session user.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "JWT Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -265,6 +280,13 @@
                 ],
                 "summary": "Update country code of session user.",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "JWT Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "Country Code [XX]",
@@ -314,6 +336,15 @@
                     "application/json"
                 ],
                 "summary": "Update profile page of session user.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "JWT Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",

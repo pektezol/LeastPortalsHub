@@ -16,9 +16,10 @@ import (
 //	@Summary	Get profile page of session user.
 //	@Accept		json
 //	@Produce	json
-//	@Success	200	{object}	models.Response{data=models.ProfileResponse}
-//	@Failure	400	{object}	models.Response
-//	@Failure	401	{object}	models.Response
+//	@Param		Authorization	header		string	true	"JWT Token"
+//	@Success	200				{object}	models.Response{data=models.ProfileResponse}
+//	@Failure	400				{object}	models.Response
+//	@Failure	401				{object}	models.Response
 //	@Router		/profile [get]
 func Profile(c *gin.Context) {
 	// Check if user exists
@@ -202,9 +203,10 @@ func FetchUser(c *gin.Context) {
 //	@Summary	Update profile page of session user.
 //	@Accept		json
 //	@Produce	json
-//	@Success	200	{object}	models.Response{data=models.ProfileResponse}
-//	@Failure	400	{object}	models.Response
-//	@Failure	401	{object}	models.Response
+//	@Param		Authorization	header		string	true	"JWT Token"
+//	@Success	200				{object}	models.Response{data=models.ProfileResponse}
+//	@Failure	400				{object}	models.Response
+//	@Failure	401				{object}	models.Response
 //	@Router		/profile [post]
 func UpdateUser(c *gin.Context) {
 	// Check if user exists
@@ -243,6 +245,7 @@ func UpdateUser(c *gin.Context) {
 //	@Summary	Update country code of session user.
 //	@Accept		json
 //	@Produce	json
+//	@Param		Authorization	header		string	true	"JWT Token"
 //	@Param		country_code	query		string	true	"Country Code [XX]"
 //	@Success	200				{object}	models.Response{data=models.ProfileResponse}
 //	@Failure	400				{object}	models.Response

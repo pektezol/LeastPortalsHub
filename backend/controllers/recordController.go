@@ -23,6 +23,7 @@ import (
 //	@Summary	Post record with demo of a specific map.
 //	@Accept		mpfd
 //	@Produce	json
+//	@Param		Authorization		header		string	true	"JWT Token"
 //	@Param		demos				formData	[]file	true	"Demos"
 //	@Param		score_count			formData	int		true	"Score Count"
 //	@Param		score_time			formData	int		true	"Score Time"
