@@ -78,3 +78,36 @@ CREATE TABLE countries (
   country_name TEXT NOT NULL,
   PRIMARY KEY (country_code)
 );
+
+-- CREATE TABLE community_maps (
+--   id SMALLSERIAL,
+--   map_id SMALLINT NOT NULL,
+--   category TEXT NOT NULL,
+--   tutorial TEXT NOT NULL,
+--   video_link TEXT NOT NULL,
+--   PRIMARY KEY (id),
+--   FOREIGN KEY (map_id) REFERENCES maps(id)
+-- );
+
+-- TODO
+-- CREATE TABLE community_history (
+--   id SERIAL,
+--   map_id SMALLINT NOT NULL,
+--   user_id TEXT NOT NULL,
+--   score_count SMALLINT NOT NULL,
+--   created_at TIMESTAMP NOT NULL DEFAULT now(),
+--   PRIMARY KEY (id),
+--   FOREIGN KEY (user_id) REFERENCES users(steam_id),
+--   FOREIGN KEY (map_id) REFERENCES maps(id)
+-- );
+
+-- CREATE TABLE community_posts (
+--   id SERIAL,
+--   map_id SMALLINT NOT NULL,
+--   user_id TEXT NOT NULL,
+--   post TEXT NOT NULL,
+--   created_at TIMESTAMP NOT NULL DEFAULT now(),
+--   PRIMARY KEY (id),
+--   FOREIGN KEY (user_id) REFERENCES users(steam_id),
+--   FOREIGN KEY (map_id) REFERENCES maps(id)
+-- );
