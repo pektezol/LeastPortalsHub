@@ -122,6 +122,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Response'
       summary: Get demo with specified demo uuid.
+      tags:
+      - demo
   /login:
     get:
       consumes:
@@ -143,6 +145,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Response'
       summary: Get (redirect) login page for Steam auth.
+      tags:
+      - login
   /maps/{id}:
     get:
       consumes:
@@ -170,6 +174,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Response'
       summary: Get map page with specified id.
+      tags:
+      - maps
   /maps/{id}/record:
     post:
       consumes:
@@ -228,6 +234,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Response'
       summary: Post record with demo of a specific map.
+      tags:
+      - maps
   /profile:
     get:
       consumes:
@@ -259,6 +267,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Response'
       summary: Get profile page of session user.
+      tags:
+      - users
     post:
       consumes:
       - application/json
@@ -289,6 +299,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Response'
       summary: Update profile page of session user.
+      tags:
+      - users
     put:
       consumes:
       - application/json
@@ -324,6 +336,8 @@ paths:
           schema:
             $ref: '#/definitions/models.Response'
       summary: Update country code of session user.
+      tags:
+      - users
   /user/{id}:
     get:
       consumes:
@@ -355,4 +369,6 @@ paths:
           schema:
             $ref: '#/definitions/models.Response'
       summary: Get profile page of another user.
+      tags:
+      - users
 swagger: "2.0"

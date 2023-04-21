@@ -14,6 +14,7 @@ import (
 // GET Profile
 //
 //	@Summary	Get profile page of session user.
+//	@Tags		users
 //	@Accept		json
 //	@Produce	json
 //	@Param		Authorization	header		string	true	"JWT Token"
@@ -100,6 +101,7 @@ func Profile(c *gin.Context) {
 // GET User
 //
 //	@Summary	Get profile page of another user.
+//	@Tags		users
 //	@Accept		json
 //	@Produce	json
 //	@Param		id	path		int	true	"User ID"
@@ -201,6 +203,7 @@ func FetchUser(c *gin.Context) {
 // PUT Profile
 //
 //	@Summary	Update profile page of session user.
+//	@Tags		users
 //	@Accept		json
 //	@Produce	json
 //	@Param		Authorization	header		string	true	"JWT Token"
@@ -243,6 +246,7 @@ func UpdateUser(c *gin.Context) {
 // PUT Profile/CountryCode
 //
 //	@Summary	Update country code of session user.
+//	@Tags		users
 //	@Accept		json
 //	@Produce	json
 //	@Param		Authorization	header		string	true	"JWT Token"

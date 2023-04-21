@@ -22,6 +22,7 @@ func Home(c *gin.Context) {
 // GET Rankings
 //
 //	@Summary	Get rankings of every player.
+//	@Tags		rankings
 //	@Accept		json
 //	@Produce	json
 //	@Success	200	{object}	models.Response{data=models.RankingsResponse}

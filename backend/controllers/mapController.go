@@ -12,6 +12,7 @@ import (
 // GET Map
 //
 //	@Summary	Get map page with specified id.
+//	@Tags		maps
 //	@Accept		json
 //	@Produce	json
 //	@Param		id	path		int	true	"Map ID"

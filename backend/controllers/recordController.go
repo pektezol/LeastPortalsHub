@@ -21,6 +21,7 @@ import (
 // POST Record
 //
 //	@Summary	Post record with demo of a specific map.
+//	@Tags		maps
 //	@Accept		mpfd
 //	@Produce	json
 //	@Param		Authorization		header		string	true	"JWT Token"
@@ -194,6 +195,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 // GET Demo
 //
 //	@Summary	Get demo with specified demo uuid.
+//	@Tags		demo
 //	@Accept		json
 //	@Produce	octet-stream
 //	@Param		uuid	path		int		true	"Demo UUID"

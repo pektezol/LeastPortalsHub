@@ -28,6 +28,9 @@ const docTemplate = `{
                 "produces": [
                     "application/octet-stream"
                 ],
+                "tags": [
+                    "demo"
+                ],
                 "summary": "Get demo with specified demo uuid.",
                 "parameters": [
                     {
@@ -61,6 +64,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "login"
                 ],
                 "summary": "Get (redirect) login page for Steam auth.",
                 "responses": {
@@ -98,6 +104,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "maps"
                 ],
                 "summary": "Get map page with specified id.",
                 "parameters": [
@@ -144,6 +153,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "maps"
                 ],
                 "summary": "Post record with demo of a specific map.",
                 "parameters": [
@@ -235,6 +247,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "users"
+                ],
                 "summary": "Get profile page of session user.",
                 "parameters": [
                     {
@@ -284,6 +299,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "users"
                 ],
                 "summary": "Update country code of session user.",
                 "parameters": [
@@ -342,6 +360,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "users"
+                ],
                 "summary": "Update profile page of session user.",
                 "parameters": [
                     {
@@ -393,6 +414,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "users"
                 ],
                 "summary": "Get profile page of another user.",
                 "parameters": [

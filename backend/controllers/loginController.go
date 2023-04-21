@@ -18,6 +18,7 @@ import (
 // Login
 //
 //	@Summary	Get (redirect) login page for Steam auth.
+//	@Tags		login
 //	@Accept		json
 //	@Produce	json
 //	@Success	200	{object}	models.Response{data=models.LoginResponse}
