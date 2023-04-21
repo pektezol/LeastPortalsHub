@@ -13,7 +13,10 @@ func InitRoutes(router *gin.Engine) {
 	{
 		v1 := api.Group("/v1")
 		v1.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-		v1.GET("/", middleware.CheckAuth, controllers.Home)
+		v1.GET("/", func(c *gin.Context) {
+			c.File("docs/index.html")
+		})
+		v1.GET("/home", middleware.CheckAuth, controllers.Home)
 		v1.GET("/login", controllers.Login)
 		v1.GET("/profile", middleware.CheckAuth, controllers.Profile)
 		v1.PUT("/profile", middleware.CheckAuth, controllers.UpdateCountryCode)
