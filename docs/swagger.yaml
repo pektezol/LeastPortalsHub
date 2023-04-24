@@ -7,17 +7,47 @@ definitions:
     type: object
   models.Map:
     properties:
+      chapter_name:
+        type: string
+      data: {}
+      game_name:
+        type: string
       id:
         type: integer
-      is_coop:
-        type: boolean
-      name:
+      map_name:
         type: string
+    type: object
+  models.MapCategoryScores:
+    properties:
+      any:
+        type: integer
+      cm:
+        type: integer
+      inbounds_sla:
+        type: integer
+      no_sla:
+        type: integer
+    type: object
+  models.MapRecords:
+    properties:
       records: {}
-      wr_score:
-        type: integer
-      wr_time:
-        type: integer
+    type: object
+  models.MapSummary:
+    properties:
+      category_scores:
+        $ref: '#/definitions/models.MapCategoryScores'
+      description:
+        type: string
+      first_completion:
+        type: string
+      rating:
+        type: number
+      routers:
+        items:
+          type: string
+        type: array
+      showcase:
+        type: string
     type: object
   models.ProfileResponse:
     properties:
@@ -104,6 +134,29 @@ paths:
     get:
       consumes:
       - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.RankingsResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Get rankings of every player.
+      tags:
+      - rankings
+  /demos:
+    get:
+      consumes:
+      - application/json
       parameters:
       - description: Demo UUID
         in: query
@@ -147,7 +200,7 @@ paths:
       summary: Get (redirect) login page for Steam auth.
       tags:
       - login
-  /maps/{id}:
+  /maps/{id}/leaderboards:
     get:
       consumes:
       - application/json
@@ -167,13 +220,18 @@ paths:
             - $ref: '#/definitions/models.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/models.Map'
+                  allOf:
+                  - $ref: '#/definitions/models.Map'
+                  - properties:
+                      data:
+                        $ref: '#/definitions/models.MapRecords'
+                    type: object
               type: object
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Get map page with specified id.
+      summary: Get map leaderboards with specified id.
       tags:
       - maps
   /maps/{id}/record:
@@ -234,6 +292,40 @@ paths:
           schema:
             $ref: '#/definitions/models.Response'
       summary: Post record with demo of a specific map.
+      tags:
+      - maps
+  /maps/{id}/summary:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Map ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  allOf:
+                  - $ref: '#/definitions/models.Map'
+                  - properties:
+                      data:
+                        $ref: '#/definitions/models.MapSummary'
+                    type: object
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Get map summary with specified id.
       tags:
       - maps
   /profile:
@@ -338,7 +430,7 @@ paths:
       summary: Update country code of session user.
       tags:
       - users
-  /user/{id}:
+  /users/{id}:
     get:
       consumes:
       - application/json

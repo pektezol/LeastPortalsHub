@@ -26,6 +26,46 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rankings"
+                ],
+                "summary": "Get rankings of every player.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.RankingsResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/demos": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
                     "application/octet-stream"
                 ],
                 "tags": [
@@ -97,7 +137,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/maps/{id}": {
+        "/maps/{id}/leaderboards": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -108,7 +148,7 @@ const docTemplate = `{
                 "tags": [
                     "maps"
                 ],
-                "summary": "Get map page with specified id.",
+                "summary": "Get map leaderboards with specified id.",
                 "parameters": [
                     {
                         "type": "integer",
@@ -130,7 +170,19 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/models.Map"
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/models.Map"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "data": {
+                                                            "$ref": "#/definitions/models.MapRecords"
+                                                        }
+                                                    }
+                                                }
+                                            ]
                                         }
                                     }
                                 }
@@ -232,6 +284,67 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/maps/{id}/summary": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "maps"
+                ],
+                "summary": "Get map summary with specified id.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Map ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "allOf": [
+                                                {
+                                                    "$ref": "#/definitions/models.Map"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "data": {
+                                                            "$ref": "#/definitions/models.MapSummary"
+                                                        }
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/models.Response"
                         }
@@ -407,7 +520,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/{id}": {
+        "/users/{id}": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -475,21 +588,67 @@ const docTemplate = `{
         "models.Map": {
             "type": "object",
             "properties": {
+                "chapter_name": {
+                    "type": "string"
+                },
+                "data": {},
+                "game_name": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
-                "is_coop": {
-                    "type": "boolean"
+                "map_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.MapCategoryScores": {
+            "type": "object",
+            "properties": {
+                "any": {
+                    "type": "integer"
                 },
-                "name": {
+                "cm": {
+                    "type": "integer"
+                },
+                "inbounds_sla": {
+                    "type": "integer"
+                },
+                "no_sla": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.MapRecords": {
+            "type": "object",
+            "properties": {
+                "records": {}
+            }
+        },
+        "models.MapSummary": {
+            "type": "object",
+            "properties": {
+                "category_scores": {
+                    "$ref": "#/definitions/models.MapCategoryScores"
+                },
+                "description": {
                     "type": "string"
                 },
-                "records": {},
-                "wr_score": {
-                    "type": "integer"
+                "first_completion": {
+                    "type": "string"
                 },
-                "wr_time": {
-                    "type": "integer"
+                "rating": {
+                    "type": "number"
+                },
+                "routers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "showcase": {
+                    "type": "string"
                 }
             }
         },
