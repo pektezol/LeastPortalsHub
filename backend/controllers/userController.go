@@ -108,7 +108,7 @@ func Profile(c *gin.Context) {
 //	@Success	200	{object}	models.Response{data=models.ProfileResponse}
 //	@Failure	400	{object}	models.Response
 //	@Failure	404	{object}	models.Response
-//	@Router		/user/{id} [get]
+//	@Router		/users/{id} [get]
 func FetchUser(c *gin.Context) {
 	id := c.Param("id")
 	// Check if id is all numbers and 17 length
