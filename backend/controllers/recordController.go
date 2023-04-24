@@ -107,6 +107,14 @@ func CreateRecordWithDemo(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
+	// Create database transaction for inserts
+	tx, err := database.DB.Begin()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))
+		return
+	}
+	// Defer to a rollback in case anything fails
+	defer tx.Rollback()
 	fileID := ""
 	for i, header := range files {
 		uuid := uuid.New().String()
@@ -134,7 +142,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 		if i == 1 {
 			partnerDemoUUID = uuid
 		}
-		_, err = database.DB.Exec(`INSERT INTO demos (id,location_id) VALUES ($1,$2)`, uuid, file.Id)
+		_, err = tx.Exec(`INSERT INTO demos (id,location_id) VALUES ($1,$2)`, uuid, file.Id)
 		if err != nil {
 			deleteFile(srv, file.Id)
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
@@ -155,7 +163,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 			partnerID = user.(models.User).SteamID
 			hostID = record.PartnerID
 		}
-		_, err := database.DB.Exec(sql, mapId, record.ScoreCount, record.ScoreTime, hostID, partnerID, hostDemoUUID, partnerDemoUUID)
+		_, err := tx.Exec(sql, mapId, record.ScoreCount, record.ScoreTime, hostID, partnerID, hostDemoUUID, partnerDemoUUID)
 		if err != nil {
 			deleteFile(srv, fileID)
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
@@ -163,7 +171,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 		}
 		// If a new world record based on portal count
 		// if record.ScoreCount < wrScore {
-		// 	_, err := database.DB.Exec(`UPDATE maps SET wr_score = $1, wr_time = $2 WHERE id = $3;`, record.ScoreCount, record.ScoreTime, mapId)
+		// 	_, err := tx.Exec(`UPDATE maps SET wr_score = $1, wr_time = $2 WHERE id = $3;`, record.ScoreCount, record.ScoreTime, mapId)
 		// 	if err != nil {
 		// 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		// 		return
@@ -172,7 +180,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 	} else {
 		sql := `INSERT INTO records_sp(map_id,score_count,score_time,user_id,demo_id) 
 		VALUES($1, $2, $3, $4, $5);`
-		_, err := database.DB.Exec(sql, mapId, record.ScoreCount, record.ScoreTime, user.(models.User).SteamID, hostDemoUUID)
+		_, err := tx.Exec(sql, mapId, record.ScoreCount, record.ScoreTime, user.(models.User).SteamID, hostDemoUUID)
 		if err != nil {
 			deleteFile(srv, fileID)
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
@@ -180,12 +188,16 @@ func CreateRecordWithDemo(c *gin.Context) {
 		}
 		// If a new world record based on portal count
 		// if record.ScoreCount < wrScore {
-		// 	_, err := database.DB.Exec(`UPDATE maps SET wr_score = $1, wr_time = $2 WHERE id = $3;`, record.ScoreCount, record.ScoreTime, mapId)
+		// 	_, err := tx.Exec(`UPDATE maps SET wr_score = $1, wr_time = $2 WHERE id = $3;`, record.ScoreCount, record.ScoreTime, mapId)
 		// 	if err != nil {
 		// 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		// 		return
 		// 	}
 		// }
+	}
+	if err = tx.Commit(); err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))
+		return
 	}
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
