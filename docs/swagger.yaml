@@ -106,7 +106,7 @@ paths:
       - application/json
       parameters:
       - description: Demo UUID
-        in: path
+        in: query
         name: uuid
         required: true
         type: integer

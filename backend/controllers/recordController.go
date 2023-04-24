@@ -198,7 +198,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 //	@Tags		demo
 //	@Accept		json
 //	@Produce	octet-stream
-//	@Param		uuid	path		int		true	"Demo UUID"
+//	@Param		uuid	query		int		true	"Demo UUID"
 //	@Success	200		{file}		binary	"Demo File"
 //	@Failure	400		{object}	models.Response
 //	@Router		/demo [get]

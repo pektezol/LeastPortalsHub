@@ -37,7 +37,7 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "Demo UUID",
                         "name": "uuid",
-                        "in": "path",
+                        "in": "query",
                         "required": true
                     }
                 ],
