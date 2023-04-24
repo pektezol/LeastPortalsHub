@@ -136,7 +136,7 @@ func FetchMapLeaderboards(c *gin.Context) {
 		ties := 0
 		for rows.Next() {
 			var record models.RecordMP
-			err := rows.Scan(&record.RecordID, &record.HostID, &record.HostName, &record.HostAvatar, &record.PartnerID, &record.PartnerName, &record.PartnerAvatar, &record.ScoreCount, &record.ScoreTime, &record.HostDemoID, &record.PartnerDemoID, &record.RecordDate)
+			err := rows.Scan(&record.RecordID, &record.HostID, &record.PartnerID, &record.ScoreCount, &record.ScoreTime, &record.HostDemoID, &record.PartnerDemoID, &record.RecordDate)
 			if err != nil {
 				c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 				return
