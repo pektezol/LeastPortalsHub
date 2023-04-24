@@ -32,12 +32,12 @@ type Map struct {
 }
 
 type MapSummary struct {
-	Description     string            `json:"description"`
-	Showcase        string            `json:"showcase"`
-	CategoryScores  MapCategoryScores `json:"category_scores"`
-	Rating          float32           `json:"rating"`
-	Routers         []string          `json:"routers"`
-	FirstCompletion any               `json:"first_completion"`
+	Description    string            `json:"description"`
+	Showcase       string            `json:"showcase"`
+	CategoryScores MapCategoryScores `json:"category_scores"`
+	Rating         float32           `json:"rating"`
+	Routers        []string          `json:"routers"`
+	History        any               `json:"history"`
 }
 
 type MapCategoryScores struct {
@@ -49,6 +49,12 @@ type MapCategoryScores struct {
 
 type MapRecords struct {
 	Records any `json:"records"`
+}
+
+type MapHistory struct {
+	RunnerName string    `json:"runner_name"`
+	ScoreCount int       `json:"score_count"`
+	Date       time.Time `json:"date"`
 }
 
 type RecordSP struct {

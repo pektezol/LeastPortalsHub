@@ -3,6 +3,7 @@ package controllers
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lib/pq"
@@ -25,6 +26,7 @@ func FetchMapSummary(c *gin.Context) {
 	// Get map data
 	var mapData models.Map
 	var mapSummaryData models.MapSummary
+	var mapHistoryData []models.MapHistory
 	intID, err := strconv.Atoi(id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
@@ -33,13 +35,6 @@ func FetchMapSummary(c *gin.Context) {
 	mapData.ID = intID
 	var routers pq.StringArray
 	sql := `SELECT g.name, c.name, m.name, m.description, m.showcase,
-	(
-	  SELECT user_name 
-	  FROM map_history 
-	  WHERE map_id = $1 
-	  ORDER BY score_count 
-	  LIMIT 1
-	), 
 	(
 	  SELECT array_agg(user_name) 
 	  FROM map_routers 
@@ -64,11 +59,36 @@ func FetchMapSummary(c *gin.Context) {
 	INNER JOIN chapters c ON m.chapter_id = c.id
 	WHERE m.id = $1;`
 	// TODO: CategoryScores
-	err = database.DB.QueryRow(sql, id).Scan(&mapData.GameName, &mapData.ChapterName, &mapData.MapName, &mapSummaryData.Description, &mapSummaryData.Showcase, &mapSummaryData.FirstCompletion, &routers, &mapSummaryData.Rating)
+	err = database.DB.QueryRow(sql, id).Scan(&mapData.GameName, &mapData.ChapterName, &mapData.MapName, &mapSummaryData.Description, &mapSummaryData.Showcase, &routers, &mapSummaryData.Rating)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
+	var historyNames pq.StringArray
+	var historyScores pq.Int32Array
+	var historyDates pq.StringArray
+	sql = `SELECT array_agg(user_name), array_agg(score_count), array_agg(record_date)
+	FROM map_history
+	WHERE map_id = $1;`
+	err = database.DB.QueryRow(sql, id).Scan(&historyNames, &historyScores, &historyDates)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	for i := 0; i < len(historyNames); i++ {
+		var history models.MapHistory
+		history.RunnerName = historyNames[i]
+		history.ScoreCount = int(historyScores[i])
+		layout := "2006-01-02 15:04:05"
+		date, err := time.Parse(layout, historyDates[i])
+		if err != nil {
+			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			return
+		}
+		history.Date = date
+		mapHistoryData = append(mapHistoryData, history)
+	}
+	mapSummaryData.History = mapHistoryData
 	mapSummaryData.Routers = routers
 	mapData.Data = mapSummaryData
 	// Return response
