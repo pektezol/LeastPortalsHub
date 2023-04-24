@@ -44,13 +44,11 @@ CREATE TABLE maps (
 CREATE TABLE map_history (
   id SMALLSERIAL,
   map_id SMALLINT NOT NULL,
-  user_id TEXT,
   user_name TEXT NOT NULL,
   score_count SMALLINT NOT NULL,
   record_date TIMESTAMP NOT NULL,
   PRIMARY KEY (id),
-  FOREIGN KEY (map_id) REFERENCES maps(id),
-  FOREIGN KEY (user_id) REFERENCES users(steam_id)
+  FOREIGN KEY (map_id) REFERENCES maps(id)
 );
 
 CREATE TABLE map_ratings (
