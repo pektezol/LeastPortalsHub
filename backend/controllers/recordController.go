@@ -43,11 +43,11 @@ func CreateRecordWithDemo(c *gin.Context) {
 		return
 	}
 	// Check if map is sp or mp
-	var wrScore int
-	var wrTime int
+	var gameID int
 	var isCoop bool
 	var isDisabled bool
-	err := database.DB.QueryRow(`SELECT wr_score, wr_time, is_coop, is_disabled FROM maps WHERE id = $1;`, mapId).Scan(&wrScore, &wrTime, &isCoop, &isDisabled)
+	sql := `SELECT game_id, is_disabled FROM maps WHERE id = $1;`
+	err := database.DB.QueryRow(sql, mapId).Scan(&gameID, &isDisabled)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
@@ -55,6 +55,9 @@ func CreateRecordWithDemo(c *gin.Context) {
 	if isDisabled {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse("Map is not available for competitive boards."))
 		return
+	}
+	if gameID == 2 {
+		isCoop = true
 	}
 	// Get record request
 	var record models.RecordRequest
@@ -159,13 +162,13 @@ func CreateRecordWithDemo(c *gin.Context) {
 			return
 		}
 		// If a new world record based on portal count
-		if record.ScoreCount < wrScore {
-			_, err := database.DB.Exec(`UPDATE maps SET wr_score = $1, wr_time = $2 WHERE id = $3;`, record.ScoreCount, record.ScoreTime, mapId)
-			if err != nil {
-				c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
-				return
-			}
-		}
+		// if record.ScoreCount < wrScore {
+		// 	_, err := database.DB.Exec(`UPDATE maps SET wr_score = $1, wr_time = $2 WHERE id = $3;`, record.ScoreCount, record.ScoreTime, mapId)
+		// 	if err != nil {
+		// 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		// 		return
+		// 	}
+		// }
 	} else {
 		sql := `INSERT INTO records_sp(map_id,score_count,score_time,user_id,demo_id) 
 		VALUES($1, $2, $3, $4, $5);`
@@ -176,13 +179,13 @@ func CreateRecordWithDemo(c *gin.Context) {
 			return
 		}
 		// If a new world record based on portal count
-		if record.ScoreCount < wrScore {
-			_, err := database.DB.Exec(`UPDATE maps SET wr_score = $1, wr_time = $2 WHERE id = $3;`, record.ScoreCount, record.ScoreTime, mapId)
-			if err != nil {
-				c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
-				return
-			}
-		}
+		// if record.ScoreCount < wrScore {
+		// 	_, err := database.DB.Exec(`UPDATE maps SET wr_score = $1, wr_time = $2 WHERE id = $3;`, record.ScoreCount, record.ScoreTime, mapId)
+		// 	if err != nil {
+		// 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		// 		return
+		// 	}
+		// }
 	}
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
