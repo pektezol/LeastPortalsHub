@@ -1,0 +1,17 @@
+INSERT INTO chapters(id, game_id, name) VALUES
+(1, 1, 'The Coutesy Call'),
+(2, 1, 'The Cold Boot'),
+(3, 1, 'The Return'),
+(4, 1, 'The Surprise'),
+(5, 1, 'The Escape'),
+(6, 1, 'The Fall'),
+(7, 1, 'The Reunion'),
+(8, 1, 'The Itch'),
+(9, 1, 'The Part Where He Kills You'),
+(10, 2, 'Introduction'),
+(11, 2, 'Team Building'),
+(12, 2, 'Mass And Velocity'),
+(13, 2, 'Hard-Light Surfaces'),
+(14, 2, 'Excursion Funnels'),
+(15, 2, 'Mobility Gels'),
+(16, 2, 'Art Therapy');

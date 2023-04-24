@@ -1,13 +1,3 @@
-DROP TABLE IF EXISTS showcases;
-DROP TABLE IF EXISTS titles;
-DROP TABLE IF EXISTS records_sp;
-DROP TABLE IF EXISTS records_mp;
-DROP TABLE IF EXISTS maps;
-DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS countries;
-
-DROP TABLE IF EXISTS demos;
-
 CREATE TABLE users (
   steam_id TEXT,
   username TEXT NOT NULL,
@@ -18,14 +8,59 @@ CREATE TABLE users (
   PRIMARY KEY (steam_id)
 );
 
+CREATE TABLE games (
+  id SMALLSERIAL,
+  name TEXT NOT NULL,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE chapters (
+  id SMALLSERIAL,
+  game_id SMALLINT NOT NULL,
+  name TEXT NOT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (game_id) REFERENCES games(id)
+);
+
+CREATE TABLE categories (
+  id SMALLSERIAL,
+  name TEXT NOT NULL,
+  PRIMARY KEY (id)
+);
+
 CREATE TABLE maps (
   id SMALLSERIAL,
-  map_name TEXT NOT NULL,
-  wr_score SMALLINT NOT NULL,
-  wr_time INTEGER NOT NULL,
-  is_coop BOOLEAN NOT NULL,
+  game_id SMALLINT NOT NULL,
+  chapter_id SMALLINT NOT NULL,
+  name TEXT NOT NULL,
+  description TEXT NOT NULL,
+  showcase TEXT NOT NULL,
   is_disabled BOOLEAN NOT NULL DEFAULT false,
-  PRIMARY KEY (id)
+  PRIMARY KEY (id),
+  FOREIGN KEY (game_id) REFERENCES games(id),
+  FOREIGN KEY (chapter_id) REFERENCES chapters(id)
+);
+
+CREATE TABLE map_history (
+  id SMALLSERIAL,
+  map_id SMALLINT NOT NULL,
+  user_id TEXT,
+  user_name TEXT NOT NULL,
+  score_count SMALLINT NOT NULL,
+  record_date TIMESTAMP NOT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (map_id) REFERENCES maps(id),
+  FOREIGN KEY (user_id) REFERENCES users(steam_id)
+);
+
+CREATE TABLE map_rating (
+  id SERIAL,
+  map_id SMALLINT NOT NULL,
+  user_id TEXT NOT NULL,
+  rating SMALLINT NOT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (map_id) REFERENCES maps(id),
+  FOREIGN KEY (user_id) REFERENCES users(steam_id)
 );
 
 CREATE TABLE demos (
@@ -78,36 +113,3 @@ CREATE TABLE countries (
   country_name TEXT NOT NULL,
   PRIMARY KEY (country_code)
 );
-
--- CREATE TABLE community_maps (
---   id SMALLSERIAL,
---   map_id SMALLINT NOT NULL,
---   category TEXT NOT NULL,
---   tutorial TEXT NOT NULL,
---   video_link TEXT NOT NULL,
---   PRIMARY KEY (id),
---   FOREIGN KEY (map_id) REFERENCES maps(id)
--- );
-
--- TODO
--- CREATE TABLE community_history (
---   id SERIAL,
---   map_id SMALLINT NOT NULL,
---   user_id TEXT NOT NULL,
---   score_count SMALLINT NOT NULL,
---   created_at TIMESTAMP NOT NULL DEFAULT now(),
---   PRIMARY KEY (id),
---   FOREIGN KEY (user_id) REFERENCES users(steam_id),
---   FOREIGN KEY (map_id) REFERENCES maps(id)
--- );
-
--- CREATE TABLE community_posts (
---   id SERIAL,
---   map_id SMALLINT NOT NULL,
---   user_id TEXT NOT NULL,
---   post TEXT NOT NULL,
---   created_at TIMESTAMP NOT NULL DEFAULT now(),
---   PRIMARY KEY (id),
---   FOREIGN KEY (user_id) REFERENCES users(steam_id),
---   FOREIGN KEY (map_id) REFERENCES maps(id)
--- );
