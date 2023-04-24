@@ -1,6 +1,6 @@
 CREATE TABLE users (
   steam_id TEXT,
-  username TEXT NOT NULL,
+  user_name TEXT NOT NULL,
   avatar_link TEXT NOT NULL,
   country_code CHAR(2) NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT now(),

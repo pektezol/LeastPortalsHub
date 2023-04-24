@@ -16,7 +16,7 @@ type LoginResponse struct {
 
 type User struct {
 	SteamID     string    `json:"steam_id"`
-	Username    string    `json:"username"`
+	UserName    string    `json:"user_name"`
 	AvatarLink  string    `json:"avatar_link"`
 	CountryCode string    `json:"country_code"`
 	CreatedAt   time.Time `json:"created_at"`
@@ -88,7 +88,7 @@ type RecordRequest struct {
 
 type UserRanking struct {
 	UserID     string `json:"user_id"`
-	Username   string `json:"username"`
+	UserName   string `json:"user_name"`
 	TotalScore int    `json:"total_score"`
 }
 
@@ -100,7 +100,7 @@ type RankingsResponse struct {
 type ProfileResponse struct {
 	Profile     bool            `json:"profile"`
 	SteamID     string          `json:"steam_id"`
-	Username    string          `json:"username"`
+	UserName    string          `json:"user_name"`
 	AvatarLink  string          `json:"avatar_link"`
 	CountryCode string          `json:"country_code"`
 	ScoresSP    []ScoreResponse `json:"scores_sp"`

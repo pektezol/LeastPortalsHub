@@ -88,7 +88,7 @@ func Profile(c *gin.Context) {
 		Data: models.ProfileResponse{
 			Profile:     true,
 			SteamID:     user.(models.User).SteamID,
-			Username:    user.(models.User).Username,
+			UserName:    user.(models.User).UserName,
 			AvatarLink:  user.(models.User).AvatarLink,
 			CountryCode: user.(models.User).CountryCode,
 			ScoresSP:    scoresSP,
@@ -120,7 +120,7 @@ func FetchUser(c *gin.Context) {
 	// Check if user exists
 	var user models.User
 	err := database.DB.QueryRow(`SELECT * FROM users WHERE steam_id = $1;`, id).Scan(
-		&user.SteamID, &user.Username, &user.AvatarLink, &user.CountryCode,
+		&user.SteamID, &user.UserName, &user.AvatarLink, &user.CountryCode,
 		&user.CreatedAt, &user.UpdatedAt)
 	if user.SteamID == "" {
 		// User does not exist
@@ -190,7 +190,7 @@ func FetchUser(c *gin.Context) {
 		Data: models.ProfileResponse{
 			Profile:     true,
 			SteamID:     user.SteamID,
-			Username:    user.Username,
+			UserName:    user.UserName,
 			AvatarLink:  user.AvatarLink,
 			CountryCode: user.CountryCode,
 			ScoresSP:    scoresSP,
@@ -236,7 +236,7 @@ func UpdateUser(c *gin.Context) {
 		Data: models.ProfileResponse{
 			Profile:     true,
 			SteamID:     user.(models.User).SteamID,
-			Username:    profile.PersonaName,
+			UserName:    profile.PersonaName,
 			AvatarLink:  profile.AvatarFull,
 			CountryCode: profile.LocCountryCode,
 		},

@@ -29,7 +29,7 @@ func Home(c *gin.Context) {
 //	@Failure	400	{object}	models.Response
 //	@Router		/demo [get]
 func Rankings(c *gin.Context) {
-	rows, err := database.DB.Query(`SELECT steam_id, username FROM users;`)
+	rows, err := database.DB.Query(`SELECT steam_id, user_name FROM users;`)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
@@ -56,7 +56,7 @@ func Rankings(c *gin.Context) {
 		if uniqueSingleUserRecords == totalSingleMaps {
 			var ranking models.UserRanking
 			ranking.UserID = userID
-			ranking.Username = username
+			ranking.UserName = username
 			sql := `SELECT DISTINCT map_id, score_count FROM records_sp WHERE user_id = $1 ORDER BY map_id, score_count;`
 			rows, err := database.DB.Query(sql, userID)
 			if err != nil {
@@ -90,7 +90,7 @@ func Rankings(c *gin.Context) {
 		if uniqueMultiUserRecords == totalMultiMaps {
 			var ranking models.UserRanking
 			ranking.UserID = userID
-			ranking.Username = username
+			ranking.UserName = username
 			sql := `SELECT DISTINCT map_id, score_count FROM records_mp WHERE host_id = $1 OR partner_id = $2 ORDER BY map_id, score_count;`
 			rows, err := database.DB.Query(sql, userID, userID)
 			if err != nil {

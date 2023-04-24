@@ -56,7 +56,7 @@ func Login(c *gin.Context) {
 				user.LocCountryCode = "XX"
 			}
 			// Insert new user to database
-			database.DB.Exec(`INSERT INTO users (steam_id, username, avatar_link, country_code)
+			database.DB.Exec(`INSERT INTO users (steam_id, user_name, avatar_link, country_code)
 			VALUES ($1, $2, $3, $4)`, steamID, user.PersonaName, user.AvatarFull, user.LocCountryCode)
 		}
 		// Generate JWT token
