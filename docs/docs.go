@@ -620,6 +620,20 @@ const docTemplate = `{
                 }
             }
         },
+        "models.MapHistory": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "runner_name": {
+                    "type": "string"
+                },
+                "score_count": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.MapRecords": {
             "type": "object",
             "properties": {
@@ -635,8 +649,11 @@ const docTemplate = `{
                 "description": {
                     "type": "string"
                 },
-                "first_completion": {
-                    "type": "string"
+                "history": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.MapHistory"
+                    }
                 },
                 "rating": {
                     "type": "number"
@@ -679,7 +696,7 @@ const docTemplate = `{
                 "steam_id": {
                     "type": "string"
                 },
-                "username": {
+                "user_name": {
                     "type": "string"
                 }
             }
@@ -754,7 +771,7 @@ const docTemplate = `{
                 "user_id": {
                     "type": "string"
                 },
-                "username": {
+                "user_name": {
                     "type": "string"
                 }
             }

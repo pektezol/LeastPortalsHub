@@ -37,7 +37,7 @@ type MapSummary struct {
 	CategoryScores MapCategoryScores `json:"category_scores"`
 	Rating         float32           `json:"rating"`
 	Routers        []string          `json:"routers"`
-	History        any               `json:"history"`
+	History        []MapHistory      `json:"history"`
 }
 
 type MapCategoryScores struct {

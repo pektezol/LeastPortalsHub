@@ -613,6 +613,20 @@
                 }
             }
         },
+        "models.MapHistory": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "runner_name": {
+                    "type": "string"
+                },
+                "score_count": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.MapRecords": {
             "type": "object",
             "properties": {
@@ -628,8 +642,11 @@
                 "description": {
                     "type": "string"
                 },
-                "first_completion": {
-                    "type": "string"
+                "history": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.MapHistory"
+                    }
                 },
                 "rating": {
                     "type": "number"
@@ -672,7 +689,7 @@
                 "steam_id": {
                     "type": "string"
                 },
-                "username": {
+                "user_name": {
                     "type": "string"
                 }
             }
@@ -747,7 +764,7 @@
                 "user_id": {
                     "type": "string"
                 },
-                "username": {
+                "user_name": {
                     "type": "string"
                 }
             }

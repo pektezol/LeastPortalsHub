@@ -28,6 +28,15 @@ definitions:
       no_sla:
         type: integer
     type: object
+  models.MapHistory:
+    properties:
+      date:
+        type: string
+      runner_name:
+        type: string
+      score_count:
+        type: integer
+    type: object
   models.MapRecords:
     properties:
       records: {}
@@ -38,8 +47,10 @@ definitions:
         $ref: '#/definitions/models.MapCategoryScores'
       description:
         type: string
-      first_completion:
-        type: string
+      history:
+        items:
+          $ref: '#/definitions/models.MapHistory'
+        type: array
       rating:
         type: number
       routers:
@@ -67,7 +78,7 @@ definitions:
         type: array
       steam_id:
         type: string
-      username:
+      user_name:
         type: string
     type: object
   models.RankingsResponse:
@@ -117,7 +128,7 @@ definitions:
         type: integer
       user_id:
         type: string
-      username:
+      user_name:
         type: string
     type: object
 host: lp.ardapektezol.com/api
