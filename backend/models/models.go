@@ -37,7 +37,7 @@ type MapSummary struct {
 	CategoryScores  MapCategoryScores `json:"category_scores"`
 	Rating          float32           `json:"rating"`
 	Routers         []string          `json:"routers"`
-	FirstCompletion string            `json:"first_completion"`
+	FirstCompletion any               `json:"first_completion"`
 }
 
 type MapCategoryScores struct {
