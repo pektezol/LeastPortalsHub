@@ -21,9 +21,10 @@ func InitRoutes(router *gin.Engine) {
 		v1.GET("/profile", middleware.CheckAuth, controllers.Profile)
 		v1.PUT("/profile", middleware.CheckAuth, controllers.UpdateCountryCode)
 		v1.POST("/profile", middleware.CheckAuth, controllers.UpdateUser)
-		v1.GET("/user/:id", middleware.CheckAuth, controllers.FetchUser)
-		v1.GET("/demo", controllers.DownloadDemoWithID)
-		v1.GET("/maps/:id", middleware.CheckAuth, controllers.FetchMap)
+		v1.GET("/users/:id", middleware.CheckAuth, controllers.FetchUser)
+		v1.GET("/demos", controllers.DownloadDemoWithID)
+		v1.GET("/maps/:id/summary", middleware.CheckAuth, controllers.FetchMapSummary)
+		v1.GET("/maps/:id/leaderboards", middleware.CheckAuth, controllers.FetchMapLeaderboards)
 		v1.POST("/maps/:id/record", middleware.CheckAuth, controllers.CreateRecordWithDemo)
 		v1.GET("/rankings", middleware.CheckAuth, controllers.Rankings)
 	}

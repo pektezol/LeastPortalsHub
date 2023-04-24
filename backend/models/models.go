@@ -24,18 +24,39 @@ type User struct {
 }
 
 type Map struct {
-	ID      int    `json:"id"`
-	Name    string `json:"name"`
-	ScoreWR int    `json:"wr_score"`
-	TimeWR  int    `json:"wr_time"`
-	IsCoop  bool   `json:"is_coop"`
-	Records any    `json:"records"`
+	ID          int    `json:"id"`
+	GameName    string `json:"game_name"`
+	ChapterName string `json:"chapter_name"`
+	MapName     string `json:"map_name"`
+	Data        any    `json:"data"`
+}
+
+type MapSummary struct {
+	Description     string            `json:"description"`
+	Showcase        string            `json:"showcase"`
+	CategoryScores  MapCategoryScores `json:"category_scores"`
+	Rating          float32           `json:"rating"`
+	Routers         []string          `json:"routers"`
+	FirstCompletion string            `json:"first_completion"`
+}
+
+type MapCategoryScores struct {
+	CM          int `json:"cm"`
+	NoSLA       int `json:"no_sla"`
+	InboundsSLA int `json:"inbounds_sla"`
+	Any         int `json:"any"`
+}
+
+type MapRecords struct {
+	Records any `json:"records"`
 }
 
 type RecordSP struct {
 	RecordID   int       `json:"record_id"`
 	Placement  int       `json:"placement"`
 	UserID     string    `json:"user_id"`
+	UserName   string    `json:"user_name"`
+	UserAvatar string    `json:"user_avatar"`
 	ScoreCount int       `json:"score_count"`
 	ScoreTime  int       `json:"score_time"`
 	DemoID     string    `json:"demo_id"`
@@ -46,7 +67,11 @@ type RecordMP struct {
 	RecordID      int       `json:"record_id"`
 	Placement     int       `json:"placement"`
 	HostID        string    `json:"host_id"`
+	HostName      string    `json:"host_name"`
+	HostAvatar    string    `json:"host_avatar"`
 	PartnerID     string    `json:"partner_id"`
+	PartnerName   string    `json:"partner_name"`
+	PartnerAvatar string    `json:"partner_avatar"`
 	ScoreCount    int       `json:"score_count"`
 	ScoreTime     int       `json:"score_time"`
 	HostDemoID    string    `json:"host_demo_id"`

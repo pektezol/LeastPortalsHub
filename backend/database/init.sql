@@ -53,11 +53,22 @@ CREATE TABLE map_history (
   FOREIGN KEY (user_id) REFERENCES users(steam_id)
 );
 
-CREATE TABLE map_rating (
+CREATE TABLE map_ratings (
   id SERIAL,
   map_id SMALLINT NOT NULL,
   user_id TEXT NOT NULL,
   rating SMALLINT NOT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (map_id) REFERENCES maps(id),
+  FOREIGN KEY (user_id) REFERENCES users(steam_id)
+);
+
+CREATE TABLE map_routers (
+  id SMALLSERIAL,
+  map_id SMALLINT NOT NULL,
+  user_id TEXT,
+  user_name TEXT NOT NULL,
+  score_count SMALLINT NOT NULL,
   PRIMARY KEY (id),
   FOREIGN KEY (map_id) REFERENCES maps(id),
   FOREIGN KEY (user_id) REFERENCES users(steam_id)
