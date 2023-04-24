@@ -201,7 +201,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 //	@Param		uuid	query		int		true	"Demo UUID"
 //	@Success	200		{file}		binary	"Demo File"
 //	@Failure	400		{object}	models.Response
-//	@Router		/demo [get]
+//	@Router		/demos [get]
 func DownloadDemoWithID(c *gin.Context) {
 	uuid := c.Query("uuid")
 	var locationID string
