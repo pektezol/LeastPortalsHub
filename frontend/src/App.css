@@ -1,9 +1,20 @@
 body {
+    overflow: hidden;
     background-color: #141520;
     margin: 0;
 }
 
 @font-face {
-    font-family: 'D-DIN';
-    src: local('D-DIN'), url(./fonts/D-DIN.otf) format('oft');
+    font-family: 'BarlowCondensed-Bold';
+    src: local('BarlowCondensed-Bold'), url(./fonts/BarlowCondensed-Bold.ttf) format('truetype');
+}
+
+@font-face {
+    font-family: 'BarlowCondensed-Regular';
+    src: local('BarlowCondensed-Regular'), url(./fonts/BarlowCondensed-Regular.ttf) format('truetype');
+}
+
+@font-face {
+    font-family: 'BarlowSemiCondensed-Regular';
+    src: local('BarlowSemiCondensed-Regular'), url(./fonts/BarlowSemiCondensed-Regular.ttf) format('truetype');
 }
