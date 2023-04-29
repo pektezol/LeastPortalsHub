@@ -1,0 +1,11 @@
+main {
+    overflow: auto;
+    position: relative;
+    width: calc(100% - 350px);
+    height: 100vh;
+    left: 350px;
+    /* background-color: red; */
+    font-size: 40px;
+    font-family: BarlowSemiCondensed-Regular;
+    color: white;
+}
