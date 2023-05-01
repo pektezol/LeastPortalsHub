@@ -143,8 +143,6 @@ info:
 paths:
   /demo:
     get:
-      consumes:
-      - application/json
       produces:
       - application/json
       responses:
@@ -441,6 +439,22 @@ paths:
       summary: Update country code of session user.
       tags:
       - users
+  /search:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Get all user and map data.
+      tags:
+      - search
   /users/{id}:
     get:
       consumes:

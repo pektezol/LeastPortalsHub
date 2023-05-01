@@ -118,6 +118,17 @@ type ScoreResponse struct {
 	Records any `json:"records"`
 }
 
+type SearchResponse struct {
+	Players []struct {
+		SteamID  string `json:"steam_id"`
+		UserName string `json:"user_name"`
+	} `json:"players"`
+	Maps []struct {
+		ID   int    `json:"id"`
+		Name string `json:"name"`
+	} `json:"maps"`
+}
+
 type PlayerSummaries struct {
 	SteamId                  string `json:"steamid"`
 	CommunityVisibilityState int    `json:"communityvisibilitystate"`
