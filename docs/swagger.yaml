@@ -2,12 +2,19 @@ basePath: /v1
 definitions:
   models.Chapter:
     properties:
-      game_id:
-        type: integer
       id:
         type: integer
       name:
         type: string
+    type: object
+  models.ChaptersResponse:
+    properties:
+      chapters:
+        items:
+          $ref: '#/definitions/models.Chapter'
+        type: array
+      game:
+        $ref: '#/definitions/models.Game'
     type: object
   models.Game:
     properties:
@@ -59,8 +66,6 @@ definitions:
     type: object
   models.MapShort:
     properties:
-      chapter_id:
-        type: integer
       id:
         type: integer
       name:
@@ -205,9 +210,7 @@ paths:
             - $ref: '#/definitions/models.Response'
             - properties:
                 data:
-                  items:
-                    $ref: '#/definitions/models.Chapter'
-                  type: array
+                  $ref: '#/definitions/models.ChaptersResponse'
               type: object
         "400":
           description: Bad Request

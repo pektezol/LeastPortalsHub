@@ -50,10 +50,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/models.Chapter"
-                                            }
+                                            "$ref": "#/definitions/models.ChaptersResponse"
                                         }
                                     }
                                 }
@@ -746,14 +743,25 @@ const docTemplate = `{
         "models.Chapter": {
             "type": "object",
             "properties": {
-                "game_id": {
-                    "type": "integer"
-                },
                 "id": {
                     "type": "integer"
                 },
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "models.ChaptersResponse": {
+            "type": "object",
+            "properties": {
+                "chapters": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Chapter"
+                    }
+                },
+                "game": {
+                    "$ref": "#/definitions/models.Game"
                 }
             }
         },
@@ -834,9 +842,6 @@ const docTemplate = `{
         "models.MapShort": {
             "type": "object",
             "properties": {
-                "chapter_id": {
-                    "type": "integer"
-                },
                 "id": {
                     "type": "integer"
                 },

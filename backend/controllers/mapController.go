@@ -250,7 +250,7 @@ func FetchGames(c *gin.Context) {
 //	@Tags		chapters
 //	@Produce	json
 //	@Param		id	path		int	true	"Game ID"
-//	@Success	200	{object}	models.Response{data=[]models.Chapter}
+//	@Success	200	{object}	models.Response{data=models.ChaptersResponse}
 //	@Failure	400	{object}	models.Response
 //	@Router		/chapters/{id} [get]
 func FetchChapters(c *gin.Context) {
@@ -260,25 +260,29 @@ func FetchChapters(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	rows, err := database.DB.Query(`SELECT id, name FROM chapters WHERE game_id = $1`, gameID)
+	var response models.ChaptersResponse
+	rows, err := database.DB.Query(`SELECT c.id, c.name, g.name FROM chapters c INNER JOIN games g ON c.game_id = g.id WHERE game_id = $1`, gameID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
 	var chapters []models.Chapter
+	var gameName string
 	for rows.Next() {
 		var chapter models.Chapter
-		if err := rows.Scan(&chapter.ID, &chapter.Name); err != nil {
+		if err := rows.Scan(&chapter.ID, &chapter.Name, &gameName); err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
-		chapter.GameID = intID
 		chapters = append(chapters, chapter)
 	}
+	response.Game.ID = intID
+	response.Game.Name = gameName
+	response.Chapters = chapters
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully retrieved chapters.",
-		Data:    chapters,
+		Data:    response,
 	})
 }
 
@@ -298,24 +302,28 @@ func FetchChapterMaps(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	rows, err := database.DB.Query(`SELECT id, name FROM maps WHERE chapter_id = $1`, chapterID)
+	var response models.ChapterMapsResponse
+	rows, err := database.DB.Query(`SELECT m.id, m.name, c.name FROM maps m INNER JOIN chapters c ON m.chapter_id = c.id WHERE chapter_id = $1`, chapterID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
 	var maps []models.MapShort
+	var chapterName string
 	for rows.Next() {
 		var mapShort models.MapShort
-		if err := rows.Scan(&mapShort.ID, &mapShort.Name); err != nil {
+		if err := rows.Scan(&mapShort.ID, &mapShort.Name, &chapterName); err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
-		mapShort.ChapterID = intID
 		maps = append(maps, mapShort)
 	}
+	response.Chapter.ID = intID
+	response.Chapter.Name = chapterName
+	response.Maps = maps
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully retrieved maps.",
-		Data:    maps,
+		Data:    response,
 	})
 }

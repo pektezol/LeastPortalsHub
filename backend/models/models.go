@@ -158,16 +158,24 @@ type Game struct {
 	Name string `json:"name"`
 }
 
+type ChaptersResponse struct {
+	Game     Game      `json:"game"`
+	Chapters []Chapter `json:"chapters"`
+}
+
 type Chapter struct {
-	ID     int    `json:"id"`
-	GameID int    `json:"game_id"`
-	Name   string `json:"name"`
+	ID   int    `json:"id"`
+	Name string `json:"name"`
 }
 
 type MapShort struct {
-	ID        int    `json:"id"`
-	ChapterID int    `json:"chapter_id"`
-	Name      string `json:"name"`
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+type ChapterMapsResponse struct {
+	Chapter Chapter    `json:"chapter"`
+	Maps    []MapShort `json:"maps"`
 }
 
 func ErrorResponse(message string) Response {
