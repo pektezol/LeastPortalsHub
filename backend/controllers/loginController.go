@@ -62,7 +62,7 @@ func Login(c *gin.Context) {
 		// Generate JWT token
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 			"sub": steamID,
-			"exp": time.Now().Add(time.Hour * 24 * 365).Unix(),
+			"exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
 		})
 		// Sign and get the complete encoded token as a string using the secret
 		tokenString, err := token.SignedString([]byte(os.Getenv("SECRET_KEY")))
@@ -70,13 +70,15 @@ func Login(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse("Failed to generate token."))
 			return
 		}
-		c.JSON(http.StatusOK, models.Response{
-			Success: true,
-			Message: "Successfully generated token.",
-			Data: models.LoginResponse{
-				Token: tokenString,
-			},
-		})
+		c.SetCookie("token", tokenString, 3600*24*30, "/", "", true, true)
+		c.Redirect(http.StatusTemporaryRedirect, "/")
+		// c.JSON(http.StatusOK, models.Response{
+		// 	Success: true,
+		// 	Message: "Successfully generated token.",
+		// 	Data: models.LoginResponse{
+		// 		Token: tokenString,
+		// 	},
+		// })
 		return
 	}
 }

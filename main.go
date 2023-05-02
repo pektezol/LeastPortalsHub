@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/gin-gonic/contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/pektezol/leastportals/backend/database"
@@ -20,8 +19,8 @@ import (
 //	@license.name	GNU General Public License, Version 2
 //	@license.url	https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
-// @host		lp.ardapektezol.com/api
-// @BasePath	/v1
+//	@host		lp.ardapektezol.com/api
+//	@BasePath	/v1
 func main() {
 	if os.Getenv("ENV") == "PROD" {
 		gin.SetMode(gin.ReleaseMode)
@@ -31,12 +30,9 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 	router := gin.Default()
-	router.Use(cors.New(cors.Config{
-		AllowedOrigins: []string{"https://steamcommunity.com"},
-	}))
 	database.ConnectDB()
 	// For frontend static serving - only for local debug
-	// router.Use(static.Serve("/", static.LocalFile("./frontend/dist", true)))
+	// router.Use(static.Serve("/", static.LocalFile("./frontend/build", true)))
 	routes.InitRoutes(router)
 	router.Run(fmt.Sprintf(":%s", os.Getenv("PORT")))
 }
