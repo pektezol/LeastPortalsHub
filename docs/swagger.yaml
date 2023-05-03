@@ -7,6 +7,15 @@ definitions:
       name:
         type: string
     type: object
+  models.ChapterMapsResponse:
+    properties:
+      chapter:
+        $ref: '#/definitions/models.Chapter'
+      maps:
+        items:
+          $ref: '#/definitions/models.MapShort'
+        type: array
+    type: object
   models.ChaptersResponse:
     properties:
       chapters:
@@ -195,7 +204,7 @@ paths:
   /chapters/{id}:
     get:
       parameters:
-      - description: Game ID
+      - description: Chapter ID
         in: path
         name: id
         required: true
@@ -210,15 +219,15 @@ paths:
             - $ref: '#/definitions/models.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/models.ChaptersResponse'
+                  $ref: '#/definitions/models.ChapterMapsResponse'
               type: object
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Get chapters from the specified game id.
+      summary: Get maps from the specified chapter id.
       tags:
-      - chapters
+      - games & chapters
   /demo:
     get:
       produces:
@@ -286,7 +295,34 @@ paths:
             $ref: '#/definitions/models.Response'
       summary: Get games from the leaderboards.
       tags:
-      - games
+      - games & chapters
+  /games/{id}:
+    get:
+      parameters:
+      - description: Game ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.ChaptersResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Get chapters from the specified game id.
+      tags:
+      - games & chapters
   /login:
     get:
       consumes:
@@ -310,35 +346,6 @@ paths:
       summary: Get (redirect) login page for Steam auth.
       tags:
       - login
-  /maps/{id}:
-    get:
-      parameters:
-      - description: Chapter ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/models.Response'
-            - properties:
-                data:
-                  items:
-                    $ref: '#/definitions/models.MapShort'
-                  type: array
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Response'
-      summary: Get maps from the specified chapter id.
-      tags:
-      - maps
   /maps/{id}/leaderboards:
     get:
       parameters:

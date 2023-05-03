@@ -31,7 +31,7 @@ func Profile(c *gin.Context) {
 	}
 	// Retrieve singleplayer records
 	var scoresSP []models.ScoreResponse
-	sql := `SELECT id, map_id, score_count, score_time, demo_id, record_date FROM records_sp WHERE user_id = $1 ORDER BY map_id;`
+	sql := `SELECT id, map_id, score_count, score_time, demo_id, record_date FROM records_sp WHERE user_id = $1 ORDER BY map_id`
 	rows, err := database.DB.Query(sql, user.(models.User).SteamID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
@@ -58,7 +58,7 @@ func Profile(c *gin.Context) {
 	// Retrieve multiplayer records
 	var scoresMP []models.ScoreResponse
 	sql = `SELECT id, map_id, host_id, partner_id, score_count, score_time, host_demo_id, partner_demo_id, record_date FROM records_mp
-	WHERE host_id = $1 OR partner_id = $2 ORDER BY map_id;`
+	WHERE host_id = $1 OR partner_id = $2 ORDER BY map_id`
 	rows, err = database.DB.Query(sql, user.(models.User).SteamID, user.(models.User).SteamID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
@@ -119,7 +119,7 @@ func FetchUser(c *gin.Context) {
 	}
 	// Check if user exists
 	var user models.User
-	err := database.DB.QueryRow(`SELECT * FROM users WHERE steam_id = $1;`, id).Scan(
+	err := database.DB.QueryRow(`SELECT * FROM users WHERE steam_id = $1`, id).Scan(
 		&user.SteamID, &user.UserName, &user.AvatarLink, &user.CountryCode,
 		&user.CreatedAt, &user.UpdatedAt)
 	if user.SteamID == "" {
@@ -133,7 +133,7 @@ func FetchUser(c *gin.Context) {
 	}
 	// Retrieve singleplayer records
 	var scoresSP []models.ScoreResponse
-	sql := `SELECT id, map_id, score_count, score_time, demo_id, record_date FROM records_sp WHERE user_id = $1 ORDER BY map_id;`
+	sql := `SELECT id, map_id, score_count, score_time, demo_id, record_date FROM records_sp WHERE user_id = $1 ORDER BY map_id`
 	rows, err := database.DB.Query(sql, user.SteamID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
@@ -160,7 +160,7 @@ func FetchUser(c *gin.Context) {
 	// Retrieve multiplayer records
 	var scoresMP []models.ScoreResponse
 	sql = `SELECT id, map_id, host_id, partner_id, score_count, score_time, host_demo_id, partner_demo_id, record_date FROM records_mp
-	WHERE host_id = $1 OR partner_id = $2 ORDER BY map_id;`
+	WHERE host_id = $1 OR partner_id = $2 ORDER BY map_id`
 	rows, err = database.DB.Query(sql, user.SteamID, user.SteamID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
@@ -225,7 +225,7 @@ func UpdateUser(c *gin.Context) {
 	}
 	// Update profile
 	_, err = database.DB.Exec(`UPDATE users SET username = $1, avatar_link = $2, country_code = $3, updated_at = $4
-	WHERE steam_id = $5;`, profile.PersonaName, profile.AvatarFull, profile.LocCountryCode, time.Now().UTC(), user.(models.User).SteamID)
+	WHERE steam_id = $5`, profile.PersonaName, profile.AvatarFull, profile.LocCountryCode, time.Now().UTC(), user.(models.User).SteamID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
@@ -268,7 +268,7 @@ func UpdateCountryCode(c *gin.Context) {
 		return
 	}
 	var validCode string
-	err := database.DB.QueryRow(`SELECT country_code FROM countries WHERE country_code = $1;`, code).Scan(&validCode)
+	err := database.DB.QueryRow(`SELECT country_code FROM countries WHERE country_code = $1`, code).Scan(&validCode)
 	if err != nil {
 		c.JSON(http.StatusNotFound, models.ErrorResponse(err.Error()))
 		return

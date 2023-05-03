@@ -56,7 +56,7 @@ func FetchMapSummary(c *gin.Context) {
 	FROM maps m
 	INNER JOIN games g ON m.game_id = g.id
 	INNER JOIN chapters c ON m.chapter_id = c.id
-	WHERE m.id = $1;`
+	WHERE m.id = $1`
 	// TODO: CategoryScores
 	err = database.DB.QueryRow(sql, id).Scan(&mapData.GameName, &mapData.ChapterName, &mapData.MapName, &mapSummaryData.Description, &mapSummaryData.Showcase, &routers, &mapSummaryData.Rating)
 	if err != nil {
@@ -68,7 +68,7 @@ func FetchMapSummary(c *gin.Context) {
 	var historyDates pq.StringArray
 	sql = `SELECT array_agg(user_name), array_agg(score_count), array_agg(record_date)
 	FROM map_history
-	WHERE map_id = $1;`
+	WHERE map_id = $1`
 	err = database.DB.QueryRow(sql, id).Scan(&historyNames, &historyScores, &historyDates)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
@@ -123,7 +123,7 @@ func FetchMapLeaderboards(c *gin.Context) {
 	FROM maps m
 	INNER JOIN games g ON m.game_id = g.id
 	INNER JOIN chapters c ON m.chapter_id = c.id
-	WHERE m.id = $1;`
+	WHERE m.id = $1`
 	err = database.DB.QueryRow(sql, id).Scan(&mapData.GameName, &mapData.ChapterName, &mapData.MapName, &isDisabled)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
@@ -144,7 +144,7 @@ func FetchMapLeaderboards(c *gin.Context) {
 		  FROM records_mp
 		  WHERE map_id = $1
 		) sub
-		WHERE rn = 1;`
+		WHERE rn = 1`
 		rows, err := database.DB.Query(sql, id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
@@ -179,7 +179,7 @@ func FetchMapLeaderboards(c *gin.Context) {
 		  WHERE map_id = $1
 		) sub
 		INNER JOIN users ON user_id = users.steam_id
-		WHERE rn = 1;`
+		WHERE rn = 1`
 		rows, err := database.DB.Query(sql, id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
@@ -217,7 +217,7 @@ func FetchMapLeaderboards(c *gin.Context) {
 // GET Games
 //
 //	@Summary	Get games from the leaderboards.
-//	@Tags		games
+//	@Tags		games & chapters
 //	@Produce	json
 //	@Success	200	{object}	models.Response{data=[]models.Game}
 //	@Failure	400	{object}	models.Response
@@ -247,12 +247,12 @@ func FetchGames(c *gin.Context) {
 // GET Chapters of a Game
 //
 //	@Summary	Get chapters from the specified game id.
-//	@Tags		chapters
+//	@Tags		games & chapters
 //	@Produce	json
 //	@Param		id	path		int	true	"Game ID"
 //	@Success	200	{object}	models.Response{data=models.ChaptersResponse}
 //	@Failure	400	{object}	models.Response
-//	@Router		/chapters/{id} [get]
+//	@Router		/games/{id} [get]
 func FetchChapters(c *gin.Context) {
 	gameID := c.Param("id")
 	intID, err := strconv.Atoi(gameID)
@@ -289,12 +289,12 @@ func FetchChapters(c *gin.Context) {
 // GET Maps of a Chapter
 //
 //	@Summary	Get maps from the specified chapter id.
-//	@Tags		maps
+//	@Tags		games & chapters
 //	@Produce	json
 //	@Param		id	path		int	true	"Chapter ID"
-//	@Success	200	{object}	models.Response{data=[]models.MapShort}
+//	@Success	200	{object}	models.Response{data=models.ChapterMapsResponse}
 //	@Failure	400	{object}	models.Response
-//	@Router		/maps/{id} [get]
+//	@Router		/chapters/{id} [get]
 func FetchChapterMaps(c *gin.Context) {
 	chapterID := c.Param("id")
 	intID, err := strconv.Atoi(chapterID)

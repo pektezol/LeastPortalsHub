@@ -26,13 +26,13 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "chapters"
+                    "games \u0026 chapters"
                 ],
-                "summary": "Get chapters from the specified game id.",
+                "summary": "Get maps from the specified chapter id.",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "Game ID",
+                        "description": "Chapter ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -50,7 +50,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/models.ChaptersResponse"
+                                            "$ref": "#/definitions/models.ChapterMapsResponse"
                                         }
                                     }
                                 }
@@ -146,7 +146,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "games"
+                    "games \u0026 chapters"
                 ],
                 "summary": "Get games from the leaderboards.",
                 "responses": {
@@ -165,6 +165,52 @@ const docTemplate = `{
                                             "items": {
                                                 "$ref": "#/definitions/models.Game"
                                             }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/games/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "games \u0026 chapters"
+                ],
+                "summary": "Get chapters from the specified game id.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Game ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.ChaptersResponse"
                                         }
                                     }
                                 }
@@ -205,55 +251,6 @@ const docTemplate = `{
                                     "properties": {
                                         "data": {
                                             "$ref": "#/definitions/models.LoginResponse"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/maps/{id}": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "maps"
-                ],
-                "summary": "Get maps from the specified chapter id.",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Chapter ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/models.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/models.MapShort"
-                                            }
                                         }
                                     }
                                 }
@@ -748,6 +745,20 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "models.ChapterMapsResponse": {
+            "type": "object",
+            "properties": {
+                "chapter": {
+                    "$ref": "#/definitions/models.Chapter"
+                },
+                "maps": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.MapShort"
+                    }
                 }
             }
         },
