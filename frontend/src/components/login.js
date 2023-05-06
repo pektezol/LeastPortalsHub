@@ -25,7 +25,7 @@ React.useEffect(() => {
     .then(d => {setToken(d.data.token);console.log(d)})
     }, []);
 
-const [[profile], setProfile] = React.useState();
+const [profile, setProfile] = React.useState();
 React.useEffect(() => {
     fetch(`/api/v1/profile`,{
         headers: {
