@@ -25,7 +25,6 @@ React.useEffect(() => {
     .then(d => {
       setToken(d.data.token);
       setIsLoggedIn(true)
-      console.log(d)
     })
     }, []);
 
@@ -38,7 +37,7 @@ React.useEffect(() => {
         }})
     .then(r => r.json())
     .then(d => {setProfile(d.data);console.log(d)})
-    console.log(profile)
+    console.log("profile:",profile)
     }, [isLoggedIn]);
 
 
