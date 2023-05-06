@@ -83,6 +83,30 @@ func Login(c *gin.Context) {
 	}
 }
 
+// GET Token
+//
+//		@Summary Gets the token cookie value from the user.
+//		@Tags auth
+//	 @Produce json
+//
+// @Success 200 {object} models.Respnose{data=models.LoginResponse}
+// @Failure 404 {object} models.Response
+// @Router /token [get]
+func GetCookie(c *gin.Context) {
+	cookie, err := c.Cookie("token")
+	if err != nil {
+		c.JSON(http.StatusNotFound, models.ErrorResponse("No token cookie found."))
+		return
+	}
+	c.JSON(http.StatusOK, models.Response{
+		Success: true,
+		Message: "Token cookie successfully retrieved.",
+		Data: models.LoginResponse{
+			Token: cookie,
+		},
+	})
+}
+
 func GetPlayerSummaries(steamId, apiKey string) (*models.PlayerSummaries, error) {
 	url := fmt.Sprintf("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=%s&steamids=%s", apiKey, steamId)
 	resp, err := http.Get(url)
