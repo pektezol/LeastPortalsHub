@@ -85,13 +85,13 @@ func Login(c *gin.Context) {
 
 // GET Token
 //
-//		@Summary Gets the token cookie value from the user.
-//		@Tags auth
-//	 @Produce json
+//	@Summary	Gets the token cookie value from the user.
+//	@Tags		auth
+//	@Produce	json
 //
-// @Success 200 {object} models.Respnose{data=models.LoginResponse}
-// @Failure 404 {object} models.Response
-// @Router /token [get]
+//	@Success	200	{object}	models.Response{data=models.LoginResponse}
+//	@Failure	404	{object}	models.Response
+//	@Router		/token [get]
 func GetCookie(c *gin.Context) {
 	cookie, err := c.Cookie("token")
 	if err != nil {

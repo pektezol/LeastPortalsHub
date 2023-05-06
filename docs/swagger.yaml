@@ -593,6 +593,27 @@ paths:
       summary: Get all user and map data.
       tags:
       - search
+  /token:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.LoginResponse'
+              type: object
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Gets the token cookie value from the user.
+      tags:
+      - auth
   /users/{id}:
     get:
       consumes:
