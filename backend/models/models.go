@@ -153,6 +153,31 @@ type PlayerSummaries struct {
 	GameServerIp      string `json:"gameserverip"`
 }
 
+type Game struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+type ChaptersResponse struct {
+	Game     Game      `json:"game"`
+	Chapters []Chapter `json:"chapters"`
+}
+
+type Chapter struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+type MapShort struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+type ChapterMapsResponse struct {
+	Chapter Chapter    `json:"chapter"`
+	Maps    []MapShort `json:"maps"`
+}
+
 func ErrorResponse(message string) Response {
 	return Response{
 		Success: false,

@@ -29,7 +29,7 @@ func Home(c *gin.Context) {
 //	@Failure	400	{object}	models.Response
 //	@Router		/demo [get]
 func Rankings(c *gin.Context) {
-	rows, err := database.DB.Query(`SELECT steam_id, user_name FROM users;`)
+	rows, err := database.DB.Query(`SELECT steam_id, user_name FROM users`)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
@@ -46,7 +46,7 @@ func Rankings(c *gin.Context) {
 		// Getting all sp records for each user
 		var uniqueSingleUserRecords, totalSingleMaps int
 		sql := `SELECT COUNT(DISTINCT map_id), (SELECT COUNT(map_name) FROM maps 
-		WHERE is_coop = FALSE AND is_disabled = false) FROM records_sp WHERE user_id = $1;`
+		WHERE is_coop = FALSE AND is_disabled = false) FROM records_sp WHERE user_id = $1`
 		err = database.DB.QueryRow(sql, userID).Scan(&uniqueSingleUserRecords, &totalSingleMaps)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
@@ -57,7 +57,7 @@ func Rankings(c *gin.Context) {
 			var ranking models.UserRanking
 			ranking.UserID = userID
 			ranking.UserName = username
-			sql := `SELECT DISTINCT map_id, score_count FROM records_sp WHERE user_id = $1 ORDER BY map_id, score_count;`
+			sql := `SELECT DISTINCT map_id, score_count FROM records_sp WHERE user_id = $1 ORDER BY map_id, score_count`
 			rows, err := database.DB.Query(sql, userID)
 			if err != nil {
 				c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
@@ -80,7 +80,7 @@ func Rankings(c *gin.Context) {
 		// Getting all mp records for each user
 		var uniqueMultiUserRecords, totalMultiMaps int
 		sql = `SELECT COUNT(DISTINCT map_id), (SELECT COUNT(map_name) FROM maps 
-		WHERE is_coop = TRUE AND is_disabled = false) FROM records_mp WHERE host_id = $1 OR partner_id = $2;`
+		WHERE is_coop = TRUE AND is_disabled = false) FROM records_mp WHERE host_id = $1 OR partner_id = $2`
 		err = database.DB.QueryRow(sql, userID, userID).Scan(&uniqueMultiUserRecords, &totalMultiMaps)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
@@ -91,7 +91,7 @@ func Rankings(c *gin.Context) {
 			var ranking models.UserRanking
 			ranking.UserID = userID
 			ranking.UserName = username
-			sql := `SELECT DISTINCT map_id, score_count FROM records_mp WHERE host_id = $1 OR partner_id = $2 ORDER BY map_id, score_count;`
+			sql := `SELECT DISTINCT map_id, score_count FROM records_mp WHERE host_id = $1 OR partner_id = $2 ORDER BY map_id, score_count`
 			rows, err := database.DB.Query(sql, userID, userID)
 			if err != nil {
 				c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))

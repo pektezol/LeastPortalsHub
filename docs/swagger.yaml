@@ -1,5 +1,37 @@
 basePath: /v1
 definitions:
+  models.Chapter:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  models.ChapterMapsResponse:
+    properties:
+      chapter:
+        $ref: '#/definitions/models.Chapter'
+      maps:
+        items:
+          $ref: '#/definitions/models.MapShort'
+        type: array
+    type: object
+  models.ChaptersResponse:
+    properties:
+      chapters:
+        items:
+          $ref: '#/definitions/models.Chapter'
+        type: array
+      game:
+        $ref: '#/definitions/models.Game'
+    type: object
+  models.Game:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
   models.LoginResponse:
     properties:
       token:
@@ -40,6 +72,13 @@ definitions:
   models.MapRecords:
     properties:
       records: {}
+    type: object
+  models.MapShort:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
     type: object
   models.MapSummary:
     properties:
@@ -122,6 +161,27 @@ definitions:
         type: integer
       records: {}
     type: object
+  models.SearchResponse:
+    properties:
+      maps:
+        items:
+          properties:
+            id:
+              type: integer
+            name:
+              type: string
+          type: object
+        type: array
+      players:
+        items:
+          properties:
+            steam_id:
+              type: string
+            user_name:
+              type: string
+          type: object
+        type: array
+    type: object
   models.UserRanking:
     properties:
       total_score:
@@ -141,6 +201,33 @@ info:
   title: Least Portals Database API
   version: "1.0"
 paths:
+  /chapters/{id}:
+    get:
+      parameters:
+      - description: Chapter ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.ChapterMapsResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Get maps from the specified chapter id.
+      tags:
+      - games & chapters
   /demo:
     get:
       produces:
@@ -186,6 +273,56 @@ paths:
       summary: Get demo with specified demo uuid.
       tags:
       - demo
+  /games:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.Game'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Get games from the leaderboards.
+      tags:
+      - games & chapters
+  /games/{id}:
+    get:
+      parameters:
+      - description: Game ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.ChaptersResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Get chapters from the specified game id.
+      tags:
+      - games & chapters
   /login:
     get:
       consumes:
@@ -211,8 +348,6 @@ paths:
       - login
   /maps/{id}/leaderboards:
     get:
-      consumes:
-      - application/json
       parameters:
       - description: Map ID
         in: path
@@ -305,8 +440,6 @@ paths:
       - maps
   /maps/{id}/summary:
     get:
-      consumes:
-      - application/json
       parameters:
       - description: Map ID
         in: path
@@ -447,7 +580,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Response'
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.SearchResponse'
+              type: object
         "400":
           description: Bad Request
           schema:

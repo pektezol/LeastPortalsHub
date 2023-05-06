@@ -46,7 +46,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 	var gameID int
 	var isCoop bool
 	var isDisabled bool
-	sql := `SELECT game_id, is_disabled FROM maps WHERE id = $1;`
+	sql := `SELECT game_id, is_disabled FROM maps WHERE id = $1`
 	err := database.DB.QueryRow(sql, mapId).Scan(&gameID, &isDisabled)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
@@ -153,7 +153,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 	// Insert into records
 	if isCoop {
 		sql := `INSERT INTO records_mp(map_id,score_count,score_time,host_id,partner_id,host_demo_id,partner_demo_id) 
-		VALUES($1, $2, $3, $4, $5, $6, $7);`
+		VALUES($1, $2, $3, $4, $5, $6, $7)`
 		var hostID string
 		var partnerID string
 		if record.IsPartnerOrange {
@@ -171,7 +171,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 		}
 		// If a new world record based on portal count
 		// if record.ScoreCount < wrScore {
-		// 	_, err := tx.Exec(`UPDATE maps SET wr_score = $1, wr_time = $2 WHERE id = $3;`, record.ScoreCount, record.ScoreTime, mapId)
+		// 	_, err := tx.Exec(`UPDATE maps SET wr_score = $1, wr_time = $2 WHERE id = $3`, record.ScoreCount, record.ScoreTime, mapId)
 		// 	if err != nil {
 		// 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		// 		return
@@ -179,7 +179,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 		// }
 	} else {
 		sql := `INSERT INTO records_sp(map_id,score_count,score_time,user_id,demo_id) 
-		VALUES($1, $2, $3, $4, $5);`
+		VALUES($1, $2, $3, $4, $5)`
 		_, err := tx.Exec(sql, mapId, record.ScoreCount, record.ScoreTime, user.(models.User).SteamID, hostDemoUUID)
 		if err != nil {
 			deleteFile(srv, fileID)
@@ -188,7 +188,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 		}
 		// If a new world record based on portal count
 		// if record.ScoreCount < wrScore {
-		// 	_, err := tx.Exec(`UPDATE maps SET wr_score = $1, wr_time = $2 WHERE id = $3;`, record.ScoreCount, record.ScoreTime, mapId)
+		// 	_, err := tx.Exec(`UPDATE maps SET wr_score = $1, wr_time = $2 WHERE id = $3`, record.ScoreCount, record.ScoreTime, mapId)
 		// 	if err != nil {
 		// 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		// 		return
@@ -224,7 +224,7 @@ func DownloadDemoWithID(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse("Invalid id given."))
 		return
 	}
-	err := database.DB.QueryRow(`SELECT location_id FROM demos WHERE id = $1;`, uuid).Scan(&locationID)
+	err := database.DB.QueryRow(`SELECT location_id FROM demos WHERE id = $1`, uuid).Scan(&locationID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
