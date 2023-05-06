@@ -17,7 +17,7 @@ function logout() {
     setIsLoggedIn(false)
     setProfile(null)
     setToken(null)
-    window.location.href="/"
+    setTimeout(() => {window.location.href="/"}, 300);
 }
 const [token, setToken] = React.useState(null);
 const [isLoggedIn, setIsLoggedIn] = React.useState(false);
