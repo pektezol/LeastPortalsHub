@@ -14,16 +14,18 @@ function login() {
 }
 function logout() {
     setToken(null)
+    setIsLoggedIn(false)
     fetch(`/api/v1/token`,{'method':'DELETE'})
     window.location.href="/"
 }
 const [token, setToken] = React.useState(null);
-const isLoggedIn = token !== null;
+const [isLoggedIn, setIsLoggedIn] = React.useState(false);
 React.useEffect(() => {
     fetch(`/api/v1/token`)
     .then(r => r.json())
     .then(d => {
       setToken(d.data.token);
+      setIsLoggedIn(true)
     })
     }, []);
 
