@@ -33,6 +33,7 @@ func main() {
 	router := gin.Default()
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = true
+	config.AllowCredentials = true
 	router.Use(cors.New(config))
 	database.ConnectDB()
 	// For frontend static serving - only for local debug
