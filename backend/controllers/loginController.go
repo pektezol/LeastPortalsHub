@@ -107,6 +107,31 @@ func GetCookie(c *gin.Context) {
 	})
 }
 
+// DELETE Token
+//
+//	@Summary	Deletes the token cookie from the user.
+//	@Tags		auth
+//	@Produce	json
+//
+//	@Success	200	{object}	models.Response{data=models.LoginResponse}
+//	@Failure	404	{object}	models.Response
+//	@Router		/token [delete]
+func DeleteCookie(c *gin.Context) {
+	cookie, err := c.Cookie("token")
+	if err != nil {
+		c.JSON(http.StatusNotFound, models.ErrorResponse("No token cookie found."))
+		return
+	}
+	c.SetCookie("token", "", -1, "/", "", true, true)
+	c.JSON(http.StatusOK, models.Response{
+		Success: true,
+		Message: "Token cookie successfully deleted.",
+		Data: models.LoginResponse{
+			Token: cookie,
+		},
+	})
+}
+
 func GetPlayerSummaries(steamId, apiKey string) (*models.PlayerSummaries, error) {
 	url := fmt.Sprintf("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=%s&steamids=%s", apiKey, steamId)
 	resp, err := http.Get(url)
