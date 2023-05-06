@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from "react-router-dom";
-import Cookies from "js-cookie";
 
 import "./login.css";
 import img1 from "../imgs/login.png"
@@ -10,22 +9,31 @@ import img3 from "../imgs/11.png"
 
 export default function Login() {
 
-const isLoggedIn = Cookies.get('token') !== undefined;
-
+function login() {
+    window.location.href="https://lp.ardapektezol.com/api/v1/login"
+}
 function logout() {
-    Cookies.remove('token')
+    setToken(null)
     window.location.href="/"
 }
 
-const [data, setData] = React.useState();
+const [token, setToken] = React.useState(null);
+const isLoggedIn = token !== null;
+React.useEffect(() => {
+    fetch(`/api/v1/token`)
+    .then(r => {console.log(r)})
+    .then(d => {setToken(d.data.token);console.log(d)})
+    }, []);
+
+const [[profile], setProfile] = React.useState();
 React.useEffect(() => {
     fetch(`/api/v1/profile`,{
         headers: {
 			'Content-Type': 'application/json',
-            Authorization: Cookies.get('token')
+            Authorization: token
         }})
     .then(r => {console.log(r)})
-    .then(d => {setData(d);console.log(d)})
+    .then(d => {setProfile(d);console.log(d)})
     }, []);
 
 return (
@@ -39,8 +47,8 @@ return (
         <button onClick={logout}><img src={img3} alt="" /><span></span></button>
     </Link>
     ) : (
-    <Link to="/api/v1/login" className='login'>
-        <button>
+    <Link className='login'>
+        <button onClick={login}>
             <img src={img2} alt="" />
             <span><img src={img1} alt="Sign in through Steam" /></span>
         </button>
