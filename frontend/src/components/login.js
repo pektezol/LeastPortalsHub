@@ -16,13 +16,15 @@ function logout() {
     setToken(null)
     window.location.href="/"
 }
-
 const [token, setToken] = React.useState(null);
 const isLoggedIn = token !== null;
 React.useEffect(() => {
     fetch(`/api/v1/token`)
-    .then(r => {console.log(r)})
-    .then(d => {setToken(d.data.token);console.log(d)})
+    .then(r => r.json())
+    .then(d => {
+      setToken(d.data.token);
+      console.log(d);
+    })
     }, []);
 
 const [profile, setProfile] = React.useState();
@@ -32,9 +34,10 @@ React.useEffect(() => {
 			'Content-Type': 'application/json',
             Authorization: token
         }})
-    .then(r => {console.log(r)})
+    .then(r => r.json())
     .then(d => {setProfile(d);console.log(d)})
     }, []);
+
 
 return (
     <>
