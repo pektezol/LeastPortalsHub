@@ -13,11 +13,11 @@ function login() {
     window.location.href="https://lp.ardapektezol.com/api/v1/login"
 }
 function logout() {
-    fetch(`/api/v1/token`,{'method':'DELETE'})
     setIsLoggedIn(false)
     setProfile(null)
     setToken(null)
-    setTimeout(() => {window.location.href="/"}, 300);
+    fetch(`/api/v1/token`,{'method':'DELETE'})
+    .then(r=>window.location.href="/")
 }
 const [token, setToken] = React.useState(null);
 const [isLoggedIn, setIsLoggedIn] = React.useState(false);
