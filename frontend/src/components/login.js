@@ -13,7 +13,6 @@ function login() {
     window.location.href="https://lp.ardapektezol.com/api/v1/login"
 }
 function logout() {
-    setToken(null)
     setIsLoggedIn(false)
     fetch(`/api/v1/token`,{'method':'DELETE'})
     window.location.href="/"
@@ -26,6 +25,7 @@ React.useEffect(() => {
     .then(d => {
       setToken(d.data.token);
       setIsLoggedIn(true)
+      console.log(d)
     })
     }, []);
 
