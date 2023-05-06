@@ -28,7 +28,7 @@ React.useEffect(() => {
     })
     }, []);
 
-const [profile, setProfile] = React.useState();
+const [profile, setProfile] = React.useState(undefined);
 React.useEffect(() => {
     fetch(`/api/v1/profile`,{
         headers: {
@@ -38,7 +38,7 @@ React.useEffect(() => {
     .then(r => r.json())
     .then(d => {setProfile(d.data);console.log(d)})
     console.log("profile:",profile)
-    }, [isLoggedIn]);
+    }, [token,profile]);
 
 
 return (
