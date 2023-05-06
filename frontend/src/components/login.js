@@ -15,6 +15,7 @@ function login() {
 function logout() {
     fetch(`/api/v1/token`,{'method':'DELETE'})
     setToken(null)
+    setProfile(null)
     setIsLoggedIn(false)
     window.location.href="/"
 }
@@ -26,7 +27,7 @@ React.useEffect(() => {
     .then(d => setToken(d.data.token))
     }, []);
 
-const [profile, setProfile] = React.useState(undefined);
+const [profile, setProfile] = React.useState(null);
 React.useEffect(() => {
     fetch(`/api/v1/profile`,{
         headers: {
@@ -34,31 +35,20 @@ React.useEffect(() => {
             Authorization: token
         }})
     .then(r => r.json())
-    .then(d => {
-        
-        console.log("data:", d);
-        setProfile(d.data);
-        console.log("profile:", profile);
-      })
-      .catch(error => {
-        console.log("error:", error);
-      });
+    .then(d => setProfile(d.data))
     }, [token]);
 
 React.useEffect(() => {
-    console.log("profile 2:", profile);
-    setIsLoggedIn(true)
-}, [profile]);
+    if(profile!==null){setIsLoggedIn(true)}
+    }, [profile]);
 
 return (
     <>
     {isLoggedIn ? (
     <Link to="/profile" tabIndex={-1} className='login'>
         <button>
-            {/* <img src={profile.avatar_link} alt="" /> */}
-            <img src={img2} alt="" />
-            {/* <span>{profile.user_name}</span> */}
-            <span>Username</span>
+            <img src={profile.avatar_link} alt="" />
+            <span>{profile.user_name}</span>
         </button>
         <button onClick={logout}><img src={img3} alt="" /><span></span></button>
     </Link>
