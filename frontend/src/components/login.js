@@ -38,7 +38,7 @@ React.useEffect(() => {
     .then(r => r.json())
     .then(d => {setProfile(d.data);console.log(d)})
     console.log("profile:",profile)
-    }, [token,profile]);
+    }, [token]);
 
 
 return (
