@@ -16,6 +16,7 @@ func InitRoutes(router *gin.Engine) {
 		v1.GET("/", func(c *gin.Context) {
 			c.File("docs/index.html")
 		})
+		v1.GET("/token", controllers.GetCookie)
 		v1.GET("/home", middleware.CheckAuth, controllers.Home)
 		v1.GET("/login", controllers.Login)
 		v1.GET("/profile", middleware.CheckAuth, controllers.Profile)
