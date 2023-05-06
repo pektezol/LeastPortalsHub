@@ -17,6 +17,7 @@ func InitRoutes(router *gin.Engine) {
 			c.File("docs/index.html")
 		})
 		v1.GET("/token", controllers.GetCookie)
+		v1.DELETE("/token", controllers.DeleteCookie)
 		v1.GET("/home", middleware.CheckAuth, controllers.Home)
 		v1.GET("/login", controllers.Login)
 		v1.GET("/profile", middleware.CheckAuth, controllers.Profile)
