@@ -40,9 +40,10 @@ span>b{
 } 
 #sidebar-toplist>button:nth-child(1){margin-top: 5px;}
 #sidebar-toplist{
+    display: grid;
     
     margin: 0 5px 0 5px;
-    display: grid;
+    justify-items: left;
     height: 400px;
     grid-template-rows: 45px 50px 50px 50px 50px 50px 50px 50px auto;
 }
@@ -52,7 +53,6 @@ span>b{
 
     margin: 0 5px 0 5px;
     justify-items: left;
-    grid-template-rows: calc(100vh - 670px) 50px 50px 50px;
     grid-template-rows: calc(100vh - 670px) 50px 50px 50px;
 }
 button>span{
@@ -80,9 +80,7 @@ button{
     transition: 
     width .3s,
     background-color .3s;
-    /* outline: red dotted 1px; */
 }
-/* button>*{outline: red 1px dotted;} */
 
 button>img {
     scale: 1.1;

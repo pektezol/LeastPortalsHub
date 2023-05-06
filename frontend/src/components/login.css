@@ -1,0 +1,26 @@
+span>img {
+    scale: 1.1;
+    padding-top: 4px;
+}
+.login>button>span{
+    max-width: 22ch;
+    overflow: hidden;
+}
+.login>button:nth-child(2){
+    position: relative;
+    left: 210px;
+    width: 50px !important;
+
+    padding-left: 10px;
+    background-color: #00000000 !important;
+    transition: opacity .1s;
+}
+
+.login{
+    display: grid;
+    grid-template-columns: 50px auto 200px ;
+}
+
+button:disabled {
+    display: none;
+}
