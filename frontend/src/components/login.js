@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from "react-router-dom";
-import Cookies from 'js-cookie';
 
 import "./login.css";
 import img1 from "../imgs/login.png"
@@ -14,8 +13,8 @@ function login() {
     window.location.href="https://lp.ardapektezol.com/api/v1/login"
 }
 function logout() {
-    Cookies.remove('token')
     setToken(null)
+    fetch(`/api/v1/token`,{'method':'DELETE'})
     window.location.href="/"
 }
 const [token, setToken] = React.useState(null);
@@ -25,7 +24,6 @@ React.useEffect(() => {
     .then(r => r.json())
     .then(d => {
       setToken(d.data.token);
-      console.log(d);
     })
     }, []);
 
@@ -37,7 +35,7 @@ React.useEffect(() => {
             Authorization: token
         }})
     .then(r => r.json())
-    .then(d => {setProfile(d);console.log(d)})
+    .then(d => setProfile(d.data))
     }, [token]);
 
 
@@ -46,13 +44,13 @@ return (
     {isLoggedIn ? (
     <Link to="/profile" tabIndex={-1} className='login'>
         <button>
-            <img src={img2} alt="" />
-            <span>Username</span>
+            <img src={profile.avatar_link} alt="" />
+            <span>{profile.user_name}</span>
         </button>
         <button onClick={logout}><img src={img3} alt="" /><span></span></button>
     </Link>
     ) : (
-    <Link className='login'>
+    <Link tabIndex={-1} className='login'>
         <button onClick={login}>
             <img src={img2} alt="" />
             <span><img src={img1} alt="Sign in through Steam" /></span>
