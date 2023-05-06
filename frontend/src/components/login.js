@@ -36,8 +36,7 @@ React.useEffect(() => {
             Authorization: token
         }})
     .then(r => r.json())
-    .then(d => {setProfile(d.data);console.log(d)})
-    console.log("profile:",profile)
+    .then(d => {setProfile(d.data);console.log(d,profile)})
     }, [token]);
 
 
