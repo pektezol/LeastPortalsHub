@@ -35,10 +35,13 @@ React.useEffect(() => {
         }})
     .then(r => r.json())
     .then(d => {
+        console.log("data:", d);
         setProfile(d.data);
-        setIsLoggedIn(true)
-        console.log(d,profile)
-    })
+        console.log("profile:", profile);
+      })
+      .catch(error => {
+        console.log("error:", error);
+      });
     }, [token]);
 
 
@@ -47,10 +50,10 @@ return (
     {isLoggedIn ? (
     <Link to="/profile" tabIndex={-1} className='login'>
         <button>
-            <img src={profile.avatar_link} alt="" />
-            {/* <img src={img2} alt="" /> */}
-            <span>{profile.user_name}</span>
-            {/* <span>Username</span> */}
+            {/* <img src={profile.avatar_link} alt="" /> */}
+            <img src={img2} alt="" />
+            {/* <span>{profile.user_name}</span> */}
+            <span>Username</span>
         </button>
         <button onClick={logout}><img src={img3} alt="" /><span></span></button>
     </Link>
