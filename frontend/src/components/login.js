@@ -13,8 +13,8 @@ function login() {
     window.location.href="https://lp.ardapektezol.com/api/v1/login"
 }
 function logout() {
-    setIsLoggedIn(false)
     fetch(`/api/v1/token`,{'method':'DELETE'})
+    setIsLoggedIn(false)
     window.location.href="/"
 }
 const [token, setToken] = React.useState(null);
@@ -37,9 +37,9 @@ React.useEffect(() => {
             Authorization: token
         }})
     .then(r => r.json())
-    .then(d => setProfile(d.data))
+    .then(d => {setProfile(d.data);console.log(d)})
     console.log(profile)
-    }, [token]);
+    }, [isLoggedIn]);
 
 
 return (
