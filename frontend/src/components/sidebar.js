@@ -13,8 +13,9 @@ import img6 from "../imgs/6.png"
 import img7 from "../imgs/7.png"
 import img8 from "../imgs/8.png"
 import img9 from "../imgs/9.png"
+import Login from "./login.js"
 
-export default function Sidebar(x) {
+export default function Sidebar() {
 
 // Locks search button for 300ms before it can be clicked again, prevents spam
 const [isLocked, setIsLocked] = React.useState(false);
@@ -48,13 +49,18 @@ function SidebarHide(){
 const btn   = document.querySelectorAll("button");
 const span  = document.querySelectorAll("button>span");
 const side  = document.querySelector("#sidebar-list");
+const login = document.querySelectorAll(".login>button")[1];
 
 if(sidebar===1){
     setSidebar(0)
     side.style.width="320px"
     btn.forEach((e, i) =>{
         e.style.width="310px"
-        setTimeout(() => {span[i].style.opacity="1"}, 100)
+        setTimeout(() => {
+            span[i].style.opacity="1"
+            login.style.opacity="1"
+
+        }, 100)
     })
     side.style.zIndex="2"
 } else {
@@ -64,10 +70,14 @@ if(sidebar===1){
         e.style.width="40px"
         span[i].style.opacity="0"
     }) 
-    setTimeout(() => {side.style.zIndex="0"}, 300);
+    login.style.opacity="0"
+    setTimeout(() => {
+        side.style.zIndex="0"
+    }, 300);
     }
 }
 
+// Links
 const location = useLocation()
 React.useEffect(()=>{
     if(location.pathname==="/"){SidebarClick(1)}
@@ -77,11 +87,13 @@ React.useEffect(()=>{
     if(location.pathname.includes("discussions")){SidebarClick(5)}
     if(location.pathname.includes("scorelog")){SidebarClick(6)}
     if(location.pathname.includes("profile")){SidebarClick(7)}
-    if(location.pathname.includes("rules")){SidebarClick(8)}
-    if(location.pathname.includes("about")){SidebarClick(9)}
+    if(location.pathname.includes("rules")){SidebarClick(9)}
+    if(location.pathname.includes("about")){SidebarClick(10)}
+
     // console.log(location.pathname)
     // eslint-disable-next-line react-hooks/exhaustive-deps
 },  [location])
+
 
 return (
     <div id='sidebar'>
@@ -124,9 +136,7 @@ return (
             <div id='sidebar-bottomlist'>
                 <span></span>
 
-                <Link to="/profile" tabIndex={-1}>
-                    <button><img src={img1} alt="" /><span>Login</span></button>
-                </Link>
+                <Login/>
 
                 <Link to="/rules" tabIndex={-1}>
                     <button><img src={img8} alt="" /><span>Leaderboard&nbsp;Rules</span></button>
