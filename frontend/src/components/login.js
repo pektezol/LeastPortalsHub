@@ -14,9 +14,9 @@ function login() {
 }
 function logout() {
     fetch(`/api/v1/token`,{'method':'DELETE'})
-    setToken(null)
-    setProfile(null)
     setIsLoggedIn(false)
+    setProfile(null)
+    setToken(null)
     window.location.href="/"
 }
 const [token, setToken] = React.useState(null);
