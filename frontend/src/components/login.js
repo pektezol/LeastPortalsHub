@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from "react-router-dom";
-import Cookies from 'js-cookie';
 
 import "./login.css";
 import img1 from "../imgs/login.png"
@@ -14,22 +13,21 @@ function login() {
     window.location.href="https://lp.ardapektezol.com/api/v1/login"
 }
 function logout() {
-    Cookies.remove('token')
+    setIsLoggedIn(false)
+    setProfile(null)
     setToken(null)
-    window.location.href="/"
+    fetch(`/api/v1/token`,{'method':'DELETE'})
+    .then(r=>window.location.href="/")
 }
 const [token, setToken] = React.useState(null);
-const isLoggedIn = token !== null;
+const [isLoggedIn, setIsLoggedIn] = React.useState(false);
 React.useEffect(() => {
     fetch(`/api/v1/token`)
     .then(r => r.json())
-    .then(d => {
-      setToken(d.data.token);
-      console.log(d);
-    })
+    .then(d => setToken(d.data.token))
     }, []);
 
-const [profile, setProfile] = React.useState();
+const [profile, setProfile] = React.useState(null);
 React.useEffect(() => {
     fetch(`/api/v1/profile`,{
         headers: {
@@ -37,22 +35,25 @@ React.useEffect(() => {
             Authorization: token
         }})
     .then(r => r.json())
-    .then(d => {setProfile(d);console.log(d)})
+    .then(d => setProfile(d.data))
     }, [token]);
 
+React.useEffect(() => {
+    if(profile!==null){setIsLoggedIn(true)}
+    }, [profile]);
 
 return (
     <>
     {isLoggedIn ? (
     <Link to="/profile" tabIndex={-1} className='login'>
         <button>
-            <img src={img2} alt="" />
-            <span>Username</span>
+            <img src={profile.avatar_link} alt="" />
+            <span>{profile.user_name}</span>
         </button>
         <button onClick={logout}><img src={img3} alt="" /><span></span></button>
     </Link>
     ) : (
-    <Link className='login'>
+    <Link tabIndex={-1} className='login'>
         <button onClick={login}>
             <img src={img2} alt="" />
             <span><img src={img1} alt="Sign in through Steam" /></span>
