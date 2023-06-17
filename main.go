@@ -31,8 +31,6 @@ func main() {
 	}
 	router := gin.Default()
 	database.ConnectDB()
-	// For frontend static serving - only for local debug
-	// router.Use(static.Serve("/", static.LocalFile("./frontend/build", true)))
 	routes.InitRoutes(router)
 	router.Run(fmt.Sprintf(":%s", os.Getenv("PORT")))
 }
