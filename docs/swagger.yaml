@@ -574,6 +574,11 @@ paths:
       - users
   /search:
     get:
+      parameters:
+      - description: Search user or map name.
+        in: query
+        name: q
+        type: string
       produces:
       - application/json
       responses:
@@ -590,7 +595,7 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Get all user and map data.
+      summary: Get all user and map data matching to the query.
       tags:
       - search
   /token:

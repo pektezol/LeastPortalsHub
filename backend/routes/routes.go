@@ -29,7 +29,7 @@ func InitRoutes(router *gin.Engine) {
 		v1.GET("/maps/:id/leaderboards", middleware.CheckAuth, controllers.FetchMapLeaderboards)
 		v1.POST("/maps/:id/record", middleware.CheckAuth, controllers.CreateRecordWithDemo)
 		v1.GET("/rankings", middleware.CheckAuth, controllers.Rankings)
-		v1.GET("/search", controllers.Search)
+		v1.GET("/search", controllers.SearchWithQuery)
 		v1.GET("/games", controllers.FetchGames)
 		v1.GET("/games/:id", controllers.FetchChapters)
 		v1.GET("/chapters/:id", controllers.FetchChapterMaps)

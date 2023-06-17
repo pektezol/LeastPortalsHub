@@ -3,6 +3,7 @@ package controllers
 import (
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pektezol/leastportals/backend/database"
@@ -122,15 +123,19 @@ func Rankings(c *gin.Context) {
 	})
 }
 
-// GET Search
+// GET Search With Query
 //
-//	@Summary	Get all user and map data.
+//	@Summary	Get all user and map data matching to the query.
 //	@Tags		search
 //	@Produce	json
+//	@Param		q	query		string	false	"Search user or map name."
 //	@Success	200	{object}	models.Response{data=models.SearchResponse}
 //	@Failure	400	{object}	models.Response
 //	@Router		/search [get]
-func Search(c *gin.Context) {
+func SearchWithQuery(c *gin.Context) {
+	query := c.Query("q")
+	query = strings.ToLower(query)
+	log.Println(query)
 	var response models.SearchResponse
 	// Cache all maps for faster response
 	var maps = []struct {
@@ -248,8 +253,23 @@ func Search(c *gin.Context) {
 		{ID: 109, Name: "Gel Maze"},
 		{ID: 110, Name: "Crazier Box"},
 	}
-	response.Maps = maps
-	rows, err := database.DB.Query("SELECT steam_id, user_name FROM users") //WHERE player_name LIKE ?", "%"+query+"%")
+	var filteredMaps []struct {
+		ID   int    `json:"id"`
+		Name string `json:"name"`
+	}
+	for _, m := range maps {
+		if strings.Contains(strings.ToLower(m.Name), strings.ToLower(query)) {
+			filteredMaps = append(filteredMaps, m)
+		}
+	}
+	response.Maps = filteredMaps
+	if len(response.Maps) == 0 {
+		response.Maps = []struct {
+			ID   int    "json:\"id\""
+			Name string "json:\"name\""
+		}{}
+	}
+	rows, err := database.DB.Query("SELECT steam_id, user_name FROM users WHERE lower(user_name) LIKE $1", "%"+query+"%")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -264,6 +284,12 @@ func Search(c *gin.Context) {
 			return
 		}
 		response.Players = append(response.Players, user)
+	}
+	if len(response.Players) == 0 {
+		response.Players = []struct {
+			SteamID  string "json:\"steam_id\""
+			UserName string "json:\"user_name\""
+		}{}
 	}
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,

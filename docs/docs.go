@@ -651,7 +651,15 @@ const docTemplate = `{
                 "tags": [
                     "search"
                 ],
-                "summary": "Get all user and map data.",
+                "summary": "Get all user and map data matching to the query.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Search user or map name.",
+                        "name": "q",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
