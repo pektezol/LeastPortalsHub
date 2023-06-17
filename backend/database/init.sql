@@ -33,12 +33,22 @@ CREATE TABLE maps (
   game_id SMALLINT NOT NULL,
   chapter_id SMALLINT NOT NULL,
   name TEXT NOT NULL,
-  description TEXT NOT NULL,
-  showcase TEXT NOT NULL,
   is_disabled BOOLEAN NOT NULL DEFAULT false,
   PRIMARY KEY (id),
   FOREIGN KEY (game_id) REFERENCES games(id),
   FOREIGN KEY (chapter_id) REFERENCES chapters(id)
+);
+
+CREATE TABLE map_routes (
+  id SMALLSERIAL,
+  map_id SMALLINT NOT NULL,
+  category_id SMALLINT NOT NULL,
+  score_count SMALLINT NOT NULL,
+  description TEXT NOT NULL,
+  showcase TEXT NOT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (map_id) REFERENCES maps(id),
+  FOREIGN KEY (category_id) REFERENCES categories(id)
 );
 
 CREATE TABLE map_history (
@@ -56,17 +66,6 @@ CREATE TABLE map_ratings (
   map_id SMALLINT NOT NULL,
   user_id TEXT NOT NULL,
   rating SMALLINT NOT NULL,
-  PRIMARY KEY (id),
-  FOREIGN KEY (map_id) REFERENCES maps(id),
-  FOREIGN KEY (user_id) REFERENCES users(steam_id)
-);
-
-CREATE TABLE map_routers (
-  id SMALLSERIAL,
-  map_id SMALLINT NOT NULL,
-  user_id TEXT,
-  user_name TEXT NOT NULL,
-  score_count SMALLINT NOT NULL,
   PRIMARY KEY (id),
   FOREIGN KEY (map_id) REFERENCES maps(id),
   FOREIGN KEY (user_id) REFERENCES users(steam_id)
