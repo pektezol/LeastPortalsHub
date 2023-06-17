@@ -138,10 +138,7 @@ func SearchWithQuery(c *gin.Context) {
 	log.Println(query)
 	var response models.SearchResponse
 	// Cache all maps for faster response
-	var maps = []struct {
-		ID   int    `json:"id"`
-		Name string `json:"name"`
-	}{
+	var maps = []models.MapShort{
 		{ID: 1, Name: "Container Ride"},
 		{ID: 2, Name: "Portal Carousel"},
 		{ID: 3, Name: "Portal Gun"},
@@ -253,10 +250,7 @@ func SearchWithQuery(c *gin.Context) {
 		{ID: 109, Name: "Gel Maze"},
 		{ID: 110, Name: "Crazier Box"},
 	}
-	var filteredMaps []struct {
-		ID   int    `json:"id"`
-		Name string `json:"name"`
-	}
+	var filteredMaps []models.MapShort
 	for _, m := range maps {
 		if strings.Contains(strings.ToLower(m.Name), strings.ToLower(query)) {
 			filteredMaps = append(filteredMaps, m)
@@ -264,10 +258,7 @@ func SearchWithQuery(c *gin.Context) {
 	}
 	response.Maps = filteredMaps
 	if len(response.Maps) == 0 {
-		response.Maps = []struct {
-			ID   int    "json:\"id\""
-			Name string "json:\"name\""
-		}{}
+		response.Maps = []models.MapShort{}
 	}
 	rows, err := database.DB.Query("SELECT steam_id, user_name FROM users WHERE lower(user_name) LIKE $1", "%"+query+"%")
 	if err != nil {
@@ -275,10 +266,7 @@ func SearchWithQuery(c *gin.Context) {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var user struct {
-			SteamID  string `json:"steam_id"`
-			UserName string `json:"user_name"`
-		}
+		var user models.UserShort
 		if err := rows.Scan(&user.SteamID, &user.UserName); err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
@@ -286,10 +274,7 @@ func SearchWithQuery(c *gin.Context) {
 		response.Players = append(response.Players, user)
 	}
 	if len(response.Players) == 0 {
-		response.Players = []struct {
-			SteamID  string "json:\"steam_id\""
-			UserName string "json:\"user_name\""
-		}{}
+		response.Players = []models.UserShort{}
 	}
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,

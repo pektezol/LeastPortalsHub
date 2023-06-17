@@ -251,7 +251,7 @@ func UpdateUser(c *gin.Context) {
 //	@Produce	json
 //	@Param		Authorization	header		string	true	"JWT Token"
 //	@Param		country_code	query		string	true	"Country Code [XX]"
-//	@Success	200				{object}	models.Response{data=models.ProfileResponse}
+//	@Success	200				{object}	models.Response
 //	@Failure	400				{object}	models.Response
 //	@Failure	401				{object}	models.Response
 //	@Router		/profile [put]
