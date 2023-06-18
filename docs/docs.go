@@ -447,19 +447,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "allOf": [
-                                                {
-                                                    "$ref": "#/definitions/models.Map"
-                                                },
-                                                {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "data": {
-                                                            "$ref": "#/definitions/models.MapSummary"
-                                                        }
-                                                    }
-                                                }
-                                            ]
+                                            "$ref": "#/definitions/models.MapSummaryResponse"
                                         }
                                     }
                                 }
@@ -560,19 +548,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/models.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/models.ProfileResponse"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/models.Response"
                         }
                     },
                     "400": {
@@ -817,6 +793,17 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "models.Category": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Chapter": {
             "type": "object",
             "properties": {
@@ -881,7 +868,6 @@ const docTemplate = `{
                 "chapter_name": {
                     "type": "string"
                 },
-                "data": {},
                 "game_name": {
                     "type": "string"
                 },
@@ -890,23 +876,6 @@ const docTemplate = `{
                 },
                 "map_name": {
                     "type": "string"
-                }
-            }
-        },
-        "models.MapCategoryScores": {
-            "type": "object",
-            "properties": {
-                "any": {
-                    "type": "integer"
-                },
-                "cm": {
-                    "type": "integer"
-                },
-                "inbounds_sla": {
-                    "type": "integer"
-                },
-                "no_sla": {
-                    "type": "integer"
                 }
             }
         },
@@ -930,6 +899,23 @@ const docTemplate = `{
                 "records": {}
             }
         },
+        "models.MapRoute": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "$ref": "#/definitions/models.Category"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "score_count": {
+                    "type": "integer"
+                },
+                "showcase": {
+                    "type": "string"
+                }
+            }
+        },
         "models.MapShort": {
             "type": "object",
             "properties": {
@@ -944,12 +930,6 @@ const docTemplate = `{
         "models.MapSummary": {
             "type": "object",
             "properties": {
-                "category_scores": {
-                    "$ref": "#/definitions/models.MapCategoryScores"
-                },
-                "description": {
-                    "type": "string"
-                },
                 "history": {
                     "type": "array",
                     "items": {
@@ -959,14 +939,22 @@ const docTemplate = `{
                 "rating": {
                     "type": "number"
                 },
-                "routers": {
+                "routes": {
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "$ref": "#/definitions/models.MapRoute"
                     }
+                }
+            }
+        },
+        "models.MapSummaryResponse": {
+            "type": "object",
+            "properties": {
+                "map": {
+                    "$ref": "#/definitions/models.Map"
                 },
-                "showcase": {
-                    "type": "string"
+                "summary": {
+                    "$ref": "#/definitions/models.MapSummary"
                 }
             }
         },
@@ -1069,29 +1057,13 @@ const docTemplate = `{
                 "maps": {
                     "type": "array",
                     "items": {
-                        "type": "object",
-                        "properties": {
-                            "id": {
-                                "type": "integer"
-                            },
-                            "name": {
-                                "type": "string"
-                            }
-                        }
+                        "$ref": "#/definitions/models.MapShort"
                     }
                 },
                 "players": {
                     "type": "array",
                     "items": {
-                        "type": "object",
-                        "properties": {
-                            "steam_id": {
-                                "type": "string"
-                            },
-                            "user_name": {
-                                "type": "string"
-                            }
-                        }
+                        "$ref": "#/definitions/models.UserShort"
                     }
                 }
             }
@@ -1103,6 +1075,17 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "user_id": {
+                    "type": "string"
+                },
+                "user_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UserShort": {
+            "type": "object",
+            "properties": {
+                "steam_id": {
                     "type": "string"
                 },
                 "user_name": {

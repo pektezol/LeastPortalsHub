@@ -23,7 +23,6 @@ type Map struct {
 	GameName    string `json:"game_name"`
 	ChapterName string `json:"chapter_name"`
 	MapName     string `json:"map_name"`
-	Data        any    `json:"data"`
 }
 
 type MapShort struct {
@@ -32,29 +31,26 @@ type MapShort struct {
 }
 
 type MapSummary struct {
-	Description    string            `json:"description"`
-	Showcase       string            `json:"showcase"`
-	CategoryScores MapCategoryScores `json:"category_scores"`
-	Rating         float32           `json:"rating"`
-	Routers        []string          `json:"routers"`
-	History        []MapHistory      `json:"history"`
-}
-
-type MapCategoryScores struct {
-	CM          int `json:"cm"`
-	NoSLA       int `json:"no_sla"`
-	InboundsSLA int `json:"inbounds_sla"`
-	Any         int `json:"any"`
-}
-
-type MapRecords struct {
-	Records any `json:"records"`
+	Rating  float32      `json:"rating"`
+	History []MapHistory `json:"history"`
+	Routes  []MapRoute   `json:"routes"`
 }
 
 type MapHistory struct {
 	RunnerName string    `json:"runner_name"`
 	ScoreCount int       `json:"score_count"`
 	Date       time.Time `json:"date"`
+}
+
+type MapRoute struct {
+	Category    Category `json:"category"`
+	ScoreCount  int      `json:"score_count"`
+	Description string   `json:"description"`
+	Showcase    string   `json:"showcase"`
+}
+
+type MapRecords struct {
+	Records any `json:"records"`
 }
 
 type UserRanking struct {
@@ -69,6 +65,11 @@ type Game struct {
 }
 
 type Chapter struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+type Category struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
 }

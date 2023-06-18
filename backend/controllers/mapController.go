@@ -3,10 +3,8 @@ package controllers
 import (
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/lib/pq"
 	"github.com/pektezol/leastportals/backend/database"
 	"github.com/pektezol/leastportals/backend/models"
 )
@@ -17,37 +15,20 @@ import (
 //	@Tags		maps
 //	@Produce	json
 //	@Param		id	path		int	true	"Map ID"
-//	@Success	200	{object}	models.Response{data=models.Map{data=models.MapSummary}}
+//	@Success	200	{object}	models.Response{data=models.MapSummaryResponse}
 //	@Failure	400	{object}	models.Response
 //	@Router		/maps/{id}/summary [get]
 func FetchMapSummary(c *gin.Context) {
 	id := c.Param("id")
 	// Get map data
-	var mapData models.Map
-	var mapSummaryData models.MapSummary
-	var mapHistoryData []models.MapHistory
+	response := models.MapSummaryResponse{Map: models.Map{}, Summary: models.MapSummary{History: []models.MapHistory{}, Routes: []models.MapRoute{}}}
 	intID, err := strconv.Atoi(id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	mapData.ID = intID
-	var routers pq.StringArray
-	sql := `SELECT g.name, c.name, m.name, m.description, m.showcase,
-	(
-	  SELECT array_agg(user_name) 
-	  FROM map_routers 
-	  WHERE map_id = $1 
-		AND score_count = (
-		  SELECT score_count 
-		  FROM map_history 
-		  WHERE map_id = $1 
-		  ORDER BY score_count 
-		  LIMIT 1
-		) 
-	  GROUP BY map_routers.user_name 
-	  ORDER BY user_name
-	),
+	response.Map.ID = intID
+	sql := `SELECT m.id, g.name, c.name, m.name,
 	(
 		SELECT COALESCE(avg(rating), 0.0)
 		FROM map_ratings
@@ -57,44 +38,53 @@ func FetchMapSummary(c *gin.Context) {
 	INNER JOIN games g ON m.game_id = g.id
 	INNER JOIN chapters c ON m.chapter_id = c.id
 	WHERE m.id = $1`
-	// TODO: CategoryScores
-	err = database.DB.QueryRow(sql, id).Scan(&mapData.GameName, &mapData.ChapterName, &mapData.MapName, &mapSummaryData.Description, &mapSummaryData.Showcase, &routers, &mapSummaryData.Rating)
+	err = database.DB.QueryRow(sql, id).Scan(&response.Map.ID, &response.Map.GameName, &response.Map.ChapterName, &response.Map.MapName, &response.Summary.Rating)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	var historyNames pq.StringArray
-	var historyScores pq.Int32Array
-	var historyDates pq.StringArray
-	sql = `SELECT array_agg(user_name), array_agg(score_count), array_agg(record_date)
+	sql = `SELECT user_name, score_count, record_date
 	FROM map_history
-	WHERE map_id = $1`
-	err = database.DB.QueryRow(sql, id).Scan(&historyNames, &historyScores, &historyDates)
+	WHERE map_id = $1
+	ORDER BY record_date ASC`
+	rows, err := database.DB.Query(sql, id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	for i := 0; i < len(historyNames); i++ {
-		var history models.MapHistory
-		history.RunnerName = historyNames[i]
-		history.ScoreCount = int(historyScores[i])
-		layout := "2006-01-02 15:04:05"
-		date, err := time.Parse(layout, historyDates[i])
+	for rows.Next() {
+		history := models.MapHistory{}
+		err = rows.Scan(&history.RunnerName, &history.ScoreCount, &history.Date)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
-		history.Date = date
-		mapHistoryData = append(mapHistoryData, history)
+		response.Summary.History = append(response.Summary.History, history)
 	}
-	mapSummaryData.History = mapHistoryData
-	mapSummaryData.Routers = routers
-	mapData.Data = mapSummaryData
+	sql = `SELECT c.id, c.name, mr.score_count, mr.description, mr.showcase
+	FROM map_routes mr
+	INNER JOIN categories c ON mr.category_id = c.id
+	WHERE mr.map_id = $1
+	ORDER BY mr.score_count DESC`
+	rows, err = database.DB.Query(sql, id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	for rows.Next() {
+		route := models.MapRoute{}
+		err = rows.Scan(&route.Category.ID, &route.Category.Name, &route.ScoreCount, &route.Description, &route.Showcase)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			return
+		}
+		response.Summary.Routes = append(response.Summary.Routes, route)
+	}
 	// Return response
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully retrieved map summary.",
-		Data:    mapData,
+		Data:    response,
 	})
 }
 
@@ -108,6 +98,7 @@ func FetchMapSummary(c *gin.Context) {
 //	@Failure	400	{object}	models.Response
 //	@Router		/maps/{id}/leaderboards [get]
 func FetchMapLeaderboards(c *gin.Context) {
+	// TODO: make new response type
 	id := c.Param("id")
 	// Get map data
 	var mapData models.Map
@@ -205,7 +196,7 @@ func FetchMapLeaderboards(c *gin.Context) {
 		}
 		mapRecordsData.Records = records
 	}
-	mapData.Data = mapRecordsData
+	// mapData.Data = mapRecordsData
 	// Return response
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,

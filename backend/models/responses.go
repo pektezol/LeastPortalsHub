@@ -30,6 +30,11 @@ type ScoreResponse struct {
 	Records any `json:"records"`
 }
 
+type MapSummaryResponse struct {
+	Map     Map        `json:"map"`
+	Summary MapSummary `json:"summary"`
+}
+
 type SearchResponse struct {
 	Players []UserShort `json:"players"`
 	Maps    []MapShort  `json:"maps"`

@@ -1,5 +1,12 @@
 basePath: /v1
 definitions:
+  models.Category:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
   models.Chapter:
     properties:
       id:
@@ -41,24 +48,12 @@ definitions:
     properties:
       chapter_name:
         type: string
-      data: {}
       game_name:
         type: string
       id:
         type: integer
       map_name:
         type: string
-    type: object
-  models.MapCategoryScores:
-    properties:
-      any:
-        type: integer
-      cm:
-        type: integer
-      inbounds_sla:
-        type: integer
-      no_sla:
-        type: integer
     type: object
   models.MapHistory:
     properties:
@@ -73,6 +68,17 @@ definitions:
     properties:
       records: {}
     type: object
+  models.MapRoute:
+    properties:
+      category:
+        $ref: '#/definitions/models.Category'
+      description:
+        type: string
+      score_count:
+        type: integer
+      showcase:
+        type: string
+    type: object
   models.MapShort:
     properties:
       id:
@@ -82,22 +88,23 @@ definitions:
     type: object
   models.MapSummary:
     properties:
-      category_scores:
-        $ref: '#/definitions/models.MapCategoryScores'
-      description:
-        type: string
       history:
         items:
           $ref: '#/definitions/models.MapHistory'
         type: array
       rating:
         type: number
-      routers:
+      routes:
         items:
-          type: string
+          $ref: '#/definitions/models.MapRoute'
         type: array
-      showcase:
-        type: string
+    type: object
+  models.MapSummaryResponse:
+    properties:
+      map:
+        $ref: '#/definitions/models.Map'
+      summary:
+        $ref: '#/definitions/models.MapSummary'
     type: object
   models.ProfileResponse:
     properties:
@@ -165,21 +172,11 @@ definitions:
     properties:
       maps:
         items:
-          properties:
-            id:
-              type: integer
-            name:
-              type: string
-          type: object
+          $ref: '#/definitions/models.MapShort'
         type: array
       players:
         items:
-          properties:
-            steam_id:
-              type: string
-            user_name:
-              type: string
-          type: object
+          $ref: '#/definitions/models.UserShort'
         type: array
     type: object
   models.UserRanking:
@@ -187,6 +184,13 @@ definitions:
       total_score:
         type: integer
       user_id:
+        type: string
+      user_name:
+        type: string
+    type: object
+  models.UserShort:
+    properties:
+      steam_id:
         type: string
       user_name:
         type: string
@@ -456,12 +460,7 @@ paths:
             - $ref: '#/definitions/models.Response'
             - properties:
                 data:
-                  allOf:
-                  - $ref: '#/definitions/models.Map'
-                  - properties:
-                      data:
-                        $ref: '#/definitions/models.MapSummary'
-                    type: object
+                  $ref: '#/definitions/models.MapSummaryResponse'
               type: object
         "400":
           description: Bad Request
@@ -555,12 +554,7 @@ paths:
         "200":
           description: OK
           schema:
-            allOf:
-            - $ref: '#/definitions/models.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/models.ProfileResponse'
-              type: object
+            $ref: '#/definitions/models.Response'
         "400":
           description: Bad Request
           schema:
