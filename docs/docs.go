@@ -914,9 +914,6 @@ const docTemplate = `{
                 "rating": {
                     "type": "number"
                 },
-                "score_count": {
-                    "type": "integer"
-                },
                 "showcase": {
                     "type": "string"
                 }

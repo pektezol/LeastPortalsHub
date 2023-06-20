@@ -44,7 +44,6 @@ type MapRoute struct {
 	Category    Category   `json:"category"`
 	History     MapHistory `json:"history"`
 	Rating      float32    `json:"rating"`
-	ScoreCount  int        `json:"score_count"`
 	Description string     `json:"description"`
 	Showcase    string     `json:"showcase"`
 }
