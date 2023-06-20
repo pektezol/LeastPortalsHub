@@ -908,6 +908,12 @@ const docTemplate = `{
                 "description": {
                     "type": "string"
                 },
+                "history": {
+                    "$ref": "#/definitions/models.MapHistory"
+                },
+                "rating": {
+                    "type": "number"
+                },
                 "score_count": {
                     "type": "integer"
                 },
@@ -930,15 +936,6 @@ const docTemplate = `{
         "models.MapSummary": {
             "type": "object",
             "properties": {
-                "history": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.MapHistory"
-                    }
-                },
-                "rating": {
-                    "type": "number"
-                },
                 "routes": {
                     "type": "array",
                     "items": {

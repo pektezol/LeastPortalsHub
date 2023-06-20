@@ -74,6 +74,10 @@ definitions:
         $ref: '#/definitions/models.Category'
       description:
         type: string
+      history:
+        $ref: '#/definitions/models.MapHistory'
+      rating:
+        type: number
       score_count:
         type: integer
       showcase:
@@ -88,12 +92,6 @@ definitions:
     type: object
   models.MapSummary:
     properties:
-      history:
-        items:
-          $ref: '#/definitions/models.MapHistory'
-        type: array
-      rating:
-        type: number
       routes:
         items:
           $ref: '#/definitions/models.MapRoute'
