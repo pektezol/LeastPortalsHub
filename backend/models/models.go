@@ -31,9 +31,7 @@ type MapShort struct {
 }
 
 type MapSummary struct {
-	Rating  float32      `json:"rating"`
-	History []MapHistory `json:"history"`
-	Routes  []MapRoute   `json:"routes"`
+	Routes []MapRoute `json:"routes"`
 }
 
 type MapHistory struct {
@@ -43,10 +41,12 @@ type MapHistory struct {
 }
 
 type MapRoute struct {
-	Category    Category `json:"category"`
-	ScoreCount  int      `json:"score_count"`
-	Description string   `json:"description"`
-	Showcase    string   `json:"showcase"`
+	Category    Category   `json:"category"`
+	History     MapHistory `json:"history"`
+	Rating      float32    `json:"rating"`
+	ScoreCount  int        `json:"score_count"`
+	Description string     `json:"description"`
+	Showcase    string     `json:"showcase"`
 }
 
 type MapRecords struct {

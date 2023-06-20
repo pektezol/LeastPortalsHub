@@ -54,20 +54,24 @@ CREATE TABLE map_routes (
 CREATE TABLE map_history (
   id SMALLSERIAL,
   map_id SMALLINT NOT NULL,
+  category_id SMALLINT NOT NULL,
   user_name TEXT NOT NULL,
   score_count SMALLINT NOT NULL,
   record_date TIMESTAMP NOT NULL,
   PRIMARY KEY (id),
+  FOREIGN KEY (category_id) REFERENCES categories(id),
   FOREIGN KEY (map_id) REFERENCES maps(id)
 );
 
 CREATE TABLE map_ratings (
   id SERIAL,
   map_id SMALLINT NOT NULL,
+  category_id SMALLINT NOT NULL,
   user_id TEXT NOT NULL,
   rating SMALLINT NOT NULL,
   PRIMARY KEY (id),
   FOREIGN KEY (map_id) REFERENCES maps(id),
+  FOREIGN KEY (category_id) REFERENCES categories(id),
   FOREIGN KEY (user_id) REFERENCES users(steam_id)
 );
 
