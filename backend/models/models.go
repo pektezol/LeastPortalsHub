@@ -11,6 +11,7 @@ type User struct {
 	CountryCode string    `json:"country_code"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
+	Titles      []string  `json:"titles"`
 }
 
 type UserShort struct {

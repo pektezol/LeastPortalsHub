@@ -1,8 +1,29 @@
 package models
 
+import (
+	"mime/multipart"
+	"time"
+)
+
+type EditMapSummaryRequest struct {
+	RouteID     int       `json:"route_id" binding:"required"`
+	Description string    `json:"description" binding:"required"`
+	Showcase    string    `json:"showcase" binding:"required"`
+	UserName    string    `json:"user_name" binding:"required"`
+	ScoreCount  int       `json:"score_count" binding:"required"`
+	RecordDate  time.Time `json:"record_date" binding:"required"`
+}
+
+type CreateMapHistoryRequest struct {
+	CategoryID int       `json:"category_id" binding:"required"`
+	UserName   string    `json:"user_name" binding:"required"`
+	ScoreCount int       `json:"score_count" binding:"required"`
+	RecordDate time.Time `json:"record_date" binding:"required"`
+}
+
 type RecordRequest struct {
-	ScoreCount      int    `json:"score_count" form:"score_count" binding:"required"`
-	ScoreTime       int    `json:"score_time" form:"score_time" binding:"required"`
-	PartnerID       string `json:"partner_id" form:"partner_id" binding:"required"`
-	IsPartnerOrange bool   `json:"is_partner_orange" form:"is_partner_orange" binding:"required"`
+	HostDemo        *multipart.FileHeader `json:"host_demo" form:"host_demo" binding:"required"`
+	PartnerDemo     *multipart.FileHeader `json:"partner_demo" form:"partner_demo"`
+	IsPartnerOrange bool                  `json:"is_partner_orange" form:"is_partner_orange"`
+	PartnerID       string                `json:"partner_id" form:"partner_id"`
 }
