@@ -23,6 +23,7 @@ type Map struct {
 	GameName    string `json:"game_name"`
 	ChapterName string `json:"chapter_name"`
 	MapName     string `json:"map_name"`
+	Image       string `json:"image"`
 }
 
 type MapShort struct {
