@@ -28,12 +28,12 @@ func FetchMapSummary(c *gin.Context) {
 	}
 	// Get map data
 	response.Map.ID = intID
-	sql := `SELECT m.id, g.name, c.name, m.name
+	sql := `SELECT m.id, g.name, c.name, m.name, m.image
 	FROM maps m
 	INNER JOIN games g ON m.game_id = g.id
 	INNER JOIN chapters c ON m.chapter_id = c.id
 	WHERE m.id = $1`
-	err = database.DB.QueryRow(sql, id).Scan(&response.Map.ID, &response.Map.GameName, &response.Map.ChapterName, &response.Map.MapName)
+	err = database.DB.QueryRow(sql, id).Scan(&response.Map.ID, &response.Map.GameName, &response.Map.ChapterName, &response.Map.MapName, &response.Map.Image)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
@@ -89,12 +89,12 @@ func FetchMapLeaderboards(c *gin.Context) {
 		return
 	}
 	mapData.ID = intID
-	sql := `SELECT g.name, c.name, m.name, is_disabled 
+	sql := `SELECT g.name, c.name, m.name, is_disabled, m.image
 	FROM maps m
 	INNER JOIN games g ON m.game_id = g.id
 	INNER JOIN chapters c ON m.chapter_id = c.id
 	WHERE m.id = $1`
-	err = database.DB.QueryRow(sql, id).Scan(&mapData.GameName, &mapData.ChapterName, &mapData.MapName, &isDisabled)
+	err = database.DB.QueryRow(sql, id).Scan(&mapData.GameName, &mapData.ChapterName, &mapData.MapName, &isDisabled, &mapData.Image)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
