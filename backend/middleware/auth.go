@@ -36,7 +36,7 @@ func CheckAuth(c *gin.Context) {
 		}
 		// Get user from DB
 		var user models.User
-		database.DB.QueryRow(`SELECT u.steam_id, u.user_name, u.avatar_link, u.country_code, u.created_at, u.updated_at, array_agg(t.) FROM users u WHERE steam_id = $1`, claims["sub"]).Scan(
+		database.DB.QueryRow(`SELECT u.steam_id, u.user_name, u.avatar_link, u.country_code, u.created_at, u.updated_at FROM users u WHERE steam_id = $1`, claims["sub"]).Scan(
 			&user.SteamID, &user.UserName, &user.AvatarLink,
 			&user.CountryCode, &user.CreatedAt, &user.UpdatedAt)
 		if user.SteamID == "" {
