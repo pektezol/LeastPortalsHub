@@ -450,6 +450,13 @@ const docTemplate = `{
                 "summary": "Edit map summary with specified map id.",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "JWT Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "Map ID",
                         "name": "id",
@@ -503,6 +510,13 @@ const docTemplate = `{
                 "summary": "Create map summary with specified map id.",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "JWT Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "Map ID",
                         "name": "id",
@@ -555,6 +569,13 @@ const docTemplate = `{
                 ],
                 "summary": "Delete map summary with specified map id.",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "JWT Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "Map ID",

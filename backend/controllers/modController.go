@@ -14,6 +14,7 @@ import (
 //	@Summary	Create map summary with specified map id.
 //	@Tags		maps
 //	@Produce	json
+//	@Param		Authorization	header		string	true	"JWT Token"
 //	@Param		id		path		int								true	"Map ID"
 //	@Param		request	body		models.CreateMapSummaryRequest	true	"Body"
 //	@Success	200		{object}	models.Response{data=models.CreateMapSummaryRequest}
@@ -99,6 +100,7 @@ func CreateMapSummary(c *gin.Context) {
 //	@Summary	Edit map summary with specified map id.
 //	@Tags		maps
 //	@Produce	json
+//	@Param		Authorization	header		string	true	"JWT Token"
 //	@Param		id		path		int								true	"Map ID"
 //	@Param		request	body		models.EditMapSummaryRequest	true	"Body"
 //	@Success	200		{object}	models.Response{data=models.EditMapSummaryRequest}
@@ -181,6 +183,7 @@ func EditMapSummary(c *gin.Context) {
 //	@Summary	Delete map summary with specified map id.
 //	@Tags		maps
 //	@Produce	json
+//	@Param		Authorization	header		string	true	"JWT Token"
 //	@Param		id		path		int								true	"Map ID"
 //	@Param		request	body		models.DeleteMapSummaryRequest	true	"Body"
 //	@Success	200		{object}	models.Response{data=models.DeleteMapSummaryRequest}
