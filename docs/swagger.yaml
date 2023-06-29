@@ -466,6 +466,38 @@ paths:
       tags:
       - maps
   /maps/{id}/summary:
+    delete:
+      parameters:
+      - description: Map ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.DeleteMapSummaryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.DeleteMapSummaryRequest'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Delete map summary with specified map id.
+      tags:
+      - maps
     get:
       parameters:
       - description: Map ID
@@ -504,7 +536,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/models.DeleteMapSummaryRequest'
+          $ref: '#/definitions/models.CreateMapSummaryRequest'
       produces:
       - application/json
       responses:
@@ -515,13 +547,13 @@ paths:
             - $ref: '#/definitions/models.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/models.DeleteMapSummaryRequest'
+                  $ref: '#/definitions/models.CreateMapSummaryRequest'
               type: object
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Delete map summary with specified map id.
+      summary: Create map summary with specified map id.
       tags:
       - maps
     put:
