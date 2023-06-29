@@ -39,7 +39,7 @@ func FetchMapSummary(c *gin.Context) {
 		return
 	}
 	// Get map routes and histories
-	sql = `SELECT c.id, c.name, h.user_name, h.score_count, h.record_date, r.description, r.showcase, COALESCE(avg(rating), 0.0) FROM map_routes r
+	sql = `SELECT r.id, c.id, c.name, h.user_name, h.score_count, h.record_date, r.description, r.showcase, COALESCE(avg(rating), 0.0) FROM map_routes r
     INNER JOIN categories c ON r.category_id = c.id
     INNER JOIN map_history h ON r.map_id = h.map_id AND r.category_id = h.category_id
     LEFT JOIN map_ratings rt ON r.map_id = rt.map_id AND r.category_id = rt.category_id 
@@ -52,7 +52,7 @@ func FetchMapSummary(c *gin.Context) {
 	}
 	for rows.Next() {
 		route := models.MapRoute{Category: models.Category{}, History: models.MapHistory{}}
-		err = rows.Scan(&route.Category.ID, &route.Category.Name, &route.History.RunnerName, &route.History.ScoreCount, &route.History.Date, &route.Description, &route.Showcase, &route.Rating)
+		err = rows.Scan(&route.RouteID, &route.Category.ID, &route.Category.Name, &route.History.RunnerName, &route.History.ScoreCount, &route.History.Date, &route.Description, &route.Showcase, &route.Rating)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return

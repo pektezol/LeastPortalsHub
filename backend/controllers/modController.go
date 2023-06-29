@@ -14,9 +14,10 @@ import (
 //	@Summary	Edit map summary with specified map id.
 //	@Tags		maps
 //	@Produce	json
-//	@Param		id	path		int	true	"Map ID"
-//	@Success	200	{object}	models.Response{data=models.EditMapSummaryRequest}
-//	@Failure	400	{object}	models.Response
+//	@Param		id		path		int								true	"Map ID"
+//	@Param		request	body		models.EditMapSummaryRequest	true	"Body"
+//	@Success	200		{object}	models.Response{data=models.EditMapSummaryRequest}
+//	@Failure	400		{object}	models.Response
 //	@Router		/maps/{id}/summary [put]
 func EditMapSummary(c *gin.Context) {
 	// Check if user exists

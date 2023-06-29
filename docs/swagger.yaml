@@ -480,6 +480,12 @@ paths:
         name: id
         required: true
         type: integer
+      - description: Body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.EditMapSummaryRequest'
       produces:
       - application/json
       responses:
