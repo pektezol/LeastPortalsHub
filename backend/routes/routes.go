@@ -26,6 +26,7 @@ func InitRoutes(router *gin.Engine) {
 		v1.GET("/users/:id", middleware.CheckAuth, controllers.FetchUser)
 		v1.GET("/demos", controllers.DownloadDemoWithID)
 		v1.GET("/maps/:id/summary", middleware.CheckAuth, controllers.FetchMapSummary)
+		v1.POST("/maps/:id/summary", middleware.CheckAuth, controllers.CreateMapSummary)
 		v1.PUT("/maps/:id/summary", middleware.CheckAuth, controllers.EditMapSummary)
 		v1.GET("/maps/:id/leaderboards", middleware.CheckAuth, controllers.FetchMapLeaderboards)
 		v1.POST("/maps/:id/record", middleware.CheckAuth, controllers.CreateRecordWithDemo)
