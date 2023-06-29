@@ -9,6 +9,91 @@ import (
 	"github.com/pektezol/leastportals/backend/models"
 )
 
+// POST Map Summary
+//
+//	@Summary	Create map summary with specified map id.
+//	@Tags		maps
+//	@Produce	json
+//	@Param		id		path		int								true	"Map ID"
+//	@Param		request	body		models.CreateMapSummaryRequest	true	"Body"
+//	@Success	200		{object}	models.Response{data=models.CreateMapSummaryRequest}
+//	@Failure	400		{object}	models.Response
+//	@Router		/maps/{id}/summary [post]
+func CreateMapSummary(c *gin.Context) {
+	// Check if user exists
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, models.ErrorResponse("User not logged in."))
+		return
+	}
+	var moderator bool
+	for _, title := range user.(models.User).Titles {
+		if title == "Moderator" {
+			moderator = true
+		}
+	}
+	if !moderator {
+		c.JSON(http.StatusUnauthorized, models.ErrorResponse("Insufficient permissions."))
+		return
+	}
+	// Bind parameter and body
+	id := c.Param("id")
+	mapID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	var request models.CreateMapSummaryRequest
+	if err := c.BindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	// Start database transaction
+	tx, err := database.DB.Begin()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))
+		return
+	}
+	defer tx.Rollback()
+	// Fetch route category and score count
+	var checkMapID int
+	sql := `SELECT m.id FROM maps m WHERE m.id = $1`
+	err = database.DB.QueryRow(sql, mapID).Scan(&checkMapID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	if mapID != checkMapID {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse("Map ID does not exist."))
+		return
+	}
+	// Update database with new data
+	sql = `INSERT INTO map_routes (map_id,category_id,score_count,description,showcase)
+	VALUES ($1,$2,$3,$4,$5)`
+	_, err = tx.Exec(sql, mapID, request.CategoryID, request.ScoreCount, request.Description, request.Showcase)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	sql = `INSERT INTO map_history (map_id,category_id,user_name,score_count,record_date)
+	VALUES ($1,$2,$3,$4,$5)`
+	_, err = tx.Exec(sql, mapID, request.CategoryID, request.UserName, request.ScoreCount, request.RecordDate)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	if err = tx.Commit(); err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))
+		return
+	}
+	// Return response
+	c.JSON(http.StatusOK, models.Response{
+		Success: true,
+		Message: "Successfully updated map summary.",
+		Data:    request,
+	})
+}
+
 // PUT Map Summary
 //
 //	@Summary	Edit map summary with specified map id.
@@ -33,7 +118,7 @@ func EditMapSummary(c *gin.Context) {
 		}
 	}
 	if !moderator {
-		c.JSON(http.StatusUnauthorized, "Insufficient permissions.")
+		c.JSON(http.StatusUnauthorized, models.ErrorResponse("Insufficient permissions."))
 		return
 	}
 	// Bind parameter and body
