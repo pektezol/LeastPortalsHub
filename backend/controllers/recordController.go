@@ -30,7 +30,7 @@ import (
 //	@Param		partner_demo		formData	file	true	"Partner Demo"
 //	@Param		is_partner_orange	formData	boolean	true	"Is Partner Orange"
 //	@Param		partner_id			formData	string	true	"Partner ID"
-//	@Success	200					{object}	models.Response{data=models.RecordRequest}
+//	@Success	200					{object}	models.Response
 //	@Failure	400					{object}	models.Response
 //	@Failure	401					{object}	models.Response
 //	@Router		/maps/{id}/record [post]
@@ -179,9 +179,8 @@ func CreateRecordWithDemo(c *gin.Context) {
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully created record.",
-		Data:    record,
+		Data:    nil,
 	})
-	return
 }
 
 // GET Demo

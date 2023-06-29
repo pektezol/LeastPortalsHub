@@ -43,6 +43,7 @@ type MapHistory struct {
 }
 
 type MapRoute struct {
+	RouteID     int        `json:"route_id"`
 	Category    Category   `json:"category"`
 	History     MapHistory `json:"history"`
 	Rating      float32    `json:"rating"`
