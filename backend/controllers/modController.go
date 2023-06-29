@@ -185,7 +185,7 @@ func EditMapSummary(c *gin.Context) {
 //	@Param		request	body		models.DeleteMapSummaryRequest	true	"Body"
 //	@Success	200		{object}	models.Response{data=models.DeleteMapSummaryRequest}
 //	@Failure	400		{object}	models.Response
-//	@Router		/maps/{id}/summary [post]
+//	@Router		/maps/{id}/summary [delete]
 func DeleteMapSummary(c *gin.Context) {
 	// Check if user exists
 	user, exists := c.Get("user")
