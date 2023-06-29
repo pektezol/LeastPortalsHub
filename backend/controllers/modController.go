@@ -89,7 +89,7 @@ func CreateMapSummary(c *gin.Context) {
 	// Return response
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
-		Message: "Successfully updated map summary.",
+		Message: "Successfully created map summary.",
 		Data:    request,
 	})
 }
@@ -172,6 +172,95 @@ func EditMapSummary(c *gin.Context) {
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully updated map summary.",
+		Data:    request,
+	})
+}
+
+// DELETE Map Summary
+//
+//	@Summary	Delete map summary with specified map id.
+//	@Tags		maps
+//	@Produce	json
+//	@Param		id		path		int								true	"Map ID"
+//	@Param		request	body		models.DeleteMapSummaryRequest	true	"Body"
+//	@Success	200		{object}	models.Response{data=models.DeleteMapSummaryRequest}
+//	@Failure	400		{object}	models.Response
+//	@Router		/maps/{id}/summary [post]
+func DeleteMapSummary(c *gin.Context) {
+	// Check if user exists
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, models.ErrorResponse("User not logged in."))
+		return
+	}
+	var moderator bool
+	for _, title := range user.(models.User).Titles {
+		if title == "Moderator" {
+			moderator = true
+		}
+	}
+	if !moderator {
+		c.JSON(http.StatusUnauthorized, models.ErrorResponse("Insufficient permissions."))
+		return
+	}
+	// Bind parameter and body
+	id := c.Param("id")
+	mapID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	var request models.DeleteMapSummaryRequest
+	if err := c.BindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	// Start database transaction
+	tx, err := database.DB.Begin()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))
+		return
+	}
+	defer tx.Rollback()
+	// Fetch route category and score count
+	var checkMapID, scoreCount, mapHistoryID int
+	sql := `SELECT m.id, mr.score_count FROM maps m INNER JOIN map_routes mr ON m.id=mr.map_id WHERE m.id = $1 AND mr.id = $2`
+	err = database.DB.QueryRow(sql, mapID, request.RouteID).Scan(&checkMapID, &scoreCount)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	if mapID != checkMapID {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse("Map ID does not exist."))
+		return
+	}
+	sql = `SELECT mh.id FROM maps m INNER JOIN map_routes mr ON m.id=mr.map_id INNER JOIN map_history mh ON m.id=mh.map_id WHERE m.id = $1 AND mr.id = $2 AND mh.score_count = $3`
+	err = database.DB.QueryRow(sql, mapID, request.RouteID, scoreCount).Scan(&mapHistoryID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	// Update database with new data
+	sql = `DELETE FROM map_routes mr WHERE mr.id = $1 `
+	_, err = tx.Exec(sql, request.RouteID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	sql = `DELETE FROM map_history mh WHERE mh.id = $1`
+	_, err = tx.Exec(sql, mapHistoryID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	if err = tx.Commit(); err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))
+		return
+	}
+	// Return response
+	c.JSON(http.StatusOK, models.Response{
+		Success: true,
+		Message: "Successfully delete map summary.",
 		Data:    request,
 	})
 }
