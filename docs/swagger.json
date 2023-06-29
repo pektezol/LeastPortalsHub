@@ -485,6 +485,59 @@
                         }
                     }
                 }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "maps"
+                ],
+                "summary": "Delete map summary with specified map id.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Map ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.DeleteMapSummaryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.DeleteMapSummaryRequest"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
             }
         },
         "/profile": {
@@ -867,24 +920,49 @@
                 }
             }
         },
-        "models.EditMapSummaryRequest": {
+        "models.CreateMapSummaryRequest": {
             "type": "object",
             "required": [
-                "image"
+                "category_id",
+                "description",
+                "record_date",
+                "score_count",
+                "showcase",
+                "user_name"
             ],
             "properties": {
-                "image": {
+                "category_id": {
+                    "type": "integer"
+                },
+                "description": {
                     "type": "string"
                 },
-                "routes": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.EditMapSummaryRequestDetails"
-                    }
+                "record_date": {
+                    "type": "string"
+                },
+                "score_count": {
+                    "type": "integer"
+                },
+                "showcase": {
+                    "type": "string"
+                },
+                "user_name": {
+                    "type": "string"
                 }
             }
         },
-        "models.EditMapSummaryRequestDetails": {
+        "models.DeleteMapSummaryRequest": {
+            "type": "object",
+            "required": [
+                "route_id"
+            ],
+            "properties": {
+                "route_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.EditMapSummaryRequest": {
             "type": "object",
             "required": [
                 "description",
