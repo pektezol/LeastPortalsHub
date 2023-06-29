@@ -443,6 +443,13 @@
                 "summary": "Edit map summary with specified map id.",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "JWT Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "Map ID",
                         "name": "id",
@@ -496,6 +503,13 @@
                 "summary": "Create map summary with specified map id.",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "JWT Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "Map ID",
                         "name": "id",
@@ -548,6 +562,13 @@
                 ],
                 "summary": "Delete map summary with specified map id.",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "JWT Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "Map ID",

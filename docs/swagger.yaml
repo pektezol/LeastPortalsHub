@@ -468,6 +468,11 @@ paths:
   /maps/{id}/summary:
     delete:
       parameters:
+      - description: JWT Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Map ID
         in: path
         name: id
@@ -526,6 +531,11 @@ paths:
       - maps
     post:
       parameters:
+      - description: JWT Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Map ID
         in: path
         name: id
@@ -558,6 +568,11 @@ paths:
       - maps
     put:
       parameters:
+      - description: JWT Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
       - description: Map ID
         in: path
         name: id
