@@ -22,8 +22,8 @@ type CreateMapHistoryRequest struct {
 }
 
 type RecordRequest struct {
-	HostDemo        *multipart.FileHeader `json:"host_demo" form:"host_demo" binding:"required"`
-	PartnerDemo     *multipart.FileHeader `json:"partner_demo" form:"partner_demo"`
+	HostDemo        *multipart.FileHeader `json:"host_demo" form:"host_demo" binding:"required" swaggerignore:"true"`
+	PartnerDemo     *multipart.FileHeader `json:"partner_demo" form:"partner_demo" swaggerignore:"true"`
 	IsPartnerOrange bool                  `json:"is_partner_orange" form:"is_partner_orange"`
 	PartnerID       string                `json:"partner_id" form:"partner_id"`
 }

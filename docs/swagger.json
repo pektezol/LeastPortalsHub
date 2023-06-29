@@ -338,26 +338,16 @@
                         "required": true
                     },
                     {
-                        "type": "array",
-                        "items": {
-                            "type": "file"
-                        },
-                        "description": "Demos",
-                        "name": "demos",
+                        "type": "file",
+                        "description": "Host Demo",
+                        "name": "host_demo",
                         "in": "formData",
                         "required": true
                     },
                     {
-                        "type": "integer",
-                        "description": "Score Count",
-                        "name": "score_count",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Score Time",
-                        "name": "score_time",
+                        "type": "file",
+                        "description": "Partner Demo",
+                        "name": "partner_demo",
                         "in": "formData",
                         "required": true
                     },
@@ -441,6 +431,50 @@
                                     "properties": {
                                         "data": {
                                             "$ref": "#/definitions/models.MapSummaryResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "maps"
+                ],
+                "summary": "Edit map summary with specified map id.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Map ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.EditMapSummaryRequest"
                                         }
                                     }
                                 }
@@ -836,6 +870,37 @@
                 }
             }
         },
+        "models.EditMapSummaryRequest": {
+            "type": "object",
+            "required": [
+                "description",
+                "record_date",
+                "route_id",
+                "score_count",
+                "showcase",
+                "user_name"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "record_date": {
+                    "type": "string"
+                },
+                "route_id": {
+                    "type": "integer"
+                },
+                "score_count": {
+                    "type": "integer"
+                },
+                "showcase": {
+                    "type": "string"
+                },
+                "user_name": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Game": {
             "type": "object",
             "properties": {
@@ -866,6 +931,9 @@
                 },
                 "id": {
                     "type": "integer"
+                },
+                "image": {
+                    "type": "string"
                 },
                 "map_name": {
                     "type": "string"
@@ -996,24 +1064,12 @@
         },
         "models.RecordRequest": {
             "type": "object",
-            "required": [
-                "is_partner_orange",
-                "partner_id",
-                "score_count",
-                "score_time"
-            ],
             "properties": {
                 "is_partner_orange": {
                     "type": "boolean"
                 },
                 "partner_id": {
                     "type": "string"
-                },
-                "score_count": {
-                    "type": "integer"
-                },
-                "score_time": {
-                    "type": "integer"
                 }
             }
         },

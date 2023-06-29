@@ -32,6 +32,28 @@ definitions:
       game:
         $ref: '#/definitions/models.Game'
     type: object
+  models.EditMapSummaryRequest:
+    properties:
+      description:
+        type: string
+      record_date:
+        type: string
+      route_id:
+        type: integer
+      score_count:
+        type: integer
+      showcase:
+        type: string
+      user_name:
+        type: string
+    required:
+    - description
+    - record_date
+    - route_id
+    - score_count
+    - showcase
+    - user_name
+    type: object
   models.Game:
     properties:
       id:
@@ -52,6 +74,8 @@ definitions:
         type: string
       id:
         type: integer
+      image:
+        type: string
       map_name:
         type: string
     type: object
@@ -140,15 +164,6 @@ definitions:
         type: boolean
       partner_id:
         type: string
-      score_count:
-        type: integer
-      score_time:
-        type: integer
-    required:
-    - is_partner_orange
-    - partner_id
-    - score_count
-    - score_time
     type: object
   models.Response:
     properties:
@@ -388,23 +403,16 @@ paths:
         name: Authorization
         required: true
         type: string
-      - description: Demos
+      - description: Host Demo
         in: formData
-        items:
-          type: file
-        name: demos
+        name: host_demo
         required: true
-        type: array
-      - description: Score Count
+        type: file
+      - description: Partner Demo
         in: formData
-        name: score_count
+        name: partner_demo
         required: true
-        type: integer
-      - description: Score Time
-        in: formData
-        name: score_time
-        required: true
-        type: integer
+        type: file
       - description: Is Partner Orange
         in: formData
         name: is_partner_orange
@@ -463,6 +471,32 @@ paths:
           schema:
             $ref: '#/definitions/models.Response'
       summary: Get map summary with specified id.
+      tags:
+      - maps
+    put:
+      parameters:
+      - description: Map ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.EditMapSummaryRequest'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+      summary: Edit map summary with specified map id.
       tags:
       - maps
   /profile:

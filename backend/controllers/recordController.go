@@ -5,14 +5,15 @@ import (
 	b64 "encoding/base64"
 	"io"
 	"log"
+	"mime/multipart"
 	"net/http"
 	"os"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/pektezol/leastportals/backend/database"
 	"github.com/pektezol/leastportals/backend/models"
+	"github.com/pektezol/leastportals/backend/parser"
 	"golang.org/x/oauth2/google"
 	"golang.org/x/oauth2/jwt"
 	"google.golang.org/api/drive/v3"
@@ -25,9 +26,8 @@ import (
 //	@Accept		mpfd
 //	@Produce	json
 //	@Param		Authorization		header		string	true	"JWT Token"
-//	@Param		demos				formData	[]file	true	"Demos"
-//	@Param		score_count			formData	int		true	"Score Count"
-//	@Param		score_time			formData	int		true	"Score Time"
+//	@Param		host_demo			formData	file	true	"Host Demo"
+//	@Param		partner_demo		formData	file	true	"Partner Demo"
 //	@Param		is_partner_orange	formData	boolean	true	"Is Partner Orange"
 //	@Param		partner_id			formData	string	true	"Partner ID"
 //	@Success	200					{object}	models.Response{data=models.RecordRequest}
@@ -43,11 +43,11 @@ func CreateRecordWithDemo(c *gin.Context) {
 		return
 	}
 	// Check if map is sp or mp
-	var gameID int
+	var gameName string
 	var isCoop bool
 	var isDisabled bool
-	sql := `SELECT game_id, is_disabled FROM maps WHERE id = $1`
-	err := database.DB.QueryRow(sql, mapId).Scan(&gameID, &isDisabled)
+	sql := `SELECT g.name, m.is_disabled FROM maps m INNER JOIN games g ON m.game_id=g.id WHERE id = $1`
+	err := database.DB.QueryRow(sql, mapId).Scan(&gameName, &isDisabled)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
@@ -56,51 +56,23 @@ func CreateRecordWithDemo(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse("Map is not available for competitive boards."))
 		return
 	}
-	if gameID == 2 {
+	if gameName == "Portal 2 - Cooperative" {
 		isCoop = true
 	}
 	// Get record request
 	var record models.RecordRequest
-	score_count, err := strconv.Atoi(c.PostForm("score_count"))
-	if err != nil {
+	if err := c.ShouldBind(&record); err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	score_time, err := strconv.Atoi(c.PostForm("score_time"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+	if isCoop && (record.PartnerDemo == nil || record.PartnerID == "") {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse("Invalid entry for coop record submission."))
 		return
 	}
-	is_partner_orange, err := strconv.ParseBool(c.PostForm("is_partner_orange"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
-		return
-	}
-	record.ScoreCount = score_count
-	record.ScoreTime = score_time
-	record.PartnerID = c.PostForm("partner_id")
-	record.IsPartnerOrange = is_partner_orange
-	if record.PartnerID == "" {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse("No partner id given."))
-		return
-	}
-	// Multipart form
-	form, err := c.MultipartForm()
-	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
-		return
-	}
-	files := form.File["demos"]
-	if len(files) != 2 && isCoop {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse("Not enough demos for coop submission."))
-		return
-	}
-	if len(files) != 1 && !isCoop {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse("Too many demos for singleplayer submission."))
-		return
-	}
-	var hostDemoUUID string
-	var partnerDemoUUID string
+	// Demo files
+	demoFiles := []*multipart.FileHeader{record.HostDemo, record.PartnerDemo}
+	var hostDemoUUID, hostDemoFileID, partnerDemoUUID, partnerDemoFileID string
+	var hostDemoScoreCount, hostDemoScoreTime int
 	client := serviceAccount()
 	srv, err := drive.New(client)
 	if err != nil {
@@ -115,16 +87,15 @@ func CreateRecordWithDemo(c *gin.Context) {
 	}
 	// Defer to a rollback in case anything fails
 	defer tx.Rollback()
-	fileID := ""
-	for i, header := range files {
+	for i, header := range demoFiles {
 		uuid := uuid.New().String()
 		// Upload & insert into demos
-		err = c.SaveUploadedFile(header, "docs/"+header.Filename)
+		err = c.SaveUploadedFile(header, "parser/demos/"+header.Filename)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
-		f, err := os.Open("docs/" + header.Filename)
+		f, err := os.Open("parser/demos/" + header.Filename)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
@@ -135,11 +106,16 @@ func CreateRecordWithDemo(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
-		fileID = file.Id
-		if i == 0 {
-			hostDemoUUID = uuid
+		hostDemoScoreCount, hostDemoScoreTime, err = parser.ProcessDemo(record.HostDemo)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			return
 		}
-		if i == 1 {
+		if i == 0 {
+			hostDemoFileID = file.Id
+			hostDemoUUID = uuid
+		} else if i == 1 {
+			partnerDemoFileID = file.Id
 			partnerDemoUUID = uuid
 		}
 		_, err = tx.Exec(`INSERT INTO demos (id,location_id) VALUES ($1,$2)`, uuid, file.Id)
@@ -148,7 +124,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
-		os.Remove("docs/" + header.Filename)
+		os.Remove("parser/demos/" + header.Filename)
 	}
 	// Insert into records
 	if isCoop {
@@ -163,9 +139,10 @@ func CreateRecordWithDemo(c *gin.Context) {
 			partnerID = user.(models.User).SteamID
 			hostID = record.PartnerID
 		}
-		_, err := tx.Exec(sql, mapId, record.ScoreCount, record.ScoreTime, hostID, partnerID, hostDemoUUID, partnerDemoUUID)
+		_, err := tx.Exec(sql, mapId, hostDemoScoreCount, hostDemoScoreTime, hostID, partnerID, hostDemoUUID, partnerDemoUUID)
 		if err != nil {
-			deleteFile(srv, fileID)
+			deleteFile(srv, hostDemoFileID)
+			deleteFile(srv, partnerDemoFileID)
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
@@ -180,9 +157,9 @@ func CreateRecordWithDemo(c *gin.Context) {
 	} else {
 		sql := `INSERT INTO records_sp(map_id,score_count,score_time,user_id,demo_id) 
 		VALUES($1, $2, $3, $4, $5)`
-		_, err := tx.Exec(sql, mapId, record.ScoreCount, record.ScoreTime, user.(models.User).SteamID, hostDemoUUID)
+		_, err := tx.Exec(sql, mapId, hostDemoScoreCount, hostDemoScoreTime, user.(models.User).SteamID, hostDemoUUID)
 		if err != nil {
-			deleteFile(srv, fileID)
+			deleteFile(srv, hostDemoFileID)
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
