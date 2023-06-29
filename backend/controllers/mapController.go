@@ -43,7 +43,7 @@ func FetchMapSummary(c *gin.Context) {
     INNER JOIN categories c ON r.category_id = c.id
     INNER JOIN map_history h ON r.map_id = h.map_id AND r.category_id = h.category_id
     LEFT JOIN map_ratings rt ON r.map_id = rt.map_id AND r.category_id = rt.category_id 
-	WHERE r.map_id = $1 AND h.score_count = r.score_count GROUP BY c.id, h.user_name, h.score_count, h.record_date, r.description, r.showcase
+	WHERE r.map_id = $1 AND h.score_count = r.score_count GROUP BY r.id, c.id, h.user_name, h.score_count, h.record_date, r.description, r.showcase
 	ORDER BY h.record_date ASC;`
 	rows, err := database.DB.Query(sql, id)
 	if err != nil {
