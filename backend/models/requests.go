@@ -6,6 +6,11 @@ import (
 )
 
 type EditMapSummaryRequest struct {
+	Image  string                         `json:"image" binding:"required"`
+	Routes []EditMapSummaryRequestDetails `json:"routes" binding:"dive"`
+}
+
+type EditMapSummaryRequestDetails struct {
 	RouteID     int       `json:"route_id" binding:"required"`
 	Description string    `json:"description" binding:"required"`
 	Showcase    string    `json:"showcase" binding:"required"`

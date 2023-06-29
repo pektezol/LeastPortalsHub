@@ -48,17 +48,6 @@ func EditMapSummary(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	// Fetch route category and score count
-	var categoryID, scoreCount int
-	sql := `SELECT mr.category_id, mr.score_count
-	FROM map_routes mr
-	INNER JOIN maps m
-	WHERE m.id = $1 AND mr.id = $2`
-	err = database.DB.QueryRow(sql, mapID, request.RouteID).Scan(&categoryID, &scoreCount)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
-		return
-	}
 	// Start database transaction
 	tx, err := database.DB.Begin()
 	if err != nil {
@@ -66,18 +55,34 @@ func EditMapSummary(c *gin.Context) {
 		return
 	}
 	defer tx.Rollback()
-	// Update database with new data
-	sql = `UPDATE map_routes SET score_count = $2, description = $3, showcase = $4 WHERE id = $1`
-	_, err = tx.Exec(sql, request.RouteID, request.ScoreCount, request.Description, request.Showcase)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
-		return
+	if request.Image != "" {
+		tx.Exec(`UPDATE maps m SET image = $2 WHERE m.id = $1`, mapID, request.Image)
 	}
-	sql = `UPDATE map_history SET user_name = $3, score_count = $4, record_date = $5 WHERE map_id = $1 AND category_id = $2`
-	_, err = tx.Exec(sql, mapID, categoryID, request.UserName, request.ScoreCount, request.RecordDate)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
-		return
+	for _, route := range request.Routes {
+		// Fetch route category and score count
+		var categoryID, scoreCount int
+		sql := `SELECT mr.category_id, mr.score_count
+		FROM map_routes mr
+		INNER JOIN maps m
+		WHERE m.id = $1 AND mr.id = $2`
+		err = database.DB.QueryRow(sql, mapID, route.RouteID).Scan(&categoryID, &scoreCount)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			return
+		}
+		// Update database with new data
+		sql = `UPDATE map_routes SET score_count = $2, description = $3, showcase = $4 WHERE id = $1`
+		_, err = tx.Exec(sql, route.RouteID, route.ScoreCount, route.Description, route.Showcase)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			return
+		}
+		sql = `UPDATE map_history SET user_name = $3, score_count = $4, record_date = $5 WHERE map_id = $1 AND category_id = $2`
+		_, err = tx.Exec(sql, mapID, categoryID, route.UserName, route.ScoreCount, route.RecordDate)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			return
+		}
 	}
 	if err = tx.Commit(); err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))

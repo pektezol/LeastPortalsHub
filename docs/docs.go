@@ -377,19 +377,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/models.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/models.RecordRequest"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/models.Response"
                         }
                     },
                     "400": {
@@ -889,6 +877,23 @@ const docTemplate = `{
         "models.EditMapSummaryRequest": {
             "type": "object",
             "required": [
+                "image"
+            ],
+            "properties": {
+                "image": {
+                    "type": "string"
+                },
+                "routes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.EditMapSummaryRequestDetails"
+                    }
+                }
+            }
+        },
+        "models.EditMapSummaryRequestDetails": {
+            "type": "object",
+            "required": [
                 "description",
                 "record_date",
                 "route_id",
@@ -991,6 +996,9 @@ const docTemplate = `{
                 "rating": {
                     "type": "number"
                 },
+                "route_id": {
+                    "type": "integer"
+                },
                 "showcase": {
                     "type": "string"
                 }
@@ -1075,17 +1083,6 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/models.UserRanking"
                     }
-                }
-            }
-        },
-        "models.RecordRequest": {
-            "type": "object",
-            "properties": {
-                "is_partner_orange": {
-                    "type": "boolean"
-                },
-                "partner_id": {
-                    "type": "string"
                 }
             }
         },
