@@ -34,6 +34,17 @@ definitions:
     type: object
   models.EditMapSummaryRequest:
     properties:
+      image:
+        type: string
+      routes:
+        items:
+          $ref: '#/definitions/models.EditMapSummaryRequestDetails'
+        type: array
+    required:
+    - image
+    type: object
+  models.EditMapSummaryRequestDetails:
+    properties:
       description:
         type: string
       record_date:
@@ -102,6 +113,8 @@ definitions:
         $ref: '#/definitions/models.MapHistory'
       rating:
         type: number
+      route_id:
+        type: integer
       showcase:
         type: string
     type: object
@@ -157,13 +170,6 @@ definitions:
         items:
           $ref: '#/definitions/models.UserRanking'
         type: array
-    type: object
-  models.RecordRequest:
-    properties:
-      is_partner_orange:
-        type: boolean
-      partner_id:
-        type: string
     type: object
   models.Response:
     properties:
@@ -429,12 +435,7 @@ paths:
         "200":
           description: OK
           schema:
-            allOf:
-            - $ref: '#/definitions/models.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/models.RecordRequest'
-              type: object
+            $ref: '#/definitions/models.Response'
         "400":
           description: Bad Request
           schema:
