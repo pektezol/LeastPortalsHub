@@ -59,10 +59,20 @@ func Login(c *gin.Context) {
 			database.DB.Exec(`INSERT INTO users (steam_id, user_name, avatar_link, country_code)
 			VALUES ($1, $2, $3, $4)`, steamID, user.PersonaName, user.AvatarFull, user.LocCountryCode)
 		}
+		moderator := false
+		rows, _ := database.DB.Query("SELECT title_name FROM titles WHERE user_id = $1", steamID)
+		for rows.Next() {
+			var title string
+			rows.Scan(&title)
+			if title == "Moderator" {
+				moderator = true
+			}
+		}
 		// Generate JWT token
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 			"sub": steamID,
 			"exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
+			"mod": moderator,
 		})
 		// Sign and get the complete encoded token as a string using the secret
 		tokenString, err := token.SignedString([]byte(os.Getenv("SECRET_KEY")))
