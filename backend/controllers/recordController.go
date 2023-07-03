@@ -21,20 +21,20 @@ import (
 
 // POST Record
 //
-//	@Summary	Post record with demo of a specific map.
-//	@Tags		maps
-//	@Accept		mpfd
-//	@Produce	json
-//	@Param		id					path		int		true	"Map ID"
-//	@Param		Authorization		header		string	true	"JWT Token"
-//	@Param		host_demo			formData	file	true	"Host Demo"
-//	@Param		partner_demo		formData	file	false	"Partner Demo"
-//	@Param		is_partner_orange	formData	boolean	false	"Is Partner Orange"
-//	@Param		partner_id			formData	string	false	"Partner ID"
-//	@Success	200					{object}	models.Response
-//	@Failure	400					{object}	models.Response
-//	@Failure	401					{object}	models.Response
-//	@Router		/maps/{id}/record [post]
+//	@Description	Post record with demo of a specific map.
+//	@Tags			maps
+//	@Accept			mpfd
+//	@Produce		json
+//	@Param			id					path		int		true	"Map ID"
+//	@Param			Authorization		header		string	true	"JWT Token"
+//	@Param			host_demo			formData	file	true	"Host Demo"
+//	@Param			partner_demo		formData	file	false	"Partner Demo"
+//	@Param			is_partner_orange	formData	boolean	false	"Is Partner Orange"
+//	@Param			partner_id			formData	string	false	"Partner ID"
+//	@Success		200					{object}	models.Response
+//	@Failure		400					{object}	models.Response
+//	@Failure		401					{object}	models.Response
+//	@Router			/maps/{id}/record [post]
 func CreateRecordWithDemo(c *gin.Context) {
 	mapId := c.Param("id")
 	// Check if user exists
@@ -189,14 +189,14 @@ func CreateRecordWithDemo(c *gin.Context) {
 
 // GET Demo
 //
-//	@Summary	Get demo with specified demo uuid.
-//	@Tags		demo
-//	@Accept		json
-//	@Produce	octet-stream
-//	@Param		uuid	query		int		true	"Demo UUID"
-//	@Success	200		{file}		binary	"Demo File"
-//	@Failure	400		{object}	models.Response
-//	@Router		/demos [get]
+//	@Description	Get demo with specified demo uuid.
+//	@Tags			demo
+//	@Accept			json
+//	@Produce		octet-stream
+//	@Param			uuid	query		string	true	"Demo UUID"
+//	@Success		200		{file}		binary	"Demo File"
+//	@Failure		400		{object}	models.Response
+//	@Router			/demos [get]
 func DownloadDemoWithID(c *gin.Context) {
 	uuid := c.Query("uuid")
 	var locationID string

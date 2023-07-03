@@ -22,13 +22,13 @@ const docTemplate = `{
     "paths": {
         "/chapters/{id}": {
             "get": {
+                "description": "Get maps from the specified chapter id.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "games \u0026 chapters"
                 ],
-                "summary": "Get maps from the specified chapter id.",
                 "parameters": [
                     {
                         "type": "integer",
@@ -66,45 +66,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/demo": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "rankings"
-                ],
-                "summary": "Get rankings of every player.",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/models.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/models.RankingsResponse"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.Response"
-                        }
-                    }
-                }
-            }
-        },
         "/demos": {
             "get": {
+                "description": "Get demo with specified demo uuid.",
                 "consumes": [
                     "application/json"
                 ],
@@ -114,10 +78,9 @@ const docTemplate = `{
                 "tags": [
                     "demo"
                 ],
-                "summary": "Get demo with specified demo uuid.",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "Demo UUID",
                         "name": "uuid",
                         "in": "query",
@@ -142,13 +105,13 @@ const docTemplate = `{
         },
         "/games": {
             "get": {
+                "description": "Get games from the leaderboards.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "games \u0026 chapters"
                 ],
-                "summary": "Get games from the leaderboards.",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -182,13 +145,13 @@ const docTemplate = `{
         },
         "/games/{id}": {
             "get": {
+                "description": "Get chapters from the specified game id.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "games \u0026 chapters"
                 ],
-                "summary": "Get chapters from the specified game id.",
                 "parameters": [
                     {
                         "type": "integer",
@@ -228,6 +191,7 @@ const docTemplate = `{
         },
         "/login": {
             "get": {
+                "description": "Get (redirect) login page for Steam auth.",
                 "consumes": [
                     "application/json"
                 ],
@@ -237,7 +201,6 @@ const docTemplate = `{
                 "tags": [
                     "login"
                 ],
-                "summary": "Get (redirect) login page for Steam auth.",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -268,13 +231,13 @@ const docTemplate = `{
         },
         "/maps/{id}/leaderboards": {
             "get": {
+                "description": "Get map leaderboards with specified id.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "maps"
                 ],
-                "summary": "Get map leaderboards with specified id.",
                 "parameters": [
                     {
                         "type": "integer",
@@ -326,6 +289,7 @@ const docTemplate = `{
         },
         "/maps/{id}/record": {
             "post": {
+                "description": "Post record with demo of a specific map.",
                 "consumes": [
                     "multipart/form-data"
                 ],
@@ -335,7 +299,6 @@ const docTemplate = `{
                 "tags": [
                     "maps"
                 ],
-                "summary": "Post record with demo of a specific map.",
                 "parameters": [
                     {
                         "type": "integer",
@@ -401,13 +364,13 @@ const docTemplate = `{
         },
         "/maps/{id}/summary": {
             "get": {
+                "description": "Get map summary with specified id.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "maps"
                 ],
-                "summary": "Get map summary with specified id.",
                 "parameters": [
                     {
                         "type": "integer",
@@ -445,13 +408,13 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "description": "Edit map summary with specified map id.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "maps"
                 ],
-                "summary": "Edit map summary with specified map id.",
                 "parameters": [
                     {
                         "type": "string",
@@ -505,13 +468,13 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "description": "Create map summary with specified map id.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "maps"
                 ],
-                "summary": "Create map summary with specified map id.",
                 "parameters": [
                     {
                         "type": "string",
@@ -565,13 +528,13 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "description": "Delete map summary with specified map id.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "maps"
                 ],
-                "summary": "Delete map summary with specified map id.",
                 "parameters": [
                     {
                         "type": "string",
@@ -627,6 +590,7 @@ const docTemplate = `{
         },
         "/profile": {
             "get": {
+                "description": "Get profile page of session user.",
                 "consumes": [
                     "application/json"
                 ],
@@ -636,7 +600,6 @@ const docTemplate = `{
                 "tags": [
                     "users"
                 ],
-                "summary": "Get profile page of session user.",
                 "parameters": [
                     {
                         "type": "string",
@@ -680,6 +643,7 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "description": "Update country code of session user.",
                 "consumes": [
                     "application/json"
                 ],
@@ -689,7 +653,6 @@ const docTemplate = `{
                 "tags": [
                     "users"
                 ],
-                "summary": "Update country code of session user.",
                 "parameters": [
                     {
                         "type": "string",
@@ -728,6 +691,7 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "description": "Update profile page of session user.",
                 "consumes": [
                     "application/json"
                 ],
@@ -737,7 +701,6 @@ const docTemplate = `{
                 "tags": [
                     "users"
                 ],
-                "summary": "Update profile page of session user.",
                 "parameters": [
                     {
                         "type": "string",
@@ -781,15 +744,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/rankings": {
+            "get": {
+                "description": "Get rankings of every player.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rankings"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.RankingsResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/search": {
             "get": {
+                "description": "Get all user and map data matching to the query.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "search"
                 ],
-                "summary": "Get all user and map data matching to the query.",
                 "parameters": [
                     {
                         "type": "string",
@@ -828,13 +828,13 @@ const docTemplate = `{
         },
         "/token": {
             "get": {
+                "description": "Gets the token cookie value from the user.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "auth"
                 ],
-                "summary": "Gets the token cookie value from the user.",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -863,13 +863,13 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "description": "Deletes the token cookie from the user.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "auth"
                 ],
-                "summary": "Deletes the token cookie from the user.",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -900,6 +900,7 @@ const docTemplate = `{
         },
         "/users/{id}": {
             "get": {
+                "description": "Get profile page of another user.",
                 "consumes": [
                     "application/json"
                 ],
@@ -909,7 +910,6 @@ const docTemplate = `{
                 "tags": [
                     "users"
                 ],
-                "summary": "Get profile page of another user.",
                 "parameters": [
                     {
                         "type": "integer",

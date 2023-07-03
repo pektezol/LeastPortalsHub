@@ -11,13 +11,13 @@ import (
 
 // GET Map Summary
 //
-//	@Summary	Get map summary with specified id.
-//	@Tags		maps
-//	@Produce	json
-//	@Param		id	path		int	true	"Map ID"
-//	@Success	200	{object}	models.Response{data=models.MapSummaryResponse}
-//	@Failure	400	{object}	models.Response
-//	@Router		/maps/{id}/summary [get]
+//	@Description	Get map summary with specified id.
+//	@Tags			maps
+//	@Produce		json
+//	@Param			id	path		int	true	"Map ID"
+//	@Success		200	{object}	models.Response{data=models.MapSummaryResponse}
+//	@Failure		400	{object}	models.Response
+//	@Router			/maps/{id}/summary [get]
 func FetchMapSummary(c *gin.Context) {
 	id := c.Param("id")
 	response := models.MapSummaryResponse{Map: models.Map{}, Summary: models.MapSummary{Routes: []models.MapRoute{}}}
@@ -69,13 +69,13 @@ func FetchMapSummary(c *gin.Context) {
 
 // GET Map Leaderboards
 //
-//	@Summary	Get map leaderboards with specified id.
-//	@Tags		maps
-//	@Produce	json
-//	@Param		id	path		int	true	"Map ID"
-//	@Success	200	{object}	models.Response{data=models.Map{data=models.MapRecords}}
-//	@Failure	400	{object}	models.Response
-//	@Router		/maps/{id}/leaderboards [get]
+//	@Description	Get map leaderboards with specified id.
+//	@Tags			maps
+//	@Produce		json
+//	@Param			id	path		int	true	"Map ID"
+//	@Success		200	{object}	models.Response{data=models.Map{data=models.MapRecords}}
+//	@Failure		400	{object}	models.Response
+//	@Router			/maps/{id}/leaderboards [get]
 func FetchMapLeaderboards(c *gin.Context) {
 	// TODO: make new response type
 	id := c.Param("id")
@@ -186,12 +186,12 @@ func FetchMapLeaderboards(c *gin.Context) {
 
 // GET Games
 //
-//	@Summary	Get games from the leaderboards.
-//	@Tags		games & chapters
-//	@Produce	json
-//	@Success	200	{object}	models.Response{data=[]models.Game}
-//	@Failure	400	{object}	models.Response
-//	@Router		/games [get]
+//	@Description	Get games from the leaderboards.
+//	@Tags			games & chapters
+//	@Produce		json
+//	@Success		200	{object}	models.Response{data=[]models.Game}
+//	@Failure		400	{object}	models.Response
+//	@Router			/games [get]
 func FetchGames(c *gin.Context) {
 	rows, err := database.DB.Query(`SELECT id, name FROM games`)
 	if err != nil {
@@ -216,13 +216,13 @@ func FetchGames(c *gin.Context) {
 
 // GET Chapters of a Game
 //
-//	@Summary	Get chapters from the specified game id.
-//	@Tags		games & chapters
-//	@Produce	json
-//	@Param		id	path		int	true	"Game ID"
-//	@Success	200	{object}	models.Response{data=models.ChaptersResponse}
-//	@Failure	400	{object}	models.Response
-//	@Router		/games/{id} [get]
+//	@Description	Get chapters from the specified game id.
+//	@Tags			games & chapters
+//	@Produce		json
+//	@Param			id	path		int	true	"Game ID"
+//	@Success		200	{object}	models.Response{data=models.ChaptersResponse}
+//	@Failure		400	{object}	models.Response
+//	@Router			/games/{id} [get]
 func FetchChapters(c *gin.Context) {
 	gameID := c.Param("id")
 	intID, err := strconv.Atoi(gameID)
@@ -258,13 +258,13 @@ func FetchChapters(c *gin.Context) {
 
 // GET Maps of a Chapter
 //
-//	@Summary	Get maps from the specified chapter id.
-//	@Tags		games & chapters
-//	@Produce	json
-//	@Param		id	path		int	true	"Chapter ID"
-//	@Success	200	{object}	models.Response{data=models.ChapterMapsResponse}
-//	@Failure	400	{object}	models.Response
-//	@Router		/chapters/{id} [get]
+//	@Description	Get maps from the specified chapter id.
+//	@Tags			games & chapters
+//	@Produce		json
+//	@Param			id	path		int	true	"Chapter ID"
+//	@Success		200	{object}	models.Response{data=models.ChapterMapsResponse}
+//	@Failure		400	{object}	models.Response
+//	@Router			/chapters/{id} [get]
 func FetchChapterMaps(c *gin.Context) {
 	chapterID := c.Param("id")
 	intID, err := strconv.Atoi(chapterID)
