@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"context"
-	b64 "encoding/base64"
+	"encoding/base64"
 	"io"
 	"log"
 	"mime/multipart"
@@ -31,7 +31,7 @@ import (
 //	@Param			partner_demo		formData	file	false	"Partner Demo"
 //	@Param			is_partner_orange	formData	boolean	false	"Is Partner Orange"
 //	@Param			partner_id			formData	string	false	"Partner ID"
-//	@Success		200					{object}	models.Response
+//	@Success		200					{object}	models.Response{data=models.RecordResponse}
 //	@Failure		400					{object}	models.Response
 //	@Failure		401					{object}	models.Response
 //	@Router			/maps/{id}/record [post]
@@ -183,7 +183,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully created record.",
-		Data:    nil,
+		Data:    models.RecordResponse{ScoreCount: hostDemoScoreCount, ScoreTime: hostDemoScoreTime},
 	})
 }
 
@@ -240,7 +240,7 @@ func DownloadDemoWithID(c *gin.Context) {
 
 // Use Service account
 func serviceAccount() *http.Client {
-	privateKey, _ := b64.StdEncoding.DecodeString(os.Getenv("GOOGLE_PRIVATE_KEY_BASE64"))
+	privateKey, _ := base64.StdEncoding.DecodeString(os.Getenv("GOOGLE_PRIVATE_KEY_BASE64"))
 	config := &jwt.Config{
 		Email:      os.Getenv("GOOGLE_CLIENT_EMAIL"),
 		PrivateKey: []byte(privateKey),
