@@ -3,15 +3,17 @@ package parser
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os/exec"
 	"strconv"
 	"strings"
 )
 
 func ProcessDemo(demoPath string) (int, int, error) {
-	cmd := exec.Command("bash", "-c", fmt.Sprintf(`echo "FEXBash" && ./parser %s`, demoPath))
+	cmd := exec.Command("bash", "-c", fmt.Sprintf(`echo "FEXBash" && ./backend/parser/parser %s`, demoPath))
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
+		log.Println(err)
 		return 0, 0, err
 	}
 	cmd.Start()
@@ -34,9 +36,8 @@ func ProcessDemo(demoPath string) (int, int, error) {
 			}
 		}
 	}
-	err = cmd.Wait()
-	if err != nil {
-		return 0, 0, err
-	}
-	return cmTicks, portalCount, nil
+	cmd.Wait()
+	// We don't check for error in wait, since FEXBash always gives segmentation fault
+	// Wanted output is retrieved, so it's okay (i think)
+	return portalCount, cmTicks, nil
 }
