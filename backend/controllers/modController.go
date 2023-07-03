@@ -14,11 +14,11 @@ import (
 //	@Summary	Create map summary with specified map id.
 //	@Tags		maps
 //	@Produce	json
-//	@Param		Authorization	header		string	true	"JWT Token"
-//	@Param		id		path		int								true	"Map ID"
-//	@Param		request	body		models.CreateMapSummaryRequest	true	"Body"
-//	@Success	200		{object}	models.Response{data=models.CreateMapSummaryRequest}
-//	@Failure	400		{object}	models.Response
+//	@Param		Authorization	header		string							true	"JWT Token"
+//	@Param		id				path		int								true	"Map ID"
+//	@Param		request			body		models.CreateMapSummaryRequest	true	"Body"
+//	@Success	200				{object}	models.Response{data=models.CreateMapSummaryRequest}
+//	@Failure	400				{object}	models.Response
 //	@Router		/maps/{id}/summary [post]
 func CreateMapSummary(c *gin.Context) {
 	// Check if user exists
@@ -100,11 +100,11 @@ func CreateMapSummary(c *gin.Context) {
 //	@Summary	Edit map summary with specified map id.
 //	@Tags		maps
 //	@Produce	json
-//	@Param		Authorization	header		string	true	"JWT Token"
-//	@Param		id		path		int								true	"Map ID"
-//	@Param		request	body		models.EditMapSummaryRequest	true	"Body"
-//	@Success	200		{object}	models.Response{data=models.EditMapSummaryRequest}
-//	@Failure	400		{object}	models.Response
+//	@Param		Authorization	header		string							true	"JWT Token"
+//	@Param		id				path		int								true	"Map ID"
+//	@Param		request			body		models.EditMapSummaryRequest	true	"Body"
+//	@Success	200				{object}	models.Response{data=models.EditMapSummaryRequest}
+//	@Failure	400				{object}	models.Response
 //	@Router		/maps/{id}/summary [put]
 func EditMapSummary(c *gin.Context) {
 	// Check if user exists
@@ -183,11 +183,11 @@ func EditMapSummary(c *gin.Context) {
 //	@Summary	Delete map summary with specified map id.
 //	@Tags		maps
 //	@Produce	json
-//	@Param		Authorization	header		string	true	"JWT Token"
-//	@Param		id		path		int								true	"Map ID"
-//	@Param		request	body		models.DeleteMapSummaryRequest	true	"Body"
-//	@Success	200		{object}	models.Response{data=models.DeleteMapSummaryRequest}
-//	@Failure	400		{object}	models.Response
+//	@Param		Authorization	header		string							true	"JWT Token"
+//	@Param		id				path		int								true	"Map ID"
+//	@Param		request			body		models.DeleteMapSummaryRequest	true	"Body"
+//	@Success	200				{object}	models.Response{data=models.DeleteMapSummaryRequest}
+//	@Failure	400				{object}	models.Response
 //	@Router		/maps/{id}/summary [delete]
 func DeleteMapSummary(c *gin.Context) {
 	// Check if user exists

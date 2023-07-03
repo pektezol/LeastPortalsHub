@@ -435,17 +435,14 @@ paths:
       - description: Partner Demo
         in: formData
         name: partner_demo
-        required: true
         type: file
       - description: Is Partner Orange
         in: formData
         name: is_partner_orange
-        required: true
         type: boolean
       - description: Partner ID
         in: formData
         name: partner_id
-        required: true
         type: string
       produces:
       - application/json
