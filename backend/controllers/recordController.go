@@ -46,7 +46,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 	var gameName string
 	var isCoop bool
 	var isDisabled bool
-	sql := `SELECT g.name, m.is_disabled FROM maps m INNER JOIN games g ON m.game_id=g.id WHERE id = $1`
+	sql := `SELECT g.name, m.is_disabled FROM maps m INNER JOIN games g ON m.game_id=g.id WHERE m.id = $1`
 	err := database.DB.QueryRow(sql, mapId).Scan(&gameName, &isDisabled)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
