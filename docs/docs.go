@@ -338,6 +338,13 @@ const docTemplate = `{
                 "summary": "Post record with demo of a specific map.",
                 "parameters": [
                     {
+                        "type": "integer",
+                        "description": "Map ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
                         "type": "string",
                         "description": "JWT Token",
                         "name": "Authorization",

@@ -25,6 +25,7 @@ import (
 //	@Tags		maps
 //	@Accept		mpfd
 //	@Produce	json
+//	@Param		id					path		int		true	"Map ID"
 //	@Param		Authorization		header		string	true	"JWT Token"
 //	@Param		host_demo			formData	file	true	"Host Demo"
 //	@Param		partner_demo		formData	file	false	"Partner Demo"
