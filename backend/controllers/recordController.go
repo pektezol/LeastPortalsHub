@@ -94,13 +94,13 @@ func CreateRecordWithDemo(c *gin.Context) {
 	for i, header := range demoFiles {
 		uuid := uuid.New().String()
 		// Upload & insert into demos
-		err = c.SaveUploadedFile(header, "backend/parser/"+uuid)
+		err = c.SaveUploadedFile(header, "backend/parser/"+uuid+".dem")
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
-		defer os.Remove("backend/parser/" + uuid)
-		f, err := os.Open("backend/parser/" + uuid)
+		defer os.Remove("backend/parser/" + uuid + ".dem")
+		f, err := os.Open("backend/parser/" + uuid + ".dem")
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
@@ -111,7 +111,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
-		hostDemoScoreCount, hostDemoScoreTime, err = parser.ProcessDemo("backend/parser/" + uuid)
+		hostDemoScoreCount, hostDemoScoreTime, err = parser.ProcessDemo("backend/parser/" + uuid + ".dem")
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
