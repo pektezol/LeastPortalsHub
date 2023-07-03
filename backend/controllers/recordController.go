@@ -71,7 +71,10 @@ func CreateRecordWithDemo(c *gin.Context) {
 		return
 	}
 	// Demo files
-	demoFiles := []*multipart.FileHeader{record.HostDemo, record.PartnerDemo}
+	demoFiles := []*multipart.FileHeader{record.HostDemo}
+	if isCoop {
+		demoFiles = append(demoFiles, record.PartnerDemo)
+	}
 	var hostDemoUUID, hostDemoFileID, partnerDemoUUID, partnerDemoFileID string
 	var hostDemoScoreCount, hostDemoScoreTime int
 	client := serviceAccount()
@@ -91,12 +94,12 @@ func CreateRecordWithDemo(c *gin.Context) {
 	for i, header := range demoFiles {
 		uuid := uuid.New().String()
 		// Upload & insert into demos
-		err = c.SaveUploadedFile(header, "backend/parser/demos/"+header.Filename)
+		err = c.SaveUploadedFile(header, "backend/parser/"+header.Filename)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
-		f, err := os.Open("backend/parser/demos/" + header.Filename)
+		f, err := os.Open("backend/parser/" + header.Filename)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
@@ -107,7 +110,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
-		hostDemoScoreCount, hostDemoScoreTime, err = parser.ProcessDemo("backend/parser/demos/" + header.Filename)
+		hostDemoScoreCount, hostDemoScoreTime, err = parser.ProcessDemo("backend/parser/" + header.Filename)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
@@ -125,7 +128,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
-		os.Remove("backend/parser/demos/" + header.Filename)
+		os.Remove("backend/parser/" + header.Filename)
 	}
 	// Insert into records
 	if isCoop {
