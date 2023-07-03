@@ -50,6 +50,11 @@ type ChapterMapsResponse struct {
 	Maps    []MapShort `json:"maps"`
 }
 
+type RecordResponse struct {
+	ScoreCount int `json:"score_count"`
+	ScoreTime  int `json:"score_time"`
+}
+
 func ErrorResponse(message string) Response {
 	return Response{
 		Success: false,
