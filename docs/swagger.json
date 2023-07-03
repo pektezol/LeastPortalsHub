@@ -348,22 +348,19 @@
                         "type": "file",
                         "description": "Partner Demo",
                         "name": "partner_demo",
-                        "in": "formData",
-                        "required": true
+                        "in": "formData"
                     },
                     {
                         "type": "boolean",
                         "description": "Is Partner Orange",
                         "name": "is_partner_orange",
-                        "in": "formData",
-                        "required": true
+                        "in": "formData"
                     },
                     {
                         "type": "string",
                         "description": "Partner ID",
                         "name": "partner_id",
-                        "in": "formData",
-                        "required": true
+                        "in": "formData"
                     }
                 ],
                 "responses": {
