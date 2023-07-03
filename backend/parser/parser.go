@@ -1,7 +1,42 @@
 package parser
 
-import "mime/multipart"
+import (
+	"bufio"
+	"fmt"
+	"os/exec"
+	"strconv"
+	"strings"
+)
 
-func ProcessDemo(demo *multipart.FileHeader) (scoreCount int, scoreTime int, err error) {
-	return 0, 0, nil
+func ProcessDemo(demoPath string) (int, int, error) {
+	cmd := exec.Command("bash", "-c", fmt.Sprintf(`echo "FEXBash" && ./parser %s`, demoPath))
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return 0, 0, err
+	}
+	cmd.Start()
+	scanner := bufio.NewScanner(stdout)
+	var cmTicks, portalCount int
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.Contains(line, "CM ticks") {
+			cmTicksStr := strings.TrimSpace(strings.Split(line, ":")[1])
+			cmTicks, err = strconv.Atoi(cmTicksStr)
+			if err != nil {
+				return 0, 0, err
+			}
+		}
+		if strings.Contains(line, "Portal count") {
+			portalCountStr := strings.TrimSpace(strings.Split(line, ":")[1])
+			portalCount, err = strconv.Atoi(portalCountStr)
+			if err != nil {
+				return 0, 0, err
+			}
+		}
+	}
+	err = cmd.Wait()
+	if err != nil {
+		return 0, 0, err
+	}
+	return cmTicks, portalCount, nil
 }

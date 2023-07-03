@@ -106,7 +106,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
-		hostDemoScoreCount, hostDemoScoreTime, err = parser.ProcessDemo(record.HostDemo)
+		hostDemoScoreCount, hostDemoScoreTime, err = parser.ProcessDemo("parser/demos/" + header.Filename)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
