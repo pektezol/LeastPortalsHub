@@ -422,6 +422,11 @@ paths:
       consumes:
       - multipart/form-data
       parameters:
+      - description: Map ID
+        in: path
+        name: id
+        required: true
+        type: integer
       - description: JWT Token
         in: header
         name: Authorization
