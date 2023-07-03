@@ -242,6 +242,7 @@ info:
 paths:
   /chapters/{id}:
     get:
+      description: Get maps from the specified chapter id.
       parameters:
       - description: Chapter ID
         in: path
@@ -264,40 +265,19 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Get maps from the specified chapter id.
       tags:
       - games & chapters
-  /demo:
-    get:
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/models.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/models.RankingsResponse'
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Response'
-      summary: Get rankings of every player.
-      tags:
-      - rankings
   /demos:
     get:
       consumes:
       - application/json
+      description: Get demo with specified demo uuid.
       parameters:
       - description: Demo UUID
         in: query
         name: uuid
         required: true
-        type: integer
+        type: string
       produces:
       - application/octet-stream
       responses:
@@ -309,11 +289,11 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Get demo with specified demo uuid.
       tags:
       - demo
   /games:
     get:
+      description: Get games from the leaderboards.
       produces:
       - application/json
       responses:
@@ -332,11 +312,11 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Get games from the leaderboards.
       tags:
       - games & chapters
   /games/{id}:
     get:
+      description: Get chapters from the specified game id.
       parameters:
       - description: Game ID
         in: path
@@ -359,13 +339,13 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Get chapters from the specified game id.
       tags:
       - games & chapters
   /login:
     get:
       consumes:
       - application/json
+      description: Get (redirect) login page for Steam auth.
       produces:
       - application/json
       responses:
@@ -382,11 +362,11 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Get (redirect) login page for Steam auth.
       tags:
       - login
   /maps/{id}/leaderboards:
     get:
+      description: Get map leaderboards with specified id.
       parameters:
       - description: Map ID
         in: path
@@ -414,13 +394,13 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Get map leaderboards with specified id.
       tags:
       - maps
   /maps/{id}/record:
     post:
       consumes:
       - multipart/form-data
+      description: Post record with demo of a specific map.
       parameters:
       - description: Map ID
         in: path
@@ -464,11 +444,11 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Post record with demo of a specific map.
       tags:
       - maps
   /maps/{id}/summary:
     delete:
+      description: Delete map summary with specified map id.
       parameters:
       - description: JWT Token
         in: header
@@ -502,10 +482,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Delete map summary with specified map id.
       tags:
       - maps
     get:
+      description: Get map summary with specified id.
       parameters:
       - description: Map ID
         in: path
@@ -528,10 +508,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Get map summary with specified id.
       tags:
       - maps
     post:
+      description: Create map summary with specified map id.
       parameters:
       - description: JWT Token
         in: header
@@ -565,10 +545,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Create map summary with specified map id.
       tags:
       - maps
     put:
+      description: Edit map summary with specified map id.
       parameters:
       - description: JWT Token
         in: header
@@ -602,13 +582,13 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Edit map summary with specified map id.
       tags:
       - maps
   /profile:
     get:
       consumes:
       - application/json
+      description: Get profile page of session user.
       parameters:
       - description: JWT Token
         in: header
@@ -635,12 +615,12 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Get profile page of session user.
       tags:
       - users
     post:
       consumes:
       - application/json
+      description: Update profile page of session user.
       parameters:
       - description: JWT Token
         in: header
@@ -667,12 +647,12 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Update profile page of session user.
       tags:
       - users
     put:
       consumes:
       - application/json
+      description: Update country code of session user.
       parameters:
       - description: JWT Token
         in: header
@@ -699,11 +679,32 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Update country code of session user.
       tags:
       - users
+  /rankings:
+    get:
+      description: Get rankings of every player.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.RankingsResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+      tags:
+      - rankings
   /search:
     get:
+      description: Get all user and map data matching to the query.
       parameters:
       - description: Search user or map name.
         in: query
@@ -725,11 +726,11 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Get all user and map data matching to the query.
       tags:
       - search
   /token:
     delete:
+      description: Deletes the token cookie from the user.
       produces:
       - application/json
       responses:
@@ -746,10 +747,10 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Deletes the token cookie from the user.
       tags:
       - auth
     get:
+      description: Gets the token cookie value from the user.
       produces:
       - application/json
       responses:
@@ -766,13 +767,13 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Gets the token cookie value from the user.
       tags:
       - auth
   /users/{id}:
     get:
       consumes:
       - application/json
+      description: Get profile page of another user.
       parameters:
       - description: User ID
         in: path
@@ -799,7 +800,6 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Get profile page of another user.
       tags:
       - users
 swagger: "2.0"

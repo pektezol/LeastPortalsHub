@@ -23,12 +23,12 @@ func Home(c *gin.Context) {
 
 // GET Rankings
 //
-//	@Summary	Get rankings of every player.
-//	@Tags		rankings
-//	@Produce	json
-//	@Success	200	{object}	models.Response{data=models.RankingsResponse}
-//	@Failure	400	{object}	models.Response
-//	@Router		/demo [get]
+//	@Description	Get rankings of every player.
+//	@Tags			rankings
+//	@Produce		json
+//	@Success		200	{object}	models.Response{data=models.RankingsResponse}
+//	@Failure		400	{object}	models.Response
+//	@Router			/rankings [get]
 func Rankings(c *gin.Context) {
 	rows, err := database.DB.Query(`SELECT steam_id, user_name FROM users`)
 	if err != nil {
@@ -125,13 +125,13 @@ func Rankings(c *gin.Context) {
 
 // GET Search With Query
 //
-//	@Summary	Get all user and map data matching to the query.
-//	@Tags		search
-//	@Produce	json
-//	@Param		q	query		string	false	"Search user or map name."
-//	@Success	200	{object}	models.Response{data=models.SearchResponse}
-//	@Failure	400	{object}	models.Response
-//	@Router		/search [get]
+//	@Description	Get all user and map data matching to the query.
+//	@Tags			search
+//	@Produce		json
+//	@Param			q	query		string	false	"Search user or map name."
+//	@Success		200	{object}	models.Response{data=models.SearchResponse}
+//	@Failure		400	{object}	models.Response
+//	@Router			/search [get]
 func SearchWithQuery(c *gin.Context) {
 	query := c.Query("q")
 	query = strings.ToLower(query)

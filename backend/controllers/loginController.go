@@ -17,13 +17,13 @@ import (
 
 // Login
 //
-//	@Summary	Get (redirect) login page for Steam auth.
-//	@Tags		login
-//	@Accept		json
-//	@Produce	json
-//	@Success	200	{object}	models.Response{data=models.LoginResponse}
-//	@Failure	400	{object}	models.Response
-//	@Router		/login [get]
+//	@Description	Get (redirect) login page for Steam auth.
+//	@Tags			login
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	models.Response{data=models.LoginResponse}
+//	@Failure		400	{object}	models.Response
+//	@Router			/login [get]
 func Login(c *gin.Context) {
 	openID := steam_go.NewOpenId(c.Request)
 	switch openID.Mode() {
@@ -95,13 +95,13 @@ func Login(c *gin.Context) {
 
 // GET Token
 //
-//	@Summary	Gets the token cookie value from the user.
-//	@Tags		auth
-//	@Produce	json
+//	@Description	Gets the token cookie value from the user.
+//	@Tags			auth
+//	@Produce		json
 //
-//	@Success	200	{object}	models.Response{data=models.LoginResponse}
-//	@Failure	404	{object}	models.Response
-//	@Router		/token [get]
+//	@Success		200	{object}	models.Response{data=models.LoginResponse}
+//	@Failure		404	{object}	models.Response
+//	@Router			/token [get]
 func GetCookie(c *gin.Context) {
 	cookie, err := c.Cookie("token")
 	if err != nil {
@@ -119,13 +119,13 @@ func GetCookie(c *gin.Context) {
 
 // DELETE Token
 //
-//	@Summary	Deletes the token cookie from the user.
-//	@Tags		auth
-//	@Produce	json
+//	@Description	Deletes the token cookie from the user.
+//	@Tags			auth
+//	@Produce		json
 //
-//	@Success	200	{object}	models.Response{data=models.LoginResponse}
-//	@Failure	404	{object}	models.Response
-//	@Router		/token [delete]
+//	@Success		200	{object}	models.Response{data=models.LoginResponse}
+//	@Failure		404	{object}	models.Response
+//	@Router			/token [delete]
 func DeleteCookie(c *gin.Context) {
 	cookie, err := c.Cookie("token")
 	if err != nil {
