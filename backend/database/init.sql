@@ -11,6 +11,7 @@ CREATE TABLE users (
 CREATE TABLE games (
   id SMALLSERIAL,
   name TEXT NOT NULL,
+  is_coop BOOLEAN NOT NULL,
   PRIMARY KEY (id)
 );
 

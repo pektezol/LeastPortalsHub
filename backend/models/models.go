@@ -62,8 +62,9 @@ type UserRanking struct {
 }
 
 type Game struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	ID     int    `json:"id"`
+	Name   string `json:"name"`
+	IsCoop bool   `json:"is_coop"`
 }
 
 type Chapter struct {
