@@ -193,7 +193,7 @@ func FetchMapLeaderboards(c *gin.Context) {
 //	@Failure		400	{object}	models.Response
 //	@Router			/games [get]
 func FetchGames(c *gin.Context) {
-	rows, err := database.DB.Query(`SELECT id, name FROM games`)
+	rows, err := database.DB.Query(`SELECT id, name, is_coop FROM games`)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
@@ -201,7 +201,7 @@ func FetchGames(c *gin.Context) {
 	var games []models.Game
 	for rows.Next() {
 		var game models.Game
-		if err := rows.Scan(&game.ID, &game.Name); err != nil {
+		if err := rows.Scan(&game.ID, &game.Name, &game.IsCoop); err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
