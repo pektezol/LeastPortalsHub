@@ -25,6 +25,7 @@ type Map struct {
 	ChapterName string `json:"chapter_name"`
 	MapName     string `json:"map_name"`
 	Image       string `json:"image"`
+	IsCoop      bool   `json:"is_coop"`
 }
 
 type MapShort struct {
