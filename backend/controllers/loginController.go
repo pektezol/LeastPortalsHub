@@ -17,13 +17,13 @@ import (
 
 // Login
 //
-//	@Summary	Get (redirect) login page for Steam auth.
-//	@Tags		login
-//	@Accept		json
-//	@Produce	json
-//	@Success	200	{object}	models.Response{data=models.LoginResponse}
-//	@Failure	400	{object}	models.Response
-//	@Router		/login [get]
+//	@Description	Get (redirect) login page for Steam auth.
+//	@Tags			login
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	models.Response{data=models.LoginResponse}
+//	@Failure		400	{object}	models.Response
+//	@Router			/login [get]
 func Login(c *gin.Context) {
 	openID := steam_go.NewOpenId(c.Request)
 	switch openID.Mode() {
@@ -59,10 +59,20 @@ func Login(c *gin.Context) {
 			database.DB.Exec(`INSERT INTO users (steam_id, user_name, avatar_link, country_code)
 			VALUES ($1, $2, $3, $4)`, steamID, user.PersonaName, user.AvatarFull, user.LocCountryCode)
 		}
+		moderator := false
+		rows, _ := database.DB.Query("SELECT title_name FROM titles WHERE user_id = $1", steamID)
+		for rows.Next() {
+			var title string
+			rows.Scan(&title)
+			if title == "Moderator" {
+				moderator = true
+			}
+		}
 		// Generate JWT token
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 			"sub": steamID,
 			"exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
+			"mod": moderator,
 		})
 		// Sign and get the complete encoded token as a string using the secret
 		tokenString, err := token.SignedString([]byte(os.Getenv("SECRET_KEY")))
@@ -85,13 +95,13 @@ func Login(c *gin.Context) {
 
 // GET Token
 //
-//	@Summary	Gets the token cookie value from the user.
-//	@Tags		auth
-//	@Produce	json
+//	@Description	Gets the token cookie value from the user.
+//	@Tags			auth
+//	@Produce		json
 //
-//	@Success	200	{object}	models.Response{data=models.LoginResponse}
-//	@Failure	404	{object}	models.Response
-//	@Router		/token [get]
+//	@Success		200	{object}	models.Response{data=models.LoginResponse}
+//	@Failure		404	{object}	models.Response
+//	@Router			/token [get]
 func GetCookie(c *gin.Context) {
 	cookie, err := c.Cookie("token")
 	if err != nil {
@@ -109,13 +119,13 @@ func GetCookie(c *gin.Context) {
 
 // DELETE Token
 //
-//	@Summary	Deletes the token cookie from the user.
-//	@Tags		auth
-//	@Produce	json
+//	@Description	Deletes the token cookie from the user.
+//	@Tags			auth
+//	@Produce		json
 //
-//	@Success	200	{object}	models.Response{data=models.LoginResponse}
-//	@Failure	404	{object}	models.Response
-//	@Router		/token [delete]
+//	@Success		200	{object}	models.Response{data=models.LoginResponse}
+//	@Failure		404	{object}	models.Response
+//	@Router			/token [delete]
 func DeleteCookie(c *gin.Context) {
 	cookie, err := c.Cookie("token")
 	if err != nil {

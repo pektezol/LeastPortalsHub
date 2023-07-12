@@ -36,12 +36,20 @@ func CheckAuth(c *gin.Context) {
 		}
 		// Get user from DB
 		var user models.User
-		database.DB.QueryRow(`SELECT * FROM users WHERE steam_id = $1`, claims["sub"]).Scan(
+		database.DB.QueryRow(`SELECT u.steam_id, u.user_name, u.avatar_link, u.country_code, u.created_at, u.updated_at FROM users u WHERE steam_id = $1`, claims["sub"]).Scan(
 			&user.SteamID, &user.UserName, &user.AvatarLink,
 			&user.CountryCode, &user.CreatedAt, &user.UpdatedAt)
 		if user.SteamID == "" {
 			c.Next()
 			return
+		}
+		// Get user titles from DB
+		user.Titles = []string{}
+		rows, _ := database.DB.Query(`SELECT t.title_name FROM titles t WHERE t.user_id = $1`, user.SteamID)
+		for rows.Next() {
+			var title string
+			rows.Scan(&title)
+			user.Titles = append(user.Titles, title)
 		}
 		c.Set("user", user)
 		c.Next()

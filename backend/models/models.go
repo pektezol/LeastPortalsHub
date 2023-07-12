@@ -4,16 +4,6 @@ import (
 	"time"
 )
 
-type Response struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-	Data    any    `json:"data"`
-}
-
-type LoginResponse struct {
-	Token string `json:"token"`
-}
-
 type User struct {
 	SteamID     string    `json:"steam_id"`
 	UserName    string    `json:"user_name"`
@@ -21,6 +11,12 @@ type User struct {
 	CountryCode string    `json:"country_code"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
+	Titles      []string  `json:"titles"`
+}
+
+type UserShort struct {
+	SteamID  string `json:"steam_id"`
+	UserName string `json:"user_name"`
 }
 
 type Map struct {
@@ -28,33 +24,58 @@ type Map struct {
 	GameName    string `json:"game_name"`
 	ChapterName string `json:"chapter_name"`
 	MapName     string `json:"map_name"`
-	Data        any    `json:"data"`
+	Image       string `json:"image"`
+	IsCoop      bool   `json:"is_coop"`
+}
+
+type MapShort struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
 }
 
 type MapSummary struct {
-	Description    string            `json:"description"`
-	Showcase       string            `json:"showcase"`
-	CategoryScores MapCategoryScores `json:"category_scores"`
-	Rating         float32           `json:"rating"`
-	Routers        []string          `json:"routers"`
-	History        []MapHistory      `json:"history"`
-}
-
-type MapCategoryScores struct {
-	CM          int `json:"cm"`
-	NoSLA       int `json:"no_sla"`
-	InboundsSLA int `json:"inbounds_sla"`
-	Any         int `json:"any"`
-}
-
-type MapRecords struct {
-	Records any `json:"records"`
+	Routes []MapRoute `json:"routes"`
 }
 
 type MapHistory struct {
 	RunnerName string    `json:"runner_name"`
 	ScoreCount int       `json:"score_count"`
 	Date       time.Time `json:"date"`
+}
+
+type MapRoute struct {
+	RouteID     int        `json:"route_id"`
+	Category    Category   `json:"category"`
+	History     MapHistory `json:"history"`
+	Rating      float32    `json:"rating"`
+	Description string     `json:"description"`
+	Showcase    string     `json:"showcase"`
+}
+
+type MapRecords struct {
+	Records any `json:"records"`
+}
+
+type UserRanking struct {
+	UserID     string `json:"user_id"`
+	UserName   string `json:"user_name"`
+	TotalScore int    `json:"total_score"`
+}
+
+type Game struct {
+	ID     int    `json:"id"`
+	Name   string `json:"name"`
+	IsCoop bool   `json:"is_coop"`
+}
+
+type Chapter struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+type Category struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
 }
 
 type RecordSP struct {
@@ -85,50 +106,6 @@ type RecordMP struct {
 	RecordDate    time.Time `json:"record_date"`
 }
 
-type RecordRequest struct {
-	ScoreCount      int    `json:"score_count" form:"score_count" binding:"required"`
-	ScoreTime       int    `json:"score_time" form:"score_time" binding:"required"`
-	PartnerID       string `json:"partner_id" form:"partner_id" binding:"required"`
-	IsPartnerOrange bool   `json:"is_partner_orange" form:"is_partner_orange" binding:"required"`
-}
-
-type UserRanking struct {
-	UserID     string `json:"user_id"`
-	UserName   string `json:"user_name"`
-	TotalScore int    `json:"total_score"`
-}
-
-type RankingsResponse struct {
-	RankingsSP []UserRanking `json:"rankings_sp"`
-	RankingsMP []UserRanking `json:"rankings_mp"`
-}
-
-type ProfileResponse struct {
-	Profile     bool            `json:"profile"`
-	SteamID     string          `json:"steam_id"`
-	UserName    string          `json:"user_name"`
-	AvatarLink  string          `json:"avatar_link"`
-	CountryCode string          `json:"country_code"`
-	ScoresSP    []ScoreResponse `json:"scores_sp"`
-	ScoresMP    []ScoreResponse `json:"scores_mp"`
-}
-
-type ScoreResponse struct {
-	MapID   int `json:"map_id"`
-	Records any `json:"records"`
-}
-
-type SearchResponse struct {
-	Players []struct {
-		SteamID  string `json:"steam_id"`
-		UserName string `json:"user_name"`
-	} `json:"players"`
-	Maps []struct {
-		ID   int    `json:"id"`
-		Name string `json:"name"`
-	} `json:"maps"`
-}
-
 type PlayerSummaries struct {
 	SteamId                  string `json:"steamid"`
 	CommunityVisibilityState int    `json:"communityvisibilitystate"`
@@ -151,37 +128,4 @@ type PlayerSummaries struct {
 	GameId            int    `json:"gameid"`
 	GameExtraInfo     string `json:"gameextrainfo"`
 	GameServerIp      string `json:"gameserverip"`
-}
-
-type Game struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-}
-
-type ChaptersResponse struct {
-	Game     Game      `json:"game"`
-	Chapters []Chapter `json:"chapters"`
-}
-
-type Chapter struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-}
-
-type MapShort struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-}
-
-type ChapterMapsResponse struct {
-	Chapter Chapter    `json:"chapter"`
-	Maps    []MapShort `json:"maps"`
-}
-
-func ErrorResponse(message string) Response {
-	return Response{
-		Success: false,
-		Message: message,
-		Data:    nil,
-	}
 }

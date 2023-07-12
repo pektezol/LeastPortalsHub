@@ -13,15 +13,15 @@ import (
 
 // GET Profile
 //
-//	@Summary	Get profile page of session user.
-//	@Tags		users
-//	@Accept		json
-//	@Produce	json
-//	@Param		Authorization	header		string	true	"JWT Token"
-//	@Success	200				{object}	models.Response{data=models.ProfileResponse}
-//	@Failure	400				{object}	models.Response
-//	@Failure	401				{object}	models.Response
-//	@Router		/profile [get]
+//	@Description	Get profile page of session user.
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			Authorization	header		string	true	"JWT Token"
+//	@Success		200				{object}	models.Response{data=models.ProfileResponse}
+//	@Failure		400				{object}	models.Response
+//	@Failure		401				{object}	models.Response
+//	@Router			/profile [get]
 func Profile(c *gin.Context) {
 	// Check if user exists
 	user, exists := c.Get("user")
@@ -100,15 +100,15 @@ func Profile(c *gin.Context) {
 
 // GET User
 //
-//	@Summary	Get profile page of another user.
-//	@Tags		users
-//	@Accept		json
-//	@Produce	json
-//	@Param		id	path		int	true	"User ID"
-//	@Success	200	{object}	models.Response{data=models.ProfileResponse}
-//	@Failure	400	{object}	models.Response
-//	@Failure	404	{object}	models.Response
-//	@Router		/users/{id} [get]
+//	@Description	Get profile page of another user.
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		int	true	"User ID"
+//	@Success		200	{object}	models.Response{data=models.ProfileResponse}
+//	@Failure		400	{object}	models.Response
+//	@Failure		404	{object}	models.Response
+//	@Router			/users/{id} [get]
 func FetchUser(c *gin.Context) {
 	id := c.Param("id")
 	// Check if id is all numbers and 17 length
@@ -202,15 +202,15 @@ func FetchUser(c *gin.Context) {
 
 // PUT Profile
 //
-//	@Summary	Update profile page of session user.
-//	@Tags		users
-//	@Accept		json
-//	@Produce	json
-//	@Param		Authorization	header		string	true	"JWT Token"
-//	@Success	200				{object}	models.Response{data=models.ProfileResponse}
-//	@Failure	400				{object}	models.Response
-//	@Failure	401				{object}	models.Response
-//	@Router		/profile [post]
+//	@Description	Update profile page of session user.
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			Authorization	header		string	true	"JWT Token"
+//	@Success		200				{object}	models.Response{data=models.ProfileResponse}
+//	@Failure		400				{object}	models.Response
+//	@Failure		401				{object}	models.Response
+//	@Router			/profile [post]
 func UpdateUser(c *gin.Context) {
 	// Check if user exists
 	user, exists := c.Get("user")
@@ -245,16 +245,16 @@ func UpdateUser(c *gin.Context) {
 
 // PUT Profile/CountryCode
 //
-//	@Summary	Update country code of session user.
-//	@Tags		users
-//	@Accept		json
-//	@Produce	json
-//	@Param		Authorization	header		string	true	"JWT Token"
-//	@Param		country_code	query		string	true	"Country Code [XX]"
-//	@Success	200				{object}	models.Response{data=models.ProfileResponse}
-//	@Failure	400				{object}	models.Response
-//	@Failure	401				{object}	models.Response
-//	@Router		/profile [put]
+//	@Description	Update country code of session user.
+//	@Tags			users
+//	@Accept			json
+//	@Produce		json
+//	@Param			Authorization	header		string	true	"JWT Token"
+//	@Param			country_code	query		string	true	"Country Code [XX]"
+//	@Success		200				{object}	models.Response
+//	@Failure		400				{object}	models.Response
+//	@Failure		401				{object}	models.Response
+//	@Router			/profile [put]
 func UpdateCountryCode(c *gin.Context) {
 	// Check if user exists
 	user, exists := c.Get("user")

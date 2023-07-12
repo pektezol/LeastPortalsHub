@@ -1,5 +1,12 @@
 basePath: /v1
 definitions:
+  models.Category:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
   models.Chapter:
     properties:
       id:
@@ -25,10 +32,68 @@ definitions:
       game:
         $ref: '#/definitions/models.Game'
     type: object
+  models.CreateMapSummaryRequest:
+    properties:
+      category_id:
+        type: integer
+      description:
+        type: string
+      record_date:
+        type: string
+      score_count:
+        type: integer
+      showcase:
+        type: string
+      user_name:
+        type: string
+    required:
+    - category_id
+    - description
+    - record_date
+    - score_count
+    - user_name
+    type: object
+  models.DeleteMapSummaryRequest:
+    properties:
+      route_id:
+        type: integer
+    required:
+    - route_id
+    type: object
+  models.EditMapImageRequest:
+    properties:
+      image:
+        type: string
+    required:
+    - image
+    type: object
+  models.EditMapSummaryRequest:
+    properties:
+      description:
+        type: string
+      record_date:
+        type: string
+      route_id:
+        type: integer
+      score_count:
+        type: integer
+      showcase:
+        type: string
+      user_name:
+        type: string
+    required:
+    - description
+    - record_date
+    - route_id
+    - score_count
+    - user_name
+    type: object
   models.Game:
     properties:
       id:
         type: integer
+      is_coop:
+        type: boolean
       name:
         type: string
     type: object
@@ -41,24 +106,16 @@ definitions:
     properties:
       chapter_name:
         type: string
-      data: {}
       game_name:
         type: string
       id:
         type: integer
+      image:
+        type: string
+      is_coop:
+        type: boolean
       map_name:
         type: string
-    type: object
-  models.MapCategoryScores:
-    properties:
-      any:
-        type: integer
-      cm:
-        type: integer
-      inbounds_sla:
-        type: integer
-      no_sla:
-        type: integer
     type: object
   models.MapHistory:
     properties:
@@ -73,6 +130,21 @@ definitions:
     properties:
       records: {}
     type: object
+  models.MapRoute:
+    properties:
+      category:
+        $ref: '#/definitions/models.Category'
+      description:
+        type: string
+      history:
+        $ref: '#/definitions/models.MapHistory'
+      rating:
+        type: number
+      route_id:
+        type: integer
+      showcase:
+        type: string
+    type: object
   models.MapShort:
     properties:
       id:
@@ -82,22 +154,17 @@ definitions:
     type: object
   models.MapSummary:
     properties:
-      category_scores:
-        $ref: '#/definitions/models.MapCategoryScores'
-      description:
-        type: string
-      history:
+      routes:
         items:
-          $ref: '#/definitions/models.MapHistory'
+          $ref: '#/definitions/models.MapRoute'
         type: array
-      rating:
-        type: number
-      routers:
-        items:
-          type: string
-        type: array
-      showcase:
-        type: string
+    type: object
+  models.MapSummaryResponse:
+    properties:
+      map:
+        $ref: '#/definitions/models.Map'
+      summary:
+        $ref: '#/definitions/models.MapSummary'
     type: object
   models.ProfileResponse:
     properties:
@@ -131,21 +198,12 @@ definitions:
           $ref: '#/definitions/models.UserRanking'
         type: array
     type: object
-  models.RecordRequest:
+  models.RecordResponse:
     properties:
-      is_partner_orange:
-        type: boolean
-      partner_id:
-        type: string
       score_count:
         type: integer
       score_time:
         type: integer
-    required:
-    - is_partner_orange
-    - partner_id
-    - score_count
-    - score_time
     type: object
   models.Response:
     properties:
@@ -165,21 +223,11 @@ definitions:
     properties:
       maps:
         items:
-          properties:
-            id:
-              type: integer
-            name:
-              type: string
-          type: object
+          $ref: '#/definitions/models.MapShort'
         type: array
       players:
         items:
-          properties:
-            steam_id:
-              type: string
-            user_name:
-              type: string
-          type: object
+          $ref: '#/definitions/models.UserShort'
         type: array
     type: object
   models.UserRanking:
@@ -187,6 +235,13 @@ definitions:
       total_score:
         type: integer
       user_id:
+        type: string
+      user_name:
+        type: string
+    type: object
+  models.UserShort:
+    properties:
+      steam_id:
         type: string
       user_name:
         type: string
@@ -203,6 +258,7 @@ info:
 paths:
   /chapters/{id}:
     get:
+      description: Get maps from the specified chapter id.
       parameters:
       - description: Chapter ID
         in: path
@@ -225,40 +281,19 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Get maps from the specified chapter id.
       tags:
       - games & chapters
-  /demo:
-    get:
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/models.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/models.RankingsResponse'
-              type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Response'
-      summary: Get rankings of every player.
-      tags:
-      - rankings
   /demos:
     get:
       consumes:
       - application/json
+      description: Get demo with specified demo uuid.
       parameters:
       - description: Demo UUID
         in: query
         name: uuid
         required: true
-        type: integer
+        type: string
       produces:
       - application/octet-stream
       responses:
@@ -270,11 +305,11 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Get demo with specified demo uuid.
       tags:
       - demo
   /games:
     get:
+      description: Get games from the leaderboards.
       produces:
       - application/json
       responses:
@@ -293,11 +328,11 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Get games from the leaderboards.
       tags:
       - games & chapters
   /games/{id}:
     get:
+      description: Get chapters from the specified game id.
       parameters:
       - description: Game ID
         in: path
@@ -320,13 +355,13 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Get chapters from the specified game id.
       tags:
       - games & chapters
   /login:
     get:
       consumes:
       - application/json
+      description: Get (redirect) login page for Steam auth.
       produces:
       - application/json
       responses:
@@ -343,11 +378,49 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Get (redirect) login page for Steam auth.
       tags:
       - login
+  /maps/{id}/image:
+    put:
+      description: Edit map image with specified map id.
+      parameters:
+      - description: JWT Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Map ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.EditMapImageRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.EditMapImageRequest'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+      tags:
+      - maps
   /maps/{id}/leaderboards:
     get:
+      description: Get map leaderboards with specified id.
       parameters:
       - description: Map ID
         in: path
@@ -375,45 +448,40 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Get map leaderboards with specified id.
       tags:
       - maps
   /maps/{id}/record:
     post:
       consumes:
       - multipart/form-data
+      description: Post record with demo of a specific map.
       parameters:
+      - description: Map ID
+        in: path
+        name: id
+        required: true
+        type: integer
       - description: JWT Token
         in: header
         name: Authorization
         required: true
         type: string
-      - description: Demos
+      - description: Host Demo
         in: formData
-        items:
-          type: file
-        name: demos
+        name: host_demo
         required: true
-        type: array
-      - description: Score Count
+        type: file
+      - description: Partner Demo
         in: formData
-        name: score_count
-        required: true
-        type: integer
-      - description: Score Time
-        in: formData
-        name: score_time
-        required: true
-        type: integer
+        name: partner_demo
+        type: file
       - description: Is Partner Orange
         in: formData
         name: is_partner_orange
-        required: true
         type: boolean
       - description: Partner ID
         in: formData
         name: partner_id
-        required: true
         type: string
       produces:
       - application/json
@@ -425,7 +493,7 @@ paths:
             - $ref: '#/definitions/models.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/models.RecordRequest'
+                  $ref: '#/definitions/models.RecordResponse'
               type: object
         "400":
           description: Bad Request
@@ -435,11 +503,48 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Post record with demo of a specific map.
       tags:
       - maps
   /maps/{id}/summary:
+    delete:
+      description: Delete map summary with specified map id.
+      parameters:
+      - description: JWT Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Map ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.DeleteMapSummaryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.DeleteMapSummaryRequest'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+      tags:
+      - maps
     get:
+      description: Get map summary with specified id.
       parameters:
       - description: Map ID
         in: path
@@ -456,24 +561,93 @@ paths:
             - $ref: '#/definitions/models.Response'
             - properties:
                 data:
-                  allOf:
-                  - $ref: '#/definitions/models.Map'
-                  - properties:
-                      data:
-                        $ref: '#/definitions/models.MapSummary'
-                    type: object
+                  $ref: '#/definitions/models.MapSummaryResponse'
               type: object
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Get map summary with specified id.
+      tags:
+      - maps
+    post:
+      description: Create map summary with specified map id.
+      parameters:
+      - description: JWT Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Map ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateMapSummaryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.CreateMapSummaryRequest'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+      tags:
+      - maps
+    put:
+      description: Edit map summary with specified map id.
+      parameters:
+      - description: JWT Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Map ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.EditMapSummaryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.EditMapSummaryRequest'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
       tags:
       - maps
   /profile:
     get:
       consumes:
       - application/json
+      description: Get profile page of session user.
       parameters:
       - description: JWT Token
         in: header
@@ -500,12 +674,12 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Get profile page of session user.
       tags:
       - users
     post:
       consumes:
       - application/json
+      description: Update profile page of session user.
       parameters:
       - description: JWT Token
         in: header
@@ -532,12 +706,12 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Update profile page of session user.
       tags:
       - users
     put:
       consumes:
       - application/json
+      description: Update country code of session user.
       parameters:
       - description: JWT Token
         in: header
@@ -555,12 +729,7 @@ paths:
         "200":
           description: OK
           schema:
-            allOf:
-            - $ref: '#/definitions/models.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/models.ProfileResponse'
-              type: object
+            $ref: '#/definitions/models.Response'
         "400":
           description: Bad Request
           schema:
@@ -569,11 +738,37 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Update country code of session user.
       tags:
       - users
+  /rankings:
+    get:
+      description: Get rankings of every player.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.RankingsResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+      tags:
+      - rankings
   /search:
     get:
+      description: Get all user and map data matching to the query.
+      parameters:
+      - description: Search user or map name.
+        in: query
+        name: q
+        type: string
       produces:
       - application/json
       responses:
@@ -590,11 +785,11 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Get all user and map data.
       tags:
       - search
   /token:
     delete:
+      description: Deletes the token cookie from the user.
       produces:
       - application/json
       responses:
@@ -611,10 +806,10 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Deletes the token cookie from the user.
       tags:
       - auth
     get:
+      description: Gets the token cookie value from the user.
       produces:
       - application/json
       responses:
@@ -631,13 +826,13 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Gets the token cookie value from the user.
       tags:
       - auth
   /users/{id}:
     get:
       consumes:
       - application/json
+      description: Get profile page of another user.
       parameters:
       - description: User ID
         in: path
@@ -664,7 +859,6 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/models.Response'
-      summary: Get profile page of another user.
       tags:
       - users
 swagger: "2.0"
