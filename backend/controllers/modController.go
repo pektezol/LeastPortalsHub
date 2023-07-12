@@ -264,3 +264,58 @@ func DeleteMapSummary(c *gin.Context) {
 		Data:    request,
 	})
 }
+
+// PUT Map Image
+//
+//	@Description	Edit map image with specified map id.
+//	@Tags			maps
+//	@Produce		json
+//	@Param			Authorization	header		string						true	"JWT Token"
+//	@Param			id				path		int							true	"Map ID"
+//	@Param			request			body		models.EditMapImageRequest	true	"Body"
+//	@Success		200				{object}	models.Response{data=models.EditMapImageRequest}
+//	@Failure		400				{object}	models.Response
+//	@Router			/maps/{id}/image [put]
+func EditMapImage(c *gin.Context) {
+	// Check if user exists
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, models.ErrorResponse("User not logged in."))
+		return
+	}
+	var moderator bool
+	for _, title := range user.(models.User).Titles {
+		if title == "Moderator" {
+			moderator = true
+		}
+	}
+	if !moderator {
+		c.JSON(http.StatusUnauthorized, models.ErrorResponse("Insufficient permissions."))
+		return
+	}
+	// Bind parameter and body
+	id := c.Param("id")
+	mapID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	var request models.EditMapImageRequest
+	if err := c.BindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	// Update database with new data
+	sql := `UPDATE maps SET image = $2 WHERE id = $1`
+	_, err = database.DB.Exec(sql, mapID, request.Image)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	// Return response
+	c.JSON(http.StatusOK, models.Response{
+		Success: true,
+		Message: "Successfully updated map image.",
+		Data:    request,
+	})
+}

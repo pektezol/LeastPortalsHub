@@ -27,6 +27,10 @@ type DeleteMapSummaryRequest struct {
 	RouteID int `json:"route_id" binding:"required"`
 }
 
+type EditMapImageRequest struct {
+	Image string `json:"image" binding:"required"`
+}
+
 type RecordRequest struct {
 	HostDemo        *multipart.FileHeader `json:"host_demo" form:"host_demo" binding:"required" swaggerignore:"true"`
 	PartnerDemo     *multipart.FileHeader `json:"partner_demo" form:"partner_demo" swaggerignore:"true"`
