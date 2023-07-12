@@ -18,7 +18,7 @@ const fakedata={} //for debug
     //fetching data
     const [data, setData] = React.useState(null);
     React.useEffect(() => {
-        fetch(`/api/v1/maps/${location.pathname.split('/')[2]}/summary`)
+        fetch(`https://lp.ardapektezol.com/api/v1/maps/${location.pathname.split('/')[2]}/summary`)
         .then(r => r.json())
         .then(d => {
             if(Object.keys(fakedata).length!==0){setData(fakedata)} 
