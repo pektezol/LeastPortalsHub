@@ -143,9 +143,15 @@ func EditMapSummary(c *gin.Context) {
 	}
 	defer tx.Rollback()
 	// Fetch route category and score count
-	var categoryID, scoreCount int
+	var categoryID, scoreCount, historyID int
 	sql := `SELECT mr.category_id, mr.score_count FROM map_routes mr INNER JOIN maps m ON m.id = mr.map_id WHERE m.id = $1 AND mr.id = $2`
 	err = database.DB.QueryRow(sql, mapID, request.RouteID).Scan(&categoryID, &scoreCount)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	sql = `SELECT mh.id FROM map_history mh WHERE mh.score_count = $1 AND mh.category_id = $2 AND mh.map_id = $3`
+	err = database.DB.QueryRow(sql, mapID, request.RouteID).Scan(&historyID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
@@ -157,8 +163,8 @@ func EditMapSummary(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	sql = `UPDATE map_history SET user_name = $3, score_count = $4, record_date = $5 WHERE map_id = $1 AND category_id = $2`
-	_, err = tx.Exec(sql, mapID, categoryID, request.UserName, request.ScoreCount, request.RecordDate)
+	sql = `UPDATE map_history SET user_name = $2, score_count = $3, record_date = $4 WHERE id = $1`
+	_, err = tx.Exec(sql, historyID, request.UserName, request.ScoreCount, request.RecordDate)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
