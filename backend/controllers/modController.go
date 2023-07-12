@@ -151,7 +151,7 @@ func EditMapSummary(c *gin.Context) {
 		return
 	}
 	sql = `SELECT mh.id FROM map_history mh WHERE mh.score_count = $1 AND mh.category_id = $2 AND mh.map_id = $3`
-	err = database.DB.QueryRow(sql, mapID, request.RouteID).Scan(&historyID)
+	err = database.DB.QueryRow(sql, scoreCount, categoryID, mapID).Scan(&historyID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
