@@ -1,11 +1,17 @@
+
 main {
     overflow: auto;
+    overflow-x: hidden;
     position: relative;
-    width: calc(100% - 350px);
+
+    width: calc(100% - 380px); 
     height: 100vh;
     left: 350px;
-    /* background-color: red; */
+
+    padding-right: 30px;
+
     font-size: 40px;
     font-family: BarlowSemiCondensed-Regular;
-    color: white;
+    color: #cdcfdf;
+
 }

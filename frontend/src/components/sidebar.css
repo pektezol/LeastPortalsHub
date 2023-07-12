@@ -55,7 +55,7 @@ span>b{
     justify-items: left;
     grid-template-rows: calc(100vh - 670px) 50px 50px 50px;
 }
-button>span{
+.sidebar-button>span{
     font-family: BarlowSemiCondensed-Regular;
     font-size: 18px;
     color: #CDCFDF;
@@ -63,7 +63,7 @@ button>span{
     line-height: 28px;
     transition: opacity .1s;
 }
-button{
+.sidebar-button{
     display: grid;
     grid-template-columns: 50px auto;
     place-items: left;
@@ -100,7 +100,7 @@ button>img {
     width: 268px; height: calc(100vh - 120px);
     min-height: 550px;
 } 
-input[type=text]{
+input#searchbar[type=text]{
     margin: 10px 0 0 6px;
     padding: 1px 0px 1px 16px;
     width: 240px;

@@ -1,6 +1,6 @@
 span>img {
     scale: 1.1;
-    padding-top: 4px;
+    padding: 4px 0 0 8px;
 }
 .login>button>span{
     max-width: 22ch;

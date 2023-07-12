@@ -15,7 +15,8 @@ import img8 from "../imgs/8.png"
 import img9 from "../imgs/9.png"
 import Login from "./login.js"
 
-export default function Sidebar() {
+export default function Sidebar(prop) {
+const {token,setToken} = prop
 
 // Locks search button for 300ms before it can be clicked again, prevents spam
 const [isLocked, setIsLocked] = React.useState(false);
@@ -30,7 +31,7 @@ if (!isLocked) {
 
 // Clicked buttons
 function SidebarClick(x){
-const btn = document.querySelectorAll("button");
+const btn = document.querySelectorAll("button.sidebar-button");
 
 if(sidebar===1){setSidebar(0);SidebarHide()}
 
@@ -46,8 +47,8 @@ btn[x].style.backgroundColor="#202232"
 const [sidebar, setSidebar] = React.useState();
 
 function SidebarHide(){
-const btn   = document.querySelectorAll("button");
-const span  = document.querySelectorAll("button>span");
+const btn   = document.querySelectorAll("button.sidebar-button")
+const span  = document.querySelectorAll("button.sidebar-button>span");
 const side  = document.querySelector("#sidebar-list");
 const login = document.querySelectorAll(".login>button")[1];
 
@@ -106,49 +107,51 @@ return (
         </div>
         <div id='sidebar-list'> {/* List */}
             <div id='sidebar-toplist'> {/* Top */} 
-                <button onClick={()=>HandleLock()}><img src={img1} alt="" /><span>Search</span></button>
+
+                <button className='sidebar-button' onClick={()=>HandleLock()}><img src={img1} alt="" /><span>Search</span></button>
+
                 <span></span>
                 
                 <Link to="/" tabIndex={-1}>
-                    <button><img src={img2} alt="" /><span>Home&nbsp;Page</span></button>
+                    <button className='sidebar-button'><img src={img2} alt="" /><span>Home&nbsp;Page</span></button>
                 </Link>
 
                 <Link to="/news" tabIndex={-1}>
-                    <button><img src={img3} alt="" /><span>News</span></button>
+                    <button className='sidebar-button'><img src={img3} alt="" /><span>News</span></button>
                 </Link>
 
                 <Link to="/records" tabIndex={-1}>
-                    <button><img src={img4} alt="" /><span>Records</span></button>
+                    <button className='sidebar-button'><img src={img4} alt="" /><span>Records</span></button>
                 </Link>
 
                 <Link to="/leaderboards" tabIndex={-1}>
-                    <button><img src={img5} alt="" /><span>Leaderboards</span></button>
+                    <button className='sidebar-button'><img src={img5} alt="" /><span>Leaderboards</span></button>
                 </Link>
 
                 <Link to="/discussions" tabIndex={-1}>
-                    <button><img src={img6} alt="" /><span>Discussions</span></button>
+                    <button className='sidebar-button'><img src={img6} alt="" /><span>Discussions</span></button>
                 </Link>
 
                 <Link to="/scorelog" tabIndex={-1}>
-                    <button><img src={img7} alt="" /><span>Score&nbsp;Logs</span></button>
+                    <button className='sidebar-button'><img src={img7} alt="" /><span>Score&nbsp;Logs</span></button>
                 </Link>
             </div>
             <div id='sidebar-bottomlist'>
                 <span></span>
 
-                <Login/>
+                <Login token={token} setToken={setToken}/>
 
                 <Link to="/rules" tabIndex={-1}>
-                    <button><img src={img8} alt="" /><span>Leaderboard&nbsp;Rules</span></button>
+                    <button className='sidebar-button'><img src={img8} alt="" /><span>Leaderboard&nbsp;Rules</span></button>
                 </Link>
 
                 <Link to="/about" tabIndex={-1}>
-                    <button><img src={img9} alt="" /><span>About&nbsp;P2LP</span></button>
+                    <button className='sidebar-button'><img src={img9} alt="" /><span>About&nbsp;P2LP</span></button>
                 </Link>
             </div>
         </div>
         <div> 
-            <input type="text" placeholder='Search for map or a player...'/>
+            <input type="text" id='searchbar' placeholder='Search for map or a player...'/>
         </div>
     </div>
         )
