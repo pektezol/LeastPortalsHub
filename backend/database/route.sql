@@ -27,7 +27,7 @@ INSERT INTO map_routes(map_id,category_id,score_count,description,showcase) VALU
 (15,1,2,'',''),
 (16,1,2,'',''),
 (16,1,0,'',''),
-(17,1,0,'',''),
+(17,1,2,'',''),
 (17,1,0,'',''),
 -- 3
 (18,1,5,'',''),

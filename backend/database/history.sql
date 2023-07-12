@@ -27,7 +27,7 @@ INSERT INTO map_history(map_id,category_id,user_name,score_count,record_date) VA
 (15,1,'Tyronis',2,'2011-10-05 00:00:00'),
 (16,1,'LookLikeAKango',2,'2011-10-05 00:00:00'),
 (16,1,'jyjey',0,'2012-08-25 00:00:00'),
-(17,1,'rocoty',0,'2011-10-05 00:00:00'),
+(17,1,'rocoty',2,'2011-10-05 00:00:00'),
 (17,1,'Nidboj132',0,'2023-02-05 00:00:00'),
 -- 3
 (18,1,'The Last Tofus',5,'2011-05-08 00:00:00'),

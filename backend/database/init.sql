@@ -49,7 +49,8 @@ CREATE TABLE map_routes (
   showcase TEXT NOT NULL,
   PRIMARY KEY (id),
   FOREIGN KEY (map_id) REFERENCES maps(id),
-  FOREIGN KEY (category_id) REFERENCES categories(id)
+  FOREIGN KEY (category_id) REFERENCES categories(id),
+  UNIQUE (map_id, category_id, score_count)
 );
 
 CREATE TABLE map_history (
@@ -61,7 +62,8 @@ CREATE TABLE map_history (
   record_date TIMESTAMP NOT NULL,
   PRIMARY KEY (id),
   FOREIGN KEY (category_id) REFERENCES categories(id),
-  FOREIGN KEY (map_id) REFERENCES maps(id)
+  FOREIGN KEY (map_id) REFERENCES maps(id),
+  UNIQUE (map_id, category_id, score_count)
 );
 
 CREATE TABLE map_ratings (
