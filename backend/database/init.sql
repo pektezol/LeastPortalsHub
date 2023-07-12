@@ -9,14 +9,14 @@ CREATE TABLE users (
 );
 
 CREATE TABLE games (
-  id SMALLSERIAL,
+  id SERIAL,
   name TEXT NOT NULL,
   is_coop BOOLEAN NOT NULL,
   PRIMARY KEY (id)
 );
 
 CREATE TABLE chapters (
-  id SMALLSERIAL,
+  id SERIAL,
   game_id SMALLINT NOT NULL,
   name TEXT NOT NULL,
   PRIMARY KEY (id),
@@ -24,13 +24,13 @@ CREATE TABLE chapters (
 );
 
 CREATE TABLE categories (
-  id SMALLSERIAL,
+  id SERIAL,
   name TEXT NOT NULL,
   PRIMARY KEY (id)
 );
 
 CREATE TABLE maps (
-  id SMALLSERIAL,
+  id SERIAL,
   game_id SMALLINT NOT NULL,
   chapter_id SMALLINT NOT NULL,
   name TEXT NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE maps (
 );
 
 CREATE TABLE map_routes (
-  id SMALLSERIAL,
+  id SERIAL,
   map_id SMALLINT NOT NULL,
   category_id SMALLINT NOT NULL,
   score_count SMALLINT NOT NULL,
@@ -54,7 +54,7 @@ CREATE TABLE map_routes (
 );
 
 CREATE TABLE map_history (
-  id SMALLSERIAL,
+  id SERIAL,
   map_id SMALLINT NOT NULL,
   category_id SMALLINT NOT NULL,
   user_name TEXT NOT NULL,
