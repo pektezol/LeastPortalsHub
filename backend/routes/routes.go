@@ -28,6 +28,7 @@ func InitRoutes(router *gin.Engine) {
 		v1.GET("/maps/:id/summary", controllers.FetchMapSummary)
 		v1.POST("/maps/:id/summary", middleware.CheckAuth, controllers.CreateMapSummary)
 		v1.PUT("/maps/:id/summary", middleware.CheckAuth, controllers.EditMapSummary)
+		v1.DELETE("/maps/:id/summary", middleware.CheckAuth, controllers.DeleteMapSummary)
 		v1.GET("/maps/:id/leaderboards", controllers.FetchMapLeaderboards)
 		v1.POST("/maps/:id/record", middleware.CheckAuth, controllers.CreateRecordWithDemo)
 		v1.GET("/rankings", controllers.Rankings)
