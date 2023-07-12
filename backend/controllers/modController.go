@@ -144,10 +144,7 @@ func EditMapSummary(c *gin.Context) {
 	defer tx.Rollback()
 	// Fetch route category and score count
 	var categoryID, scoreCount int
-	sql := `SELECT mr.category_id, mr.score_count
-		FROM map_routes mr
-		INNER JOIN maps m
-		WHERE m.id = $1 AND mr.id = $2`
+	sql := `SELECT mr.category_id, mr.score_count FROM map_routes mr INNER JOIN maps m ON m.id = mr.map_id WHERE m.id = $1 AND mr.id = $2`
 	err = database.DB.QueryRow(sql, mapID, request.RouteID).Scan(&categoryID, &scoreCount)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
