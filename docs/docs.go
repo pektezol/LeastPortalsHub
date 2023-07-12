@@ -229,6 +229,68 @@ const docTemplate = `{
                 }
             }
         },
+        "/maps/{id}/image": {
+            "put": {
+                "description": "Edit map image with specified map id.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "maps"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "JWT Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Map ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.EditMapImageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.EditMapImageRequest"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/maps/{id}/leaderboards": {
             "get": {
                 "description": "Get map leaderboards with specified id.",
@@ -344,7 +406,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.Response"
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.RecordResponse"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     },
                     "400": {
@@ -1047,6 +1121,17 @@ const docTemplate = `{
                 }
             }
         },
+        "models.EditMapImageRequest": {
+            "type": "object",
+            "required": [
+                "image"
+            ],
+            "properties": {
+                "image": {
+                    "type": "string"
+                }
+            }
+        },
         "models.EditMapSummaryRequest": {
             "type": "object",
             "required": [
@@ -1084,6 +1169,9 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "is_coop": {
+                    "type": "boolean"
+                },
                 "name": {
                     "type": "string"
                 }
@@ -1111,6 +1199,9 @@ const docTemplate = `{
                 },
                 "image": {
                     "type": "string"
+                },
+                "is_coop": {
+                    "type": "boolean"
                 },
                 "map_name": {
                     "type": "string"
@@ -1239,6 +1330,17 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/models.UserRanking"
                     }
+                }
+            }
+        },
+        "models.RecordResponse": {
+            "type": "object",
+            "properties": {
+                "score_count": {
+                    "type": "integer"
+                },
+                "score_time": {
+                    "type": "integer"
                 }
             }
         },

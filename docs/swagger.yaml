@@ -61,6 +61,13 @@ definitions:
     required:
     - route_id
     type: object
+  models.EditMapImageRequest:
+    properties:
+      image:
+        type: string
+    required:
+    - image
+    type: object
   models.EditMapSummaryRequest:
     properties:
       description:
@@ -87,6 +94,8 @@ definitions:
     properties:
       id:
         type: integer
+      is_coop:
+        type: boolean
       name:
         type: string
     type: object
@@ -105,6 +114,8 @@ definitions:
         type: integer
       image:
         type: string
+      is_coop:
+        type: boolean
       map_name:
         type: string
     type: object
@@ -188,6 +199,13 @@ definitions:
         items:
           $ref: '#/definitions/models.UserRanking'
         type: array
+    type: object
+  models.RecordResponse:
+    properties:
+      score_count:
+        type: integer
+      score_time:
+        type: integer
     type: object
   models.Response:
     properties:
@@ -364,6 +382,44 @@ paths:
             $ref: '#/definitions/models.Response'
       tags:
       - login
+  /maps/{id}/image:
+    put:
+      description: Edit map image with specified map id.
+      parameters:
+      - description: JWT Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Map ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.EditMapImageRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.EditMapImageRequest'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+      tags:
+      - maps
   /maps/{id}/leaderboards:
     get:
       description: Get map leaderboards with specified id.
@@ -435,7 +491,12 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Response'
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.RecordResponse'
+              type: object
         "400":
           description: Bad Request
           schema:
