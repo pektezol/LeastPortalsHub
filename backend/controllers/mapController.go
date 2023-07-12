@@ -3,111 +3,81 @@ package controllers
 import (
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/lib/pq"
 	"github.com/pektezol/leastportals/backend/database"
 	"github.com/pektezol/leastportals/backend/models"
 )
 
 // GET Map Summary
 //
-//	@Summary	Get map summary with specified id.
-//	@Tags		maps
-//	@Produce	json
-//	@Param		id	path		int	true	"Map ID"
-//	@Success	200	{object}	models.Response{data=models.Map{data=models.MapSummary}}
-//	@Failure	400	{object}	models.Response
-//	@Router		/maps/{id}/summary [get]
+//	@Description	Get map summary with specified id.
+//	@Tags			maps
+//	@Produce		json
+//	@Param			id	path		int	true	"Map ID"
+//	@Success		200	{object}	models.Response{data=models.MapSummaryResponse}
+//	@Failure		400	{object}	models.Response
+//	@Router			/maps/{id}/summary [get]
 func FetchMapSummary(c *gin.Context) {
 	id := c.Param("id")
-	// Get map data
-	var mapData models.Map
-	var mapSummaryData models.MapSummary
-	var mapHistoryData []models.MapHistory
+	response := models.MapSummaryResponse{Map: models.Map{}, Summary: models.MapSummary{Routes: []models.MapRoute{}}}
 	intID, err := strconv.Atoi(id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	mapData.ID = intID
-	var routers pq.StringArray
-	sql := `SELECT g.name, c.name, m.name, m.description, m.showcase,
-	(
-	  SELECT array_agg(user_name) 
-	  FROM map_routers 
-	  WHERE map_id = $1 
-		AND score_count = (
-		  SELECT score_count 
-		  FROM map_history 
-		  WHERE map_id = $1 
-		  ORDER BY score_count 
-		  LIMIT 1
-		) 
-	  GROUP BY map_routers.user_name 
-	  ORDER BY user_name
-	),
-	(
-		SELECT COALESCE(avg(rating), 0.0)
-		FROM map_ratings
-		WHERE map_id = $1
-	)
+	// Get map data
+	response.Map.ID = intID
+	sql := `SELECT m.id, g.name, c.name, m.name, m.image, g.is_coop
 	FROM maps m
 	INNER JOIN games g ON m.game_id = g.id
 	INNER JOIN chapters c ON m.chapter_id = c.id
 	WHERE m.id = $1`
-	// TODO: CategoryScores
-	err = database.DB.QueryRow(sql, id).Scan(&mapData.GameName, &mapData.ChapterName, &mapData.MapName, &mapSummaryData.Description, &mapSummaryData.Showcase, &routers, &mapSummaryData.Rating)
+	err = database.DB.QueryRow(sql, id).Scan(&response.Map.ID, &response.Map.GameName, &response.Map.ChapterName, &response.Map.MapName, &response.Map.Image, &response.Map.IsCoop)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	var historyNames pq.StringArray
-	var historyScores pq.Int32Array
-	var historyDates pq.StringArray
-	sql = `SELECT array_agg(user_name), array_agg(score_count), array_agg(record_date)
-	FROM map_history
-	WHERE map_id = $1`
-	err = database.DB.QueryRow(sql, id).Scan(&historyNames, &historyScores, &historyDates)
+	// Get map routes and histories
+	sql = `SELECT r.id, c.id, c.name, h.user_name, h.score_count, h.record_date, r.description, r.showcase, COALESCE(avg(rating), 0.0) FROM map_routes r
+    INNER JOIN categories c ON r.category_id = c.id
+    INNER JOIN map_history h ON r.map_id = h.map_id AND r.category_id = h.category_id
+    LEFT JOIN map_ratings rt ON r.map_id = rt.map_id AND r.category_id = rt.category_id 
+	WHERE r.map_id = $1 AND h.score_count = r.score_count GROUP BY r.id, c.id, h.user_name, h.score_count, h.record_date, r.description, r.showcase
+	ORDER BY h.record_date ASC;`
+	rows, err := database.DB.Query(sql, id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	for i := 0; i < len(historyNames); i++ {
-		var history models.MapHistory
-		history.RunnerName = historyNames[i]
-		history.ScoreCount = int(historyScores[i])
-		layout := "2006-01-02 15:04:05"
-		date, err := time.Parse(layout, historyDates[i])
+	for rows.Next() {
+		route := models.MapRoute{Category: models.Category{}, History: models.MapHistory{}}
+		err = rows.Scan(&route.RouteID, &route.Category.ID, &route.Category.Name, &route.History.RunnerName, &route.History.ScoreCount, &route.History.Date, &route.Description, &route.Showcase, &route.Rating)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
-		history.Date = date
-		mapHistoryData = append(mapHistoryData, history)
+		response.Summary.Routes = append(response.Summary.Routes, route)
 	}
-	mapSummaryData.History = mapHistoryData
-	mapSummaryData.Routers = routers
-	mapData.Data = mapSummaryData
 	// Return response
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully retrieved map summary.",
-		Data:    mapData,
+		Data:    response,
 	})
 }
 
 // GET Map Leaderboards
 //
-//	@Summary	Get map leaderboards with specified id.
-//	@Tags		maps
-//	@Produce	json
-//	@Param		id	path		int	true	"Map ID"
-//	@Success	200	{object}	models.Response{data=models.Map{data=models.MapRecords}}
-//	@Failure	400	{object}	models.Response
-//	@Router		/maps/{id}/leaderboards [get]
+//	@Description	Get map leaderboards with specified id.
+//	@Tags			maps
+//	@Produce		json
+//	@Param			id	path		int	true	"Map ID"
+//	@Success		200	{object}	models.Response{data=models.Map{data=models.MapRecords}}
+//	@Failure		400	{object}	models.Response
+//	@Router			/maps/{id}/leaderboards [get]
 func FetchMapLeaderboards(c *gin.Context) {
+	// TODO: make new response type
 	id := c.Param("id")
 	// Get map data
 	var mapData models.Map
@@ -119,12 +89,12 @@ func FetchMapLeaderboards(c *gin.Context) {
 		return
 	}
 	mapData.ID = intID
-	sql := `SELECT g.name, c.name, m.name, is_disabled 
+	sql := `SELECT g.name, c.name, m.name, is_disabled, m.image
 	FROM maps m
 	INNER JOIN games g ON m.game_id = g.id
 	INNER JOIN chapters c ON m.chapter_id = c.id
 	WHERE m.id = $1`
-	err = database.DB.QueryRow(sql, id).Scan(&mapData.GameName, &mapData.ChapterName, &mapData.MapName, &isDisabled)
+	err = database.DB.QueryRow(sql, id).Scan(&mapData.GameName, &mapData.ChapterName, &mapData.MapName, &isDisabled, &mapData.Image)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
@@ -205,7 +175,7 @@ func FetchMapLeaderboards(c *gin.Context) {
 		}
 		mapRecordsData.Records = records
 	}
-	mapData.Data = mapRecordsData
+	// mapData.Data = mapRecordsData
 	// Return response
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
@@ -216,14 +186,14 @@ func FetchMapLeaderboards(c *gin.Context) {
 
 // GET Games
 //
-//	@Summary	Get games from the leaderboards.
-//	@Tags		games & chapters
-//	@Produce	json
-//	@Success	200	{object}	models.Response{data=[]models.Game}
-//	@Failure	400	{object}	models.Response
-//	@Router		/games [get]
+//	@Description	Get games from the leaderboards.
+//	@Tags			games & chapters
+//	@Produce		json
+//	@Success		200	{object}	models.Response{data=[]models.Game}
+//	@Failure		400	{object}	models.Response
+//	@Router			/games [get]
 func FetchGames(c *gin.Context) {
-	rows, err := database.DB.Query(`SELECT id, name FROM games`)
+	rows, err := database.DB.Query(`SELECT id, name, is_coop FROM games`)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
@@ -231,7 +201,7 @@ func FetchGames(c *gin.Context) {
 	var games []models.Game
 	for rows.Next() {
 		var game models.Game
-		if err := rows.Scan(&game.ID, &game.Name); err != nil {
+		if err := rows.Scan(&game.ID, &game.Name, &game.IsCoop); err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
@@ -246,13 +216,13 @@ func FetchGames(c *gin.Context) {
 
 // GET Chapters of a Game
 //
-//	@Summary	Get chapters from the specified game id.
-//	@Tags		games & chapters
-//	@Produce	json
-//	@Param		id	path		int	true	"Game ID"
-//	@Success	200	{object}	models.Response{data=models.ChaptersResponse}
-//	@Failure	400	{object}	models.Response
-//	@Router		/games/{id} [get]
+//	@Description	Get chapters from the specified game id.
+//	@Tags			games & chapters
+//	@Produce		json
+//	@Param			id	path		int	true	"Game ID"
+//	@Success		200	{object}	models.Response{data=models.ChaptersResponse}
+//	@Failure		400	{object}	models.Response
+//	@Router			/games/{id} [get]
 func FetchChapters(c *gin.Context) {
 	gameID := c.Param("id")
 	intID, err := strconv.Atoi(gameID)
@@ -288,13 +258,13 @@ func FetchChapters(c *gin.Context) {
 
 // GET Maps of a Chapter
 //
-//	@Summary	Get maps from the specified chapter id.
-//	@Tags		games & chapters
-//	@Produce	json
-//	@Param		id	path		int	true	"Chapter ID"
-//	@Success	200	{object}	models.Response{data=models.ChapterMapsResponse}
-//	@Failure	400	{object}	models.Response
-//	@Router		/chapters/{id} [get]
+//	@Description	Get maps from the specified chapter id.
+//	@Tags			games & chapters
+//	@Produce		json
+//	@Param			id	path		int	true	"Chapter ID"
+//	@Success		200	{object}	models.Response{data=models.ChapterMapsResponse}
+//	@Failure		400	{object}	models.Response
+//	@Router			/chapters/{id} [get]
 func FetchChapterMaps(c *gin.Context) {
 	chapterID := c.Param("id")
 	intID, err := strconv.Atoi(chapterID)

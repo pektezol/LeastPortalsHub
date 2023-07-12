@@ -22,13 +22,13 @@ const docTemplate = `{
     "paths": {
         "/chapters/{id}": {
             "get": {
+                "description": "Get maps from the specified chapter id.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "games \u0026 chapters"
                 ],
-                "summary": "Get maps from the specified chapter id.",
                 "parameters": [
                     {
                         "type": "integer",
@@ -66,45 +66,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/demo": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "rankings"
-                ],
-                "summary": "Get rankings of every player.",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/models.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/models.RankingsResponse"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.Response"
-                        }
-                    }
-                }
-            }
-        },
         "/demos": {
             "get": {
+                "description": "Get demo with specified demo uuid.",
                 "consumes": [
                     "application/json"
                 ],
@@ -114,10 +78,9 @@ const docTemplate = `{
                 "tags": [
                     "demo"
                 ],
-                "summary": "Get demo with specified demo uuid.",
                 "parameters": [
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "Demo UUID",
                         "name": "uuid",
                         "in": "query",
@@ -142,13 +105,13 @@ const docTemplate = `{
         },
         "/games": {
             "get": {
+                "description": "Get games from the leaderboards.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "games \u0026 chapters"
                 ],
-                "summary": "Get games from the leaderboards.",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -182,13 +145,13 @@ const docTemplate = `{
         },
         "/games/{id}": {
             "get": {
+                "description": "Get chapters from the specified game id.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "games \u0026 chapters"
                 ],
-                "summary": "Get chapters from the specified game id.",
                 "parameters": [
                     {
                         "type": "integer",
@@ -228,6 +191,7 @@ const docTemplate = `{
         },
         "/login": {
             "get": {
+                "description": "Get (redirect) login page for Steam auth.",
                 "consumes": [
                     "application/json"
                 ],
@@ -237,7 +201,6 @@ const docTemplate = `{
                 "tags": [
                     "login"
                 ],
-                "summary": "Get (redirect) login page for Steam auth.",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -266,15 +229,77 @@ const docTemplate = `{
                 }
             }
         },
-        "/maps/{id}/leaderboards": {
-            "get": {
+        "/maps/{id}/image": {
+            "put": {
+                "description": "Edit map image with specified map id.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "maps"
                 ],
-                "summary": "Get map leaderboards with specified id.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "JWT Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Map ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.EditMapImageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.EditMapImageRequest"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/maps/{id}/leaderboards": {
+            "get": {
+                "description": "Get map leaderboards with specified id.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "maps"
+                ],
                 "parameters": [
                     {
                         "type": "integer",
@@ -326,6 +351,7 @@ const docTemplate = `{
         },
         "/maps/{id}/record": {
             "post": {
+                "description": "Post record with demo of a specific map.",
                 "consumes": [
                     "multipart/form-data"
                 ],
@@ -335,8 +361,14 @@ const docTemplate = `{
                 "tags": [
                     "maps"
                 ],
-                "summary": "Post record with demo of a specific map.",
                 "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Map ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
                     {
                         "type": "string",
                         "description": "JWT Token",
@@ -345,42 +377,29 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "type": "array",
-                        "items": {
-                            "type": "file"
-                        },
-                        "description": "Demos",
-                        "name": "demos",
+                        "type": "file",
+                        "description": "Host Demo",
+                        "name": "host_demo",
                         "in": "formData",
                         "required": true
                     },
                     {
-                        "type": "integer",
-                        "description": "Score Count",
-                        "name": "score_count",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Score Time",
-                        "name": "score_time",
-                        "in": "formData",
-                        "required": true
+                        "type": "file",
+                        "description": "Partner Demo",
+                        "name": "partner_demo",
+                        "in": "formData"
                     },
                     {
                         "type": "boolean",
                         "description": "Is Partner Orange",
                         "name": "is_partner_orange",
-                        "in": "formData",
-                        "required": true
+                        "in": "formData"
                     },
                     {
                         "type": "string",
                         "description": "Partner ID",
                         "name": "partner_id",
-                        "in": "formData",
-                        "required": true
+                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -395,7 +414,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/models.RecordRequest"
+                                            "$ref": "#/definitions/models.RecordResponse"
                                         }
                                     }
                                 }
@@ -419,13 +438,13 @@ const docTemplate = `{
         },
         "/maps/{id}/summary": {
             "get": {
+                "description": "Get map summary with specified id.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "maps"
                 ],
-                "summary": "Get map summary with specified id.",
                 "parameters": [
                     {
                         "type": "integer",
@@ -447,19 +466,187 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "allOf": [
-                                                {
-                                                    "$ref": "#/definitions/models.Map"
-                                                },
-                                                {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "data": {
-                                                            "$ref": "#/definitions/models.MapSummary"
-                                                        }
-                                                    }
-                                                }
-                                            ]
+                                            "$ref": "#/definitions/models.MapSummaryResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Edit map summary with specified map id.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "maps"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "JWT Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Map ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.EditMapSummaryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.EditMapSummaryRequest"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create map summary with specified map id.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "maps"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "JWT Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Map ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CreateMapSummaryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.CreateMapSummaryRequest"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete map summary with specified map id.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "maps"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "JWT Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Map ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.DeleteMapSummaryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.DeleteMapSummaryRequest"
                                         }
                                     }
                                 }
@@ -477,6 +664,7 @@ const docTemplate = `{
         },
         "/profile": {
             "get": {
+                "description": "Get profile page of session user.",
                 "consumes": [
                     "application/json"
                 ],
@@ -486,7 +674,6 @@ const docTemplate = `{
                 "tags": [
                     "users"
                 ],
-                "summary": "Get profile page of session user.",
                 "parameters": [
                     {
                         "type": "string",
@@ -530,6 +717,7 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "description": "Update country code of session user.",
                 "consumes": [
                     "application/json"
                 ],
@@ -539,7 +727,6 @@ const docTemplate = `{
                 "tags": [
                     "users"
                 ],
-                "summary": "Update country code of session user.",
                 "parameters": [
                     {
                         "type": "string",
@@ -560,19 +747,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/models.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/models.ProfileResponse"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/models.Response"
                         }
                     },
                     "400": {
@@ -590,6 +765,7 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "description": "Update profile page of session user.",
                 "consumes": [
                     "application/json"
                 ],
@@ -599,7 +775,6 @@ const docTemplate = `{
                 "tags": [
                     "users"
                 ],
-                "summary": "Update profile page of session user.",
                 "parameters": [
                     {
                         "type": "string",
@@ -643,15 +818,60 @@ const docTemplate = `{
                 }
             }
         },
+        "/rankings": {
+            "get": {
+                "description": "Get rankings of every player.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rankings"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.RankingsResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/search": {
             "get": {
+                "description": "Get all user and map data matching to the query.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "search"
                 ],
-                "summary": "Get all user and map data.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Search user or map name.",
+                        "name": "q",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -682,13 +902,13 @@ const docTemplate = `{
         },
         "/token": {
             "get": {
+                "description": "Gets the token cookie value from the user.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "auth"
                 ],
-                "summary": "Gets the token cookie value from the user.",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -717,13 +937,13 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "description": "Deletes the token cookie from the user.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "auth"
                 ],
-                "summary": "Deletes the token cookie from the user.",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -754,6 +974,7 @@ const docTemplate = `{
         },
         "/users/{id}": {
             "get": {
+                "description": "Get profile page of another user.",
                 "consumes": [
                     "application/json"
                 ],
@@ -763,7 +984,6 @@ const docTemplate = `{
                 "tags": [
                     "users"
                 ],
-                "summary": "Get profile page of another user.",
                 "parameters": [
                     {
                         "type": "integer",
@@ -809,6 +1029,17 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "models.Category": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Chapter": {
             "type": "object",
             "properties": {
@@ -848,11 +1079,96 @@ const docTemplate = `{
                 }
             }
         },
+        "models.CreateMapSummaryRequest": {
+            "type": "object",
+            "required": [
+                "category_id",
+                "description",
+                "record_date",
+                "score_count",
+                "user_name"
+            ],
+            "properties": {
+                "category_id": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "record_date": {
+                    "type": "string"
+                },
+                "score_count": {
+                    "type": "integer"
+                },
+                "showcase": {
+                    "type": "string"
+                },
+                "user_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.DeleteMapSummaryRequest": {
+            "type": "object",
+            "required": [
+                "route_id"
+            ],
+            "properties": {
+                "route_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.EditMapImageRequest": {
+            "type": "object",
+            "required": [
+                "image"
+            ],
+            "properties": {
+                "image": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.EditMapSummaryRequest": {
+            "type": "object",
+            "required": [
+                "description",
+                "record_date",
+                "route_id",
+                "score_count",
+                "user_name"
+            ],
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "record_date": {
+                    "type": "string"
+                },
+                "route_id": {
+                    "type": "integer"
+                },
+                "score_count": {
+                    "type": "integer"
+                },
+                "showcase": {
+                    "type": "string"
+                },
+                "user_name": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Game": {
             "type": "object",
             "properties": {
                 "id": {
                     "type": "integer"
+                },
+                "is_coop": {
+                    "type": "boolean"
                 },
                 "name": {
                     "type": "string"
@@ -873,32 +1189,20 @@ const docTemplate = `{
                 "chapter_name": {
                     "type": "string"
                 },
-                "data": {},
                 "game_name": {
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
                 },
+                "image": {
+                    "type": "string"
+                },
+                "is_coop": {
+                    "type": "boolean"
+                },
                 "map_name": {
                     "type": "string"
-                }
-            }
-        },
-        "models.MapCategoryScores": {
-            "type": "object",
-            "properties": {
-                "any": {
-                    "type": "integer"
-                },
-                "cm": {
-                    "type": "integer"
-                },
-                "inbounds_sla": {
-                    "type": "integer"
-                },
-                "no_sla": {
-                    "type": "integer"
                 }
             }
         },
@@ -922,6 +1226,29 @@ const docTemplate = `{
                 "records": {}
             }
         },
+        "models.MapRoute": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "$ref": "#/definitions/models.Category"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "history": {
+                    "$ref": "#/definitions/models.MapHistory"
+                },
+                "rating": {
+                    "type": "number"
+                },
+                "route_id": {
+                    "type": "integer"
+                },
+                "showcase": {
+                    "type": "string"
+                }
+            }
+        },
         "models.MapShort": {
             "type": "object",
             "properties": {
@@ -936,29 +1263,22 @@ const docTemplate = `{
         "models.MapSummary": {
             "type": "object",
             "properties": {
-                "category_scores": {
-                    "$ref": "#/definitions/models.MapCategoryScores"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "history": {
+                "routes": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.MapHistory"
+                        "$ref": "#/definitions/models.MapRoute"
                     }
+                }
+            }
+        },
+        "models.MapSummaryResponse": {
+            "type": "object",
+            "properties": {
+                "map": {
+                    "$ref": "#/definitions/models.Map"
                 },
-                "rating": {
-                    "type": "number"
-                },
-                "routers": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "showcase": {
-                    "type": "string"
+                "summary": {
+                    "$ref": "#/definitions/models.MapSummary"
                 }
             }
         },
@@ -1011,21 +1331,9 @@ const docTemplate = `{
                 }
             }
         },
-        "models.RecordRequest": {
+        "models.RecordResponse": {
             "type": "object",
-            "required": [
-                "is_partner_orange",
-                "partner_id",
-                "score_count",
-                "score_time"
-            ],
             "properties": {
-                "is_partner_orange": {
-                    "type": "boolean"
-                },
-                "partner_id": {
-                    "type": "string"
-                },
                 "score_count": {
                     "type": "integer"
                 },
@@ -1061,29 +1369,13 @@ const docTemplate = `{
                 "maps": {
                     "type": "array",
                     "items": {
-                        "type": "object",
-                        "properties": {
-                            "id": {
-                                "type": "integer"
-                            },
-                            "name": {
-                                "type": "string"
-                            }
-                        }
+                        "$ref": "#/definitions/models.MapShort"
                     }
                 },
                 "players": {
                     "type": "array",
                     "items": {
-                        "type": "object",
-                        "properties": {
-                            "steam_id": {
-                                "type": "string"
-                            },
-                            "user_name": {
-                                "type": "string"
-                            }
-                        }
+                        "$ref": "#/definitions/models.UserShort"
                     }
                 }
             }
@@ -1095,6 +1387,17 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "user_id": {
+                    "type": "string"
+                },
+                "user_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UserShort": {
+            "type": "object",
+            "properties": {
+                "steam_id": {
                     "type": "string"
                 },
                 "user_name": {
