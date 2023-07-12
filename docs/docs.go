@@ -1086,7 +1086,6 @@ const docTemplate = `{
                 "description",
                 "record_date",
                 "score_count",
-                "showcase",
                 "user_name"
             ],
             "properties": {
@@ -1139,7 +1138,6 @@ const docTemplate = `{
                 "record_date",
                 "route_id",
                 "score_count",
-                "showcase",
                 "user_name"
             ],
             "properties": {

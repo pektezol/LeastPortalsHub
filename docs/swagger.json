@@ -1079,7 +1079,6 @@
                 "description",
                 "record_date",
                 "score_count",
-                "showcase",
                 "user_name"
             ],
             "properties": {
@@ -1132,7 +1131,6 @@
                 "record_date",
                 "route_id",
                 "score_count",
-                "showcase",
                 "user_name"
             ],
             "properties": {
