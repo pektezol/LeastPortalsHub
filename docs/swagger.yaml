@@ -51,7 +51,6 @@ definitions:
     - description
     - record_date
     - score_count
-    - showcase
     - user_name
     type: object
   models.DeleteMapSummaryRequest:
@@ -87,7 +86,6 @@ definitions:
     - record_date
     - route_id
     - score_count
-    - showcase
     - user_name
     type: object
   models.Game:
