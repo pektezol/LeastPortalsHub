@@ -17,11 +17,12 @@ In addition, we host a leaderboard section for each map where users can compare 
 
 ## Special Thanks
 
-* [@UncraftedName](https://github.com/UncraftedName) - For providing the parser that retrieves total portal count and elapsed time from the CM counter.
+* [@UncraftedName](https://github.com/UncraftedName) - For providing the parser that retrieves total portal count and elapsed time from the CM counter found [here](https://github.com/UncraftedName/UntitledParser).
+* [@NeKz](https://github.com/NeKzor) - For being the inspiration of this project and developer of the current/former least portals site found [here](https://lp.nekz.me/). 
 
 ## Documentation
 
-Full documentation can be found at https://lp.ardapektezol.com/api/v1/
+Full API documentation can be found at https://lp.ardapektezol.com/api/v1/
 
 ## License
 
@@ -33,7 +34,7 @@ If you have any questions or feedback, please feel free to contact us at our [Di
 
 ## Support
 
-If you want to support the creator, you can do so by using GitHub sponsorships by [clicking here](https://github.com/sponsors/pektezol).
+If you want to support the creator, you can do it via using GitHub sponsorships by clicking [here](https://github.com/sponsors/pektezol).
 
 ## Disclaimer
 
