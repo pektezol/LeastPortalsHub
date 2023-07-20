@@ -10,8 +10,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/pektezol/leastportals/backend/database"
-	"github.com/pektezol/leastportals/backend/models"
+	"github.com/pektezol/leastportalshub/backend/database"
+	"github.com/pektezol/leastportalshub/backend/models"
 	"github.com/solovev/steam_go"
 )
 

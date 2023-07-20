@@ -2,8 +2,8 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/pektezol/leastportals/backend/controllers"
-	"github.com/pektezol/leastportals/backend/middleware"
+	"github.com/pektezol/leastportalshub/backend/controllers"
+	"github.com/pektezol/leastportalshub/backend/middleware"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
