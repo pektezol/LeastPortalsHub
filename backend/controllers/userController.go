@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/pektezol/leastportals/backend/database"
-	"github.com/pektezol/leastportals/backend/models"
+	"github.com/pektezol/leastportalshub/backend/database"
+	"github.com/pektezol/leastportalshub/backend/models"
 )
 
 // GET Profile

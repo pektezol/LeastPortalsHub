@@ -1,4 +1,4 @@
-module github.com/pektezol/leastportals
+module github.com/pektezol/leastportalshub
 
 go 1.19
 
