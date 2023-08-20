@@ -19,6 +19,18 @@ import (
 	"google.golang.org/api/drive/v3"
 )
 
+type RecordRequest struct {
+	HostDemo        *multipart.FileHeader `json:"host_demo" form:"host_demo" binding:"required" swaggerignore:"true"`
+	PartnerDemo     *multipart.FileHeader `json:"partner_demo" form:"partner_demo" swaggerignore:"true"`
+	IsPartnerOrange bool                  `json:"is_partner_orange" form:"is_partner_orange"`
+	PartnerID       string                `json:"partner_id" form:"partner_id"`
+}
+
+type RecordResponse struct {
+	ScoreCount int `json:"score_count"`
+	ScoreTime  int `json:"score_time"`
+}
+
 // POST Record
 //
 //	@Description	Post record with demo of a specific map.
@@ -31,7 +43,7 @@ import (
 //	@Param			partner_demo		formData	file	false	"Partner Demo"
 //	@Param			is_partner_orange	formData	boolean	false	"Is Partner Orange"
 //	@Param			partner_id			formData	string	false	"Partner ID"
-//	@Success		200					{object}	models.Response{data=models.RecordResponse}
+//	@Success		200					{object}	models.Response{data=RecordResponse}
 //	@Failure		400					{object}	models.Response
 //	@Failure		401					{object}	models.Response
 //	@Router			/maps/{id}/record [post]
@@ -61,7 +73,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 		isCoop = true
 	}
 	// Get record request
-	var record models.RecordRequest
+	var record RecordRequest
 	if err := c.ShouldBind(&record); err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
@@ -183,7 +195,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully created record.",
-		Data:    models.RecordResponse{ScoreCount: hostDemoScoreCount, ScoreTime: hostDemoScoreTime},
+		Data:    RecordResponse{ScoreCount: hostDemoScoreCount, ScoreTime: hostDemoScoreTime},
 	})
 }
 
@@ -253,6 +265,7 @@ func serviceAccount() *http.Client {
 	return client
 }
 
+// Create Gdrive file
 func createFile(service *drive.Service, name string, mimeType string, content io.Reader, parentId string) (*drive.File, error) {
 	f := &drive.File{
 		MimeType: mimeType,
@@ -269,6 +282,7 @@ func createFile(service *drive.Service, name string, mimeType string, content io
 	return file, nil
 }
 
+// Delete Gdrive file
 func deleteFile(service *drive.Service, fileId string) {
 	service.Files.Delete(fileId)
 }

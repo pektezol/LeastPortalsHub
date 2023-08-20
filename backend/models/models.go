@@ -4,6 +4,20 @@ import (
 	"time"
 )
 
+type Response struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+	Data    any    `json:"data"`
+}
+
+func ErrorResponse(message string) Response {
+	return Response{
+		Success: false,
+		Message: message,
+		Data:    nil,
+	}
+}
+
 type User struct {
 	SteamID     string    `json:"steam_id"`
 	UserName    string    `json:"user_name"`

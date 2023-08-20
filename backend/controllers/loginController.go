@@ -15,13 +15,17 @@ import (
 	"github.com/solovev/steam_go"
 )
 
+type LoginResponse struct {
+	Token string `json:"token"`
+}
+
 // Login
 //
 //	@Description	Get (redirect) login page for Steam auth.
 //	@Tags			login
 //	@Accept			json
 //	@Produce		json
-//	@Success		200	{object}	models.Response{data=models.LoginResponse}
+//	@Success		200	{object}	models.Response{data=LoginResponse}
 //	@Failure		400	{object}	models.Response
 //	@Router			/login [get]
 func Login(c *gin.Context) {
@@ -85,7 +89,7 @@ func Login(c *gin.Context) {
 		// c.JSON(http.StatusOK, models.Response{
 		// 	Success: true,
 		// 	Message: "Successfully generated token.",
-		// 	Data: models.LoginResponse{
+		// 	Data: LoginResponse{
 		// 		Token: tokenString,
 		// 	},
 		// })
@@ -99,7 +103,7 @@ func Login(c *gin.Context) {
 //	@Tags			auth
 //	@Produce		json
 //
-//	@Success		200	{object}	models.Response{data=models.LoginResponse}
+//	@Success		200	{object}	models.Response{data=LoginResponse}
 //	@Failure		404	{object}	models.Response
 //	@Router			/token [get]
 func GetCookie(c *gin.Context) {
@@ -111,7 +115,7 @@ func GetCookie(c *gin.Context) {
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Token cookie successfully retrieved.",
-		Data: models.LoginResponse{
+		Data: LoginResponse{
 			Token: cookie,
 		},
 	})
@@ -123,7 +127,7 @@ func GetCookie(c *gin.Context) {
 //	@Tags			auth
 //	@Produce		json
 //
-//	@Success		200	{object}	models.Response{data=models.LoginResponse}
+//	@Success		200	{object}	models.Response{data=LoginResponse}
 //	@Failure		404	{object}	models.Response
 //	@Router			/token [delete]
 func DeleteCookie(c *gin.Context) {
@@ -136,7 +140,7 @@ func DeleteCookie(c *gin.Context) {
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Token cookie successfully deleted.",
-		Data: models.LoginResponse{
+		Data: LoginResponse{
 			Token: cookie,
 		},
 	})

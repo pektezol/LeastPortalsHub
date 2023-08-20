@@ -10,6 +10,16 @@ import (
 	"github.com/pektezol/leastportalshub/backend/models"
 )
 
+type SearchResponse struct {
+	Players []models.UserShort `json:"players"`
+	Maps    []models.MapShort  `json:"maps"`
+}
+
+type RankingsResponse struct {
+	RankingsSP []models.UserRanking `json:"rankings_sp"`
+	RankingsMP []models.UserRanking `json:"rankings_mp"`
+}
+
 func Home(c *gin.Context) {
 	user, exists := c.Get("user")
 	if !exists {
@@ -26,7 +36,7 @@ func Home(c *gin.Context) {
 //	@Description	Get rankings of every player.
 //	@Tags			rankings
 //	@Produce		json
-//	@Success		200	{object}	models.Response{data=models.RankingsResponse}
+//	@Success		200	{object}	models.Response{data=RankingsResponse}
 //	@Failure		400	{object}	models.Response
 //	@Router			/rankings [get]
 func Rankings(c *gin.Context) {
@@ -116,7 +126,7 @@ func Rankings(c *gin.Context) {
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully retrieved rankings.",
-		Data: models.RankingsResponse{
+		Data: RankingsResponse{
 			RankingsSP: spRankings,
 			RankingsMP: mpRankings,
 		},
@@ -129,14 +139,14 @@ func Rankings(c *gin.Context) {
 //	@Tags			search
 //	@Produce		json
 //	@Param			q	query		string	false	"Search user or map name."
-//	@Success		200	{object}	models.Response{data=models.SearchResponse}
+//	@Success		200	{object}	models.Response{data=SearchResponse}
 //	@Failure		400	{object}	models.Response
 //	@Router			/search [get]
 func SearchWithQuery(c *gin.Context) {
 	query := c.Query("q")
 	query = strings.ToLower(query)
 	log.Println(query)
-	var response models.SearchResponse
+	var response SearchResponse
 	// Cache all maps for faster response
 	var maps = []models.MapShort{
 		{ID: 1, Name: "Container Ride"},
