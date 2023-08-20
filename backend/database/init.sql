@@ -59,7 +59,7 @@ CREATE TABLE map_history (
   category_id SMALLINT NOT NULL,
   user_name TEXT NOT NULL,
   score_count SMALLINT NOT NULL,
-  record_date TIMESTAMP NOT NULL,
+  record_date DATE NOT NULL,
   PRIMARY KEY (id),
   FOREIGN KEY (category_id) REFERENCES categories(id),
   FOREIGN KEY (map_id) REFERENCES maps(id),
