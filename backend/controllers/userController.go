@@ -11,6 +11,21 @@ import (
 	"github.com/pektezol/leastportalshub/backend/models"
 )
 
+type ProfileResponse struct {
+	Profile     bool            `json:"profile"`
+	SteamID     string          `json:"steam_id"`
+	UserName    string          `json:"user_name"`
+	AvatarLink  string          `json:"avatar_link"`
+	CountryCode string          `json:"country_code"`
+	ScoresSP    []ScoreResponse `json:"scores_sp"`
+	ScoresMP    []ScoreResponse `json:"scores_mp"`
+}
+
+type ScoreResponse struct {
+	MapID   int `json:"map_id"`
+	Records any `json:"records"`
+}
+
 // GET Profile
 //
 //	@Description	Get profile page of session user.
@@ -18,7 +33,7 @@ import (
 //	@Accept			json
 //	@Produce		json
 //	@Param			Authorization	header		string	true	"JWT Token"
-//	@Success		200				{object}	models.Response{data=models.ProfileResponse}
+//	@Success		200				{object}	models.Response{data=ProfileResponse}
 //	@Failure		400				{object}	models.Response
 //	@Failure		401				{object}	models.Response
 //	@Router			/profile [get]
@@ -30,7 +45,7 @@ func Profile(c *gin.Context) {
 		return
 	}
 	// Retrieve singleplayer records
-	var scoresSP []models.ScoreResponse
+	var scoresSP []ScoreResponse
 	sql := `SELECT id, map_id, score_count, score_time, demo_id, record_date FROM records_sp WHERE user_id = $1 ORDER BY map_id`
 	rows, err := database.DB.Query(sql, user.(models.User).SteamID)
 	if err != nil {
@@ -50,13 +65,13 @@ func Profile(c *gin.Context) {
 		// New map
 		recordsSP = []models.RecordSP{}
 		recordsSP = append(recordsSP, record)
-		scoresSP = append(scoresSP, models.ScoreResponse{
+		scoresSP = append(scoresSP, ScoreResponse{
 			MapID:   mapID,
 			Records: recordsSP,
 		})
 	}
 	// Retrieve multiplayer records
-	var scoresMP []models.ScoreResponse
+	var scoresMP []ScoreResponse
 	sql = `SELECT id, map_id, host_id, partner_id, score_count, score_time, host_demo_id, partner_demo_id, record_date FROM records_mp
 	WHERE host_id = $1 OR partner_id = $2 ORDER BY map_id`
 	rows, err = database.DB.Query(sql, user.(models.User).SteamID, user.(models.User).SteamID)
@@ -77,7 +92,7 @@ func Profile(c *gin.Context) {
 		// New map
 		recordsMP = []models.RecordMP{}
 		recordsMP = append(recordsMP, record)
-		scoresMP = append(scoresMP, models.ScoreResponse{
+		scoresMP = append(scoresMP, ScoreResponse{
 			MapID:   mapID,
 			Records: recordsMP,
 		})
@@ -85,7 +100,7 @@ func Profile(c *gin.Context) {
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully retrieved user scores.",
-		Data: models.ProfileResponse{
+		Data: ProfileResponse{
 			Profile:     true,
 			SteamID:     user.(models.User).SteamID,
 			UserName:    user.(models.User).UserName,
@@ -105,7 +120,7 @@ func Profile(c *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			id	path		int	true	"User ID"
-//	@Success		200	{object}	models.Response{data=models.ProfileResponse}
+//	@Success		200	{object}	models.Response{data=ProfileResponse}
 //	@Failure		400	{object}	models.Response
 //	@Failure		404	{object}	models.Response
 //	@Router			/users/{id} [get]
@@ -132,7 +147,7 @@ func FetchUser(c *gin.Context) {
 		return
 	}
 	// Retrieve singleplayer records
-	var scoresSP []models.ScoreResponse
+	var scoresSP []ScoreResponse
 	sql := `SELECT id, map_id, score_count, score_time, demo_id, record_date FROM records_sp WHERE user_id = $1 ORDER BY map_id`
 	rows, err := database.DB.Query(sql, user.SteamID)
 	if err != nil {
@@ -152,13 +167,13 @@ func FetchUser(c *gin.Context) {
 		// New map
 		recordsSP = []models.RecordSP{}
 		recordsSP = append(recordsSP, record)
-		scoresSP = append(scoresSP, models.ScoreResponse{
+		scoresSP = append(scoresSP, ScoreResponse{
 			MapID:   mapID,
 			Records: recordsSP,
 		})
 	}
 	// Retrieve multiplayer records
-	var scoresMP []models.ScoreResponse
+	var scoresMP []ScoreResponse
 	sql = `SELECT id, map_id, host_id, partner_id, score_count, score_time, host_demo_id, partner_demo_id, record_date FROM records_mp
 	WHERE host_id = $1 OR partner_id = $2 ORDER BY map_id`
 	rows, err = database.DB.Query(sql, user.SteamID, user.SteamID)
@@ -179,7 +194,7 @@ func FetchUser(c *gin.Context) {
 		// New map
 		recordsMP = []models.RecordMP{}
 		recordsMP = append(recordsMP, record)
-		scoresMP = append(scoresMP, models.ScoreResponse{
+		scoresMP = append(scoresMP, ScoreResponse{
 			MapID:   mapID,
 			Records: recordsMP,
 		})
@@ -187,7 +202,7 @@ func FetchUser(c *gin.Context) {
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully retrieved user scores.",
-		Data: models.ProfileResponse{
+		Data: ProfileResponse{
 			Profile:     true,
 			SteamID:     user.SteamID,
 			UserName:    user.UserName,
@@ -207,7 +222,7 @@ func FetchUser(c *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			Authorization	header		string	true	"JWT Token"
-//	@Success		200				{object}	models.Response{data=models.ProfileResponse}
+//	@Success		200				{object}	models.Response{data=ProfileResponse}
 //	@Failure		400				{object}	models.Response
 //	@Failure		401				{object}	models.Response
 //	@Router			/profile [post]
@@ -233,7 +248,7 @@ func UpdateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully updated user.",
-		Data: models.ProfileResponse{
+		Data: ProfileResponse{
 			Profile:     true,
 			SteamID:     user.(models.User).SteamID,
 			UserName:    profile.PersonaName,

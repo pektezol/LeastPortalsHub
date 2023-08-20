@@ -9,18 +9,33 @@ import (
 	"github.com/pektezol/leastportalshub/backend/models"
 )
 
+type MapSummaryResponse struct {
+	Map     models.Map        `json:"map"`
+	Summary models.MapSummary `json:"summary"`
+}
+
+type ChaptersResponse struct {
+	Game     models.Game      `json:"game"`
+	Chapters []models.Chapter `json:"chapters"`
+}
+
+type ChapterMapsResponse struct {
+	Chapter models.Chapter    `json:"chapter"`
+	Maps    []models.MapShort `json:"maps"`
+}
+
 // GET Map Summary
 //
 //	@Description	Get map summary with specified id.
 //	@Tags			maps
 //	@Produce		json
 //	@Param			id	path		int	true	"Map ID"
-//	@Success		200	{object}	models.Response{data=models.MapSummaryResponse}
+//	@Success		200	{object}	models.Response{data=MapSummaryResponse}
 //	@Failure		400	{object}	models.Response
 //	@Router			/maps/{id}/summary [get]
 func FetchMapSummary(c *gin.Context) {
 	id := c.Param("id")
-	response := models.MapSummaryResponse{Map: models.Map{}, Summary: models.MapSummary{Routes: []models.MapRoute{}}}
+	response := MapSummaryResponse{Map: models.Map{}, Summary: models.MapSummary{Routes: []models.MapRoute{}}}
 	intID, err := strconv.Atoi(id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
@@ -220,7 +235,7 @@ func FetchGames(c *gin.Context) {
 //	@Tags			games & chapters
 //	@Produce		json
 //	@Param			id	path		int	true	"Game ID"
-//	@Success		200	{object}	models.Response{data=models.ChaptersResponse}
+//	@Success		200	{object}	models.Response{data=ChaptersResponse}
 //	@Failure		400	{object}	models.Response
 //	@Router			/games/{id} [get]
 func FetchChapters(c *gin.Context) {
@@ -230,7 +245,7 @@ func FetchChapters(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	var response models.ChaptersResponse
+	var response ChaptersResponse
 	rows, err := database.DB.Query(`SELECT c.id, c.name, g.name FROM chapters c INNER JOIN games g ON c.game_id = g.id WHERE game_id = $1`, gameID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
@@ -262,7 +277,7 @@ func FetchChapters(c *gin.Context) {
 //	@Tags			games & chapters
 //	@Produce		json
 //	@Param			id	path		int	true	"Chapter ID"
-//	@Success		200	{object}	models.Response{data=models.ChapterMapsResponse}
+//	@Success		200	{object}	models.Response{data=ChapterMapsResponse}
 //	@Failure		400	{object}	models.Response
 //	@Router			/chapters/{id} [get]
 func FetchChapterMaps(c *gin.Context) {
@@ -272,7 +287,7 @@ func FetchChapterMaps(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	var response models.ChapterMapsResponse
+	var response ChapterMapsResponse
 	rows, err := database.DB.Query(`SELECT m.id, m.name, c.name FROM maps m INNER JOIN chapters c ON m.chapter_id = c.id WHERE chapter_id = $1`, chapterID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))

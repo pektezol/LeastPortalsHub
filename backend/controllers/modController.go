@@ -3,21 +3,48 @@ package controllers
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pektezol/leastportalshub/backend/database"
 	"github.com/pektezol/leastportalshub/backend/models"
 )
 
+type CreateMapSummaryRequest struct {
+	CategoryID  int       `json:"category_id" binding:"required"`
+	Description string    `json:"description" binding:"required"`
+	Showcase    string    `json:"showcase"`
+	UserName    string    `json:"user_name" binding:"required"`
+	ScoreCount  *int      `json:"score_count" binding:"required"`
+	RecordDate  time.Time `json:"record_date" binding:"required"`
+}
+
+type EditMapSummaryRequest struct {
+	RouteID     int       `json:"route_id" binding:"required"`
+	Description string    `json:"description" binding:"required"`
+	Showcase    string    `json:"showcase"`
+	UserName    string    `json:"user_name" binding:"required"`
+	ScoreCount  *int      `json:"score_count" binding:"required"`
+	RecordDate  time.Time `json:"record_date" binding:"required"`
+}
+
+type DeleteMapSummaryRequest struct {
+	RouteID int `json:"route_id" binding:"required"`
+}
+
+type EditMapImageRequest struct {
+	Image string `json:"image" binding:"required"`
+}
+
 // POST Map Summary
 //
 //	@Description	Create map summary with specified map id.
 //	@Tags			maps
 //	@Produce		json
-//	@Param			Authorization	header		string							true	"JWT Token"
-//	@Param			id				path		int								true	"Map ID"
-//	@Param			request			body		models.CreateMapSummaryRequest	true	"Body"
-//	@Success		200				{object}	models.Response{data=models.CreateMapSummaryRequest}
+//	@Param			Authorization	header		string					true	"JWT Token"
+//	@Param			id				path		int						true	"Map ID"
+//	@Param			request			body		CreateMapSummaryRequest	true	"Body"
+//	@Success		200				{object}	models.Response{data=CreateMapSummaryRequest}
 //	@Failure		400				{object}	models.Response
 //	@Router			/maps/{id}/summary [post]
 func CreateMapSummary(c *gin.Context) {
@@ -44,7 +71,7 @@ func CreateMapSummary(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	var request models.CreateMapSummaryRequest
+	var request CreateMapSummaryRequest
 	if err := c.BindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
@@ -100,10 +127,10 @@ func CreateMapSummary(c *gin.Context) {
 //	@Description	Edit map summary with specified map id.
 //	@Tags			maps
 //	@Produce		json
-//	@Param			Authorization	header		string							true	"JWT Token"
-//	@Param			id				path		int								true	"Map ID"
-//	@Param			request			body		models.EditMapSummaryRequest	true	"Body"
-//	@Success		200				{object}	models.Response{data=models.EditMapSummaryRequest}
+//	@Param			Authorization	header		string					true	"JWT Token"
+//	@Param			id				path		int						true	"Map ID"
+//	@Param			request			body		EditMapSummaryRequest	true	"Body"
+//	@Success		200				{object}	models.Response{data=EditMapSummaryRequest}
 //	@Failure		400				{object}	models.Response
 //	@Router			/maps/{id}/summary [put]
 func EditMapSummary(c *gin.Context) {
@@ -130,7 +157,7 @@ func EditMapSummary(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	var request models.EditMapSummaryRequest
+	var request EditMapSummaryRequest
 	if err := c.BindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
@@ -186,10 +213,10 @@ func EditMapSummary(c *gin.Context) {
 //	@Description	Delete map summary with specified map id.
 //	@Tags			maps
 //	@Produce		json
-//	@Param			Authorization	header		string							true	"JWT Token"
-//	@Param			id				path		int								true	"Map ID"
-//	@Param			request			body		models.DeleteMapSummaryRequest	true	"Body"
-//	@Success		200				{object}	models.Response{data=models.DeleteMapSummaryRequest}
+//	@Param			Authorization	header		string					true	"JWT Token"
+//	@Param			id				path		int						true	"Map ID"
+//	@Param			request			body		DeleteMapSummaryRequest	true	"Body"
+//	@Success		200				{object}	models.Response{data=DeleteMapSummaryRequest}
 //	@Failure		400				{object}	models.Response
 //	@Router			/maps/{id}/summary [delete]
 func DeleteMapSummary(c *gin.Context) {
@@ -216,7 +243,7 @@ func DeleteMapSummary(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	var request models.DeleteMapSummaryRequest
+	var request DeleteMapSummaryRequest
 	if err := c.BindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
@@ -276,10 +303,10 @@ func DeleteMapSummary(c *gin.Context) {
 //	@Description	Edit map image with specified map id.
 //	@Tags			maps
 //	@Produce		json
-//	@Param			Authorization	header		string						true	"JWT Token"
-//	@Param			id				path		int							true	"Map ID"
-//	@Param			request			body		models.EditMapImageRequest	true	"Body"
-//	@Success		200				{object}	models.Response{data=models.EditMapImageRequest}
+//	@Param			Authorization	header		string				true	"JWT Token"
+//	@Param			id				path		int					true	"Map ID"
+//	@Param			request			body		EditMapImageRequest	true	"Body"
+//	@Success		200				{object}	models.Response{data=EditMapImageRequest}
 //	@Failure		400				{object}	models.Response
 //	@Router			/maps/{id}/image [put]
 func EditMapImage(c *gin.Context) {
@@ -306,7 +333,7 @@ func EditMapImage(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	var request models.EditMapImageRequest
+	var request EditMapImageRequest
 	if err := c.BindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
