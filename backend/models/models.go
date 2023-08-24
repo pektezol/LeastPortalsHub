@@ -25,7 +25,7 @@ type User struct {
 	CountryCode string    `json:"country_code"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
-	Titles      []string  `json:"titles"`
+	Titles      []Title   `json:"titles"`
 }
 
 type UserShort struct {
@@ -90,6 +90,18 @@ type Chapter struct {
 type Category struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
+}
+
+type Title struct {
+	Name  string `json:"name"`
+	Color string `json:"color"`
+}
+
+type Links struct {
+	P2SR    string `json:"p2sr"`
+	Steam   string `json:"stream"`
+	YouTube string `json:"youtube"`
+	Twitch  string `json:"twitch"`
 }
 
 type RecordSP struct {

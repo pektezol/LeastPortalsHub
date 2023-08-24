@@ -44,14 +44,19 @@ func CheckAuth(c *gin.Context) {
 			return
 		}
 		// Get user titles from DB
-		user.Titles = []string{}
-		rows, _ := database.DB.Query(`SELECT title_name FROM titles t INNER JOIN user_titles ut ON t.id=ut.title_id WHERE ut.user_id = $1`, user.SteamID)
+		var moderator bool
+		user.Titles = []models.Title{}
+		rows, _ := database.DB.Query(`SELECT t.title_name, t.title_color FROM titles t INNER JOIN user_titles ut ON t.id=ut.title_id WHERE ut.user_id = $1`, user.SteamID)
 		for rows.Next() {
-			var title string
-			rows.Scan(&title)
+			var title models.Title
+			rows.Scan(&title.Name, &title.Color)
+			if title.Name == "Moderator" {
+				moderator = true
+			}
 			user.Titles = append(user.Titles, title)
 		}
 		c.Set("user", user)
+		c.Set("mod", moderator)
 		c.Next()
 	} else {
 		c.Next()

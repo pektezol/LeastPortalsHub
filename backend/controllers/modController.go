@@ -49,18 +49,13 @@ type EditMapImageRequest struct {
 //	@Router			/maps/{id}/summary [post]
 func CreateMapSummary(c *gin.Context) {
 	// Check if user exists
-	user, exists := c.Get("user")
+	_, exists := c.Get("user")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, models.ErrorResponse("User not logged in."))
 		return
 	}
-	var moderator bool
-	for _, title := range user.(models.User).Titles {
-		if title == "Moderator" {
-			moderator = true
-		}
-	}
-	if !moderator {
+	mod, exists := c.Get("mod")
+	if !exists || !mod.(bool) {
 		c.JSON(http.StatusUnauthorized, models.ErrorResponse("Insufficient permissions."))
 		return
 	}
@@ -135,18 +130,13 @@ func CreateMapSummary(c *gin.Context) {
 //	@Router			/maps/{id}/summary [put]
 func EditMapSummary(c *gin.Context) {
 	// Check if user exists
-	user, exists := c.Get("user")
+	_, exists := c.Get("user")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, models.ErrorResponse("User not logged in."))
 		return
 	}
-	var moderator bool
-	for _, title := range user.(models.User).Titles {
-		if title == "Moderator" {
-			moderator = true
-		}
-	}
-	if !moderator {
+	mod, exists := c.Get("mod")
+	if !exists || !mod.(bool) {
 		c.JSON(http.StatusUnauthorized, models.ErrorResponse("Insufficient permissions."))
 		return
 	}
@@ -221,18 +211,13 @@ func EditMapSummary(c *gin.Context) {
 //	@Router			/maps/{id}/summary [delete]
 func DeleteMapSummary(c *gin.Context) {
 	// Check if user exists
-	user, exists := c.Get("user")
+	_, exists := c.Get("user")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, models.ErrorResponse("User not logged in."))
 		return
 	}
-	var moderator bool
-	for _, title := range user.(models.User).Titles {
-		if title == "Moderator" {
-			moderator = true
-		}
-	}
-	if !moderator {
+	mod, exists := c.Get("mod")
+	if !exists || !mod.(bool) {
 		c.JSON(http.StatusUnauthorized, models.ErrorResponse("Insufficient permissions."))
 		return
 	}
@@ -311,18 +296,13 @@ func DeleteMapSummary(c *gin.Context) {
 //	@Router			/maps/{id}/image [put]
 func EditMapImage(c *gin.Context) {
 	// Check if user exists
-	user, exists := c.Get("user")
+	_, exists := c.Get("user")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, models.ErrorResponse("User not logged in."))
 		return
 	}
-	var moderator bool
-	for _, title := range user.(models.User).Titles {
-		if title == "Moderator" {
-			moderator = true
-		}
-	}
-	if !moderator {
+	mod, exists := c.Get("mod")
+	if !exists || !mod.(bool) {
 		c.JSON(http.StatusUnauthorized, models.ErrorResponse("Insufficient permissions."))
 		return
 	}
