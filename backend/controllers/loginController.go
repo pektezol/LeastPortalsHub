@@ -64,7 +64,7 @@ func Login(c *gin.Context) {
 			VALUES ($1, $2, $3, $4)`, steamID, user.PersonaName, user.AvatarFull, user.LocCountryCode)
 		}
 		moderator := false
-		rows, _ := database.DB.Query("SELECT title_name FROM titles WHERE user_id = $1", steamID)
+		rows, _ := database.DB.Query("SELECT title_name FROM titles t INNER JOIN user_titles ut ON t.id=ut.title_id WHERE ut.user_id = $1", steamID)
 		for rows.Next() {
 			var title string
 			rows.Scan(&title)
