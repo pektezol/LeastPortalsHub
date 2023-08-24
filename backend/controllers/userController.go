@@ -143,58 +143,21 @@ func FetchUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	// Retrieve singleplayer records
-	var scoresSP []ScoreResponse
-	sql := `SELECT id, map_id, score_count, score_time, demo_id, record_date FROM records_sp WHERE user_id = $1 ORDER BY map_id`
+	// Get user titles
+	sql := `SELECT t.title_name, t.title_color FROM titles t
+	INNER JOIN user_titles ut ON t.id=ut.title_id WHERE ut.user_id = $1`
 	rows, err := database.DB.Query(sql, user.SteamID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	var recordsSP []models.RecordSP
 	for rows.Next() {
-		var mapID int
-		var record models.RecordSP
-		rows.Scan(&record.RecordID, &mapID, &record.ScoreCount, &record.ScoreTime, &record.DemoID, &record.RecordDate)
-		// More than one record in one map
-		if len(scoresSP) != 0 && mapID == scoresSP[len(scoresSP)-1].MapID {
-			scoresSP[len(scoresSP)-1].Records = append(scoresSP[len(scoresSP)-1].Records.([]models.RecordSP), record)
-			continue
+		var title models.Title
+		if err := rows.Scan(&title.Name, &title.Color); err != nil {
+			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			return
 		}
-		// New map
-		recordsSP = []models.RecordSP{}
-		recordsSP = append(recordsSP, record)
-		scoresSP = append(scoresSP, ScoreResponse{
-			MapID:   mapID,
-			Records: recordsSP,
-		})
-	}
-	// Retrieve multiplayer records
-	var scoresMP []ScoreResponse
-	sql = `SELECT id, map_id, host_id, partner_id, score_count, score_time, host_demo_id, partner_demo_id, record_date FROM records_mp
-	WHERE host_id = $1 OR partner_id = $2 ORDER BY map_id`
-	rows, err = database.DB.Query(sql, user.SteamID, user.SteamID)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
-		return
-	}
-	var recordsMP []models.RecordMP
-	for rows.Next() {
-		var mapID int
-		var record models.RecordMP
-		rows.Scan(&record.RecordID, &mapID, &record.HostID, &record.PartnerID, &record.ScoreCount, &record.ScoreTime, &record.HostDemoID, &record.PartnerDemoID, &record.RecordDate)
-		// More than one record in one map
-		if len(scoresMP) != 0 && mapID == scoresMP[len(scoresMP)-1].MapID {
-			scoresMP[len(scoresMP)-1].Records = append(scoresMP[len(scoresMP)-1].Records.([]models.RecordMP), record)
-			continue
-		}
-		// New map
-		recordsMP = []models.RecordMP{}
-		recordsMP = append(recordsMP, record)
-		scoresMP = append(scoresMP, ScoreResponse{
-			MapID:   mapID,
-			Records: recordsMP,
-		})
+		user.Titles = append(user.Titles, title)
 	}
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
@@ -205,8 +168,10 @@ func FetchUser(c *gin.Context) {
 			UserName:    user.UserName,
 			AvatarLink:  user.AvatarLink,
 			CountryCode: user.CountryCode,
-			ScoresSP:    scoresSP,
-			ScoresMP:    scoresMP,
+			Titles:      user.Titles,
+			Links:       models.Links{},
+			Rankings:    ProfileRankings{},
+			Records:     ProfileRecords{},
 		},
 	})
 	return
