@@ -19,8 +19,8 @@ import (
 //	@license.name	GNU General Public License, Version 2
 //	@license.url	https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
-// @host		lp.ardapektezol.com/api
-// @BasePath	/v1
+//	@host		lp.ardapektezol.com/api
+//	@BasePath	/v1
 func main() {
 	if os.Getenv("ENV") == "PROD" {
 		gin.SetMode(gin.ReleaseMode)

@@ -86,26 +86,79 @@ definitions:
       summary:
         $ref: '#/definitions/models.MapSummary'
     type: object
+  controllers.ProfileRankings:
+    properties:
+      cooperative:
+        $ref: '#/definitions/controllers.ProfileRankingsDetails'
+      overall:
+        $ref: '#/definitions/controllers.ProfileRankingsDetails'
+      singleplayer:
+        $ref: '#/definitions/controllers.ProfileRankingsDetails'
+    type: object
+  controllers.ProfileRankingsDetails:
+    properties:
+      completion_count:
+        type: integer
+      completion_total:
+        type: integer
+      rank:
+        type: integer
+    type: object
+  controllers.ProfileRecords:
+    properties:
+      portal2_cooperative:
+        items:
+          $ref: '#/definitions/controllers.ProfileRecordsDetails'
+        type: array
+      portal2_singleplayer:
+        items:
+          $ref: '#/definitions/controllers.ProfileRecordsDetails'
+        type: array
+    type: object
+  controllers.ProfileRecordsDetails:
+    properties:
+      map_id:
+        type: integer
+      map_name:
+        type: string
+      scores:
+        items:
+          $ref: '#/definitions/controllers.ProfileScores'
+        type: array
+    type: object
   controllers.ProfileResponse:
     properties:
       avatar_link:
         type: string
       country_code:
         type: string
+      links:
+        $ref: '#/definitions/models.Links'
       profile:
         type: boolean
-      scores_mp:
-        items:
-          $ref: '#/definitions/controllers.ScoreResponse'
-        type: array
-      scores_sp:
-        items:
-          $ref: '#/definitions/controllers.ScoreResponse'
-        type: array
+      rankings:
+        $ref: '#/definitions/controllers.ProfileRankings'
+      records:
+        $ref: '#/definitions/controllers.ProfileRecords'
       steam_id:
         type: string
+      titles:
+        items:
+          $ref: '#/definitions/models.Title'
+        type: array
       user_name:
         type: string
+    type: object
+  controllers.ProfileScores:
+    properties:
+      date:
+        type: string
+      demo_id:
+        type: string
+      score_count:
+        type: integer
+      score_time:
+        type: integer
     type: object
   controllers.RankingsResponse:
     properties:
@@ -124,12 +177,6 @@ definitions:
         type: integer
       score_time:
         type: integer
-    type: object
-  controllers.ScoreResponse:
-    properties:
-      map_id:
-        type: integer
-      records: {}
     type: object
   controllers.SearchResponse:
     properties:
@@ -163,6 +210,17 @@ definitions:
       is_coop:
         type: boolean
       name:
+        type: string
+    type: object
+  models.Links:
+    properties:
+      p2sr:
+        type: string
+      stream:
+        type: string
+      twitch:
+        type: string
+      youtube:
         type: string
     type: object
   models.Map:
@@ -229,6 +287,13 @@ definitions:
         type: string
       success:
         type: boolean
+    type: object
+  models.Title:
+    properties:
+      color:
+        type: string
+      name:
+        type: string
     type: object
   models.UserRanking:
     properties:
