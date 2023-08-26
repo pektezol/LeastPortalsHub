@@ -1,9 +1,9 @@
-package controllers
+package handlers
 
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"time"
@@ -43,11 +43,7 @@ func Login(c *gin.Context) {
 		}
 		// Create user if new
 		var checkSteamID int64
-		err = database.DB.QueryRow("SELECT steam_id FROM users WHERE steam_id = $1", steamID).Scan(&checkSteamID)
-		// if err != nil {
-		// 	c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
-		// 	return
-		// }
+		database.DB.QueryRow("SELECT steam_id FROM users WHERE steam_id = $1", steamID).Scan(&checkSteamID)
 		// User does not exist
 		if checkSteamID == 0 {
 			user, err := GetPlayerSummaries(steamID, os.Getenv("API_KEY"))
@@ -152,7 +148,7 @@ func GetPlayerSummaries(steamId, apiKey string) (*models.PlayerSummaries, error)
 	if err != nil {
 		return nil, err
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
