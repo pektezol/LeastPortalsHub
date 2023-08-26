@@ -1,4 +1,4 @@
-package controllers
+package handlers
 
 import (
 	"context"
@@ -228,6 +228,10 @@ func DownloadDemoWithID(c *gin.Context) {
 	url := "https://drive.google.com/uc?export=download&id=" + locationID
 	fileName := uuid + ".dem"
 	output, err := os.Create(fileName)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
 	defer os.Remove(fileName)
 	defer output.Close()
 	response, err := http.Get(url)

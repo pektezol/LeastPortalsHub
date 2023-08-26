@@ -7,8 +7,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/pektezol/leastportalshub/backend/api"
 	"github.com/pektezol/leastportalshub/backend/database"
-	"github.com/pektezol/leastportalshub/backend/routes"
 	_ "github.com/pektezol/leastportalshub/docs"
 )
 
@@ -19,8 +19,8 @@ import (
 //	@license.name	GNU General Public License, Version 2
 //	@license.url	https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
-//	@host		lp.ardapektezol.com/api
-//	@BasePath	/v1
+// @host		lp.ardapektezol.com/api
+// @BasePath	/v1
 func main() {
 	if os.Getenv("ENV") == "PROD" {
 		gin.SetMode(gin.ReleaseMode)
@@ -31,6 +31,6 @@ func main() {
 	}
 	router := gin.Default()
 	database.ConnectDB()
-	routes.InitRoutes(router)
+	api.InitRoutes(router)
 	router.Run(fmt.Sprintf(":%s", os.Getenv("PORT")))
 }
