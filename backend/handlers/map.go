@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pektezol/leastportalshub/backend/database"
@@ -14,6 +15,11 @@ type MapSummaryResponse struct {
 	Summary models.MapSummary `json:"summary"`
 }
 
+type MapLeaderboardsResponse struct {
+	Map     models.Map `json:"map"`
+	Records any        `json:"records"`
+}
+
 type ChaptersResponse struct {
 	Game     models.Game      `json:"game"`
 	Chapters []models.Chapter `json:"chapters"`
@@ -22,6 +28,34 @@ type ChaptersResponse struct {
 type ChapterMapsResponse struct {
 	Chapter models.Chapter    `json:"chapter"`
 	Maps    []models.MapShort `json:"maps"`
+}
+
+type RecordSingleplayer struct {
+	Placement  int       `json:"placement"`
+	RecordID   int       `json:"record_id"`
+	ScoreCount int       `json:"score_count"`
+	ScoreTime  int       `json:"score_time"`
+	UserID     string    `json:"user_id"`
+	UserName   string    `json:"user_name"`
+	UserAvatar string    `json:"user_avatar"`
+	DemoID     string    `json:"demo_id"`
+	RecordDate time.Time `json:"record_date"`
+}
+
+type RecordMultiplayer struct {
+	Placement     int       `json:"placement"`
+	RecordID      int       `json:"record_id"`
+	ScoreCount    int       `json:"score_count"`
+	ScoreTime     int       `json:"score_time"`
+	HostID        string    `json:"host_id"`
+	HostName      string    `json:"host_name"`
+	HostAvatar    string    `json:"host_avatar"`
+	PartnerID     string    `json:"partner_id"`
+	PartnerName   string    `json:"partner_name"`
+	PartnerAvatar string    `json:"partner_avatar"`
+	HostDemoID    string    `json:"host_demo_id"`
+	PartnerDemoID string    `json:"partner_demo_id"`
+	RecordDate    time.Time `json:"record_date"`
 }
 
 // GET Map Summary
@@ -88,28 +122,29 @@ func FetchMapSummary(c *gin.Context) {
 //	@Tags			maps
 //	@Produce		json
 //	@Param			id	path		int	true	"Map ID"
-//	@Success		200	{object}	models.Response{data=models.Map{data=models.MapRecords}}
+//	@Success		200	{object}	models.Response{data=MapLeaderboardsResponse}
 //	@Failure		400	{object}	models.Response
 //	@Router			/maps/{id}/leaderboards [get]
 func FetchMapLeaderboards(c *gin.Context) {
 	// TODO: make new response type
 	id := c.Param("id")
 	// Get map data
-	var mapData models.Map
-	var mapRecordsData models.MapRecords
+	response := MapLeaderboardsResponse{Map: models.Map{}, Records: nil}
+	// var mapData models.Map
+	// var mapRecordsData models.MapRecords
 	var isDisabled bool
 	intID, err := strconv.Atoi(id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	mapData.ID = intID
+	response.Map.ID = intID
 	sql := `SELECT g.name, c.name, m.name, is_disabled, m.image
 	FROM maps m
 	INNER JOIN games g ON m.game_id = g.id
 	INNER JOIN chapters c ON m.chapter_id = c.id
 	WHERE m.id = $1`
-	err = database.DB.QueryRow(sql, id).Scan(&mapData.GameName, &mapData.ChapterName, &mapData.MapName, &isDisabled, &mapData.Image)
+	err = database.DB.QueryRow(sql, id).Scan(&response.Map.GameName, &response.Map.ChapterName, &response.Map.MapName, &isDisabled, &response.Map.Image)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
@@ -119,17 +154,38 @@ func FetchMapLeaderboards(c *gin.Context) {
 		return
 	}
 	// TODO: avatar and names for host & partner
-	// Get records from the map
-	if mapData.GameName == "Portal 2 - Cooperative" {
-		var records []models.RecordMP
-		sql = `SELECT id, host_id, partner_id, score_count, score_time, host_demo_id, partner_demo_id, record_date
-		FROM (
-		  SELECT id, host_id, partner_id, score_count, score_time, host_demo_id, partner_demo_id, record_date,
-				 ROW_NUMBER() OVER (PARTITION BY host_id, partner_id ORDER BY score_count, score_time) AS rn
-		  FROM records_mp
-		  WHERE map_id = $1
-		) sub
-		WHERE rn = 1`
+	if response.Map.GameName == "Portal 2 - Cooperative" {
+		records := []RecordMultiplayer{}
+		sql = `SELECT
+		sub.id,
+		sub.host_id,
+		host.user_name AS host_user_name,
+		host.avatar_link AS host_avatar_link,
+		sub.partner_id,
+		partner.user_name AS partner_user_name,
+		partner.avatar_link AS partner_avatar_link,
+		sub.score_count,
+		sub.score_time,
+		sub.host_demo_id,
+		sub.partner_demo_id,
+		sub.record_date
+	FROM (
+		SELECT
+			id,
+			host_id,
+			partner_id,
+			score_count,
+			score_time,
+			host_demo_id,
+			partner_demo_id,
+			record_date,
+			ROW_NUMBER() OVER (PARTITION BY host_id, partner_id ORDER BY score_count, score_time) AS rn
+		FROM records_mp
+		WHERE map_id = $1
+	) sub
+	JOIN users AS host ON sub.host_id = host.steam_id 
+	JOIN users AS partner ON sub.partner_id = partner.steam_id 
+	WHERE sub.rn = 1;`
 		rows, err := database.DB.Query(sql, id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
@@ -138,8 +194,8 @@ func FetchMapLeaderboards(c *gin.Context) {
 		placement := 1
 		ties := 0
 		for rows.Next() {
-			var record models.RecordMP
-			err := rows.Scan(&record.RecordID, &record.HostID, &record.PartnerID, &record.ScoreCount, &record.ScoreTime, &record.HostDemoID, &record.PartnerDemoID, &record.RecordDate)
+			var record RecordMultiplayer
+			err := rows.Scan(&record.RecordID, &record.HostID, &record.HostName, &record.HostAvatar, &record.PartnerID, &record.PartnerName, &record.PartnerAvatar, &record.ScoreCount, &record.ScoreTime, &record.HostDemoID, &record.PartnerDemoID, &record.RecordDate)
 			if err != nil {
 				c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 				return
@@ -153,9 +209,9 @@ func FetchMapLeaderboards(c *gin.Context) {
 			records = append(records, record)
 			placement++
 		}
-		mapRecordsData.Records = records
+		response.Records = records
 	} else {
-		var records []models.RecordSP
+		records := []RecordSingleplayer{}
 		sql = `SELECT id, user_id, users.user_name, users.avatar_link, score_count, score_time, demo_id, record_date
 		FROM (
 		  SELECT id, user_id, score_count, score_time, demo_id, record_date,
@@ -173,7 +229,7 @@ func FetchMapLeaderboards(c *gin.Context) {
 		placement := 1
 		ties := 0
 		for rows.Next() {
-			var record models.RecordSP
+			var record RecordSingleplayer
 			err := rows.Scan(&record.RecordID, &record.UserID, &record.UserName, &record.UserAvatar, &record.ScoreCount, &record.ScoreTime, &record.DemoID, &record.RecordDate)
 			if err != nil {
 				c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
@@ -188,14 +244,12 @@ func FetchMapLeaderboards(c *gin.Context) {
 			records = append(records, record)
 			placement++
 		}
-		mapRecordsData.Records = records
+		response.Records = records
 	}
-	// mapData.Data = mapRecordsData
-	// Return response
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully retrieved map leaderboards.",
-		Data:    mapData,
+		Data:    response,
 	})
 }
 
