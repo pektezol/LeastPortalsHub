@@ -104,34 +104,6 @@ type Links struct {
 	Twitch  string `json:"twitch"`
 }
 
-type RecordSP struct {
-	RecordID   int       `json:"record_id"`
-	Placement  int       `json:"placement"`
-	UserID     string    `json:"user_id"`
-	UserName   string    `json:"user_name"`
-	UserAvatar string    `json:"user_avatar"`
-	ScoreCount int       `json:"score_count"`
-	ScoreTime  int       `json:"score_time"`
-	DemoID     string    `json:"demo_id"`
-	RecordDate time.Time `json:"record_date"`
-}
-
-type RecordMP struct {
-	RecordID      int       `json:"record_id"`
-	Placement     int       `json:"placement"`
-	HostID        string    `json:"host_id"`
-	HostName      string    `json:"host_name"`
-	HostAvatar    string    `json:"host_avatar"`
-	PartnerID     string    `json:"partner_id"`
-	PartnerName   string    `json:"partner_name"`
-	PartnerAvatar string    `json:"partner_avatar"`
-	ScoreCount    int       `json:"score_count"`
-	ScoreTime     int       `json:"score_time"`
-	HostDemoID    string    `json:"host_demo_id"`
-	PartnerDemoID string    `json:"partner_demo_id"`
-	RecordDate    time.Time `json:"record_date"`
-}
-
 type PlayerSummaries struct {
 	SteamId                  string `json:"steamid"`
 	CommunityVisibilityState int    `json:"communityvisibilitystate"`
