@@ -1186,28 +1186,20 @@ const docTemplate = `{
         "handlers.ProfileRecords": {
             "type": "object",
             "properties": {
-                "portal2_cooperative": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/handlers.ProfileRecordsDetails"
-                    }
+                "category_id": {
+                    "type": "integer"
                 },
-                "portal2_singleplayer": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/handlers.ProfileRecordsDetails"
-                    }
-                }
-            }
-        },
-        "handlers.ProfileRecordsDetails": {
-            "type": "object",
-            "properties": {
+                "game_id": {
+                    "type": "integer"
+                },
                 "map_id": {
                     "type": "integer"
                 },
                 "map_name": {
                     "type": "string"
+                },
+                "map_wr_count": {
+                    "type": "integer"
                 },
                 "scores": {
                     "type": "array",
@@ -1236,7 +1228,10 @@ const docTemplate = `{
                     "$ref": "#/definitions/handlers.ProfileRankings"
                 },
                 "records": {
-                    "$ref": "#/definitions/handlers.ProfileRecords"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handlers.ProfileRecords"
+                    }
                 },
                 "steam_id": {
                     "type": "string"

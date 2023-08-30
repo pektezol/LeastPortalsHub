@@ -112,21 +112,16 @@ definitions:
     type: object
   handlers.ProfileRecords:
     properties:
-      portal2_cooperative:
-        items:
-          $ref: '#/definitions/handlers.ProfileRecordsDetails'
-        type: array
-      portal2_singleplayer:
-        items:
-          $ref: '#/definitions/handlers.ProfileRecordsDetails'
-        type: array
-    type: object
-  handlers.ProfileRecordsDetails:
-    properties:
+      category_id:
+        type: integer
+      game_id:
+        type: integer
       map_id:
         type: integer
       map_name:
         type: string
+      map_wr_count:
+        type: integer
       scores:
         items:
           $ref: '#/definitions/handlers.ProfileScores'
@@ -145,7 +140,9 @@ definitions:
       rankings:
         $ref: '#/definitions/handlers.ProfileRankings'
       records:
-        $ref: '#/definitions/handlers.ProfileRecords'
+        items:
+          $ref: '#/definitions/handlers.ProfileRecords'
+        type: array
       steam_id:
         type: string
       titles:
