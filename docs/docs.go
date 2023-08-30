@@ -50,7 +50,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/controllers.ChapterMapsResponse"
+                                            "$ref": "#/definitions/handlers.ChapterMapsResponse"
                                         }
                                     }
                                 }
@@ -173,7 +173,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/controllers.ChaptersResponse"
+                                            "$ref": "#/definitions/handlers.ChaptersResponse"
                                         }
                                     }
                                 }
@@ -213,7 +213,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/controllers.LoginResponse"
+                                            "$ref": "#/definitions/handlers.LoginResponse"
                                         }
                                     }
                                 }
@@ -259,7 +259,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/controllers.EditMapImageRequest"
+                            "$ref": "#/definitions/handlers.EditMapImageRequest"
                         }
                     }
                 ],
@@ -275,7 +275,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/controllers.EditMapImageRequest"
+                                            "$ref": "#/definitions/handlers.EditMapImageRequest"
                                         }
                                     }
                                 }
@@ -321,19 +321,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "allOf": [
-                                                {
-                                                    "$ref": "#/definitions/models.Map"
-                                                },
-                                                {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "data": {
-                                                            "$ref": "#/definitions/models.MapRecords"
-                                                        }
-                                                    }
-                                                }
-                                            ]
+                                            "$ref": "#/definitions/handlers.MapLeaderboardsResponse"
                                         }
                                     }
                                 }
@@ -414,7 +402,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/controllers.RecordResponse"
+                                            "$ref": "#/definitions/handlers.RecordResponse"
                                         }
                                     }
                                 }
@@ -466,7 +454,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/controllers.MapSummaryResponse"
+                                            "$ref": "#/definitions/handlers.MapSummaryResponse"
                                         }
                                     }
                                 }
@@ -510,7 +498,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/controllers.EditMapSummaryRequest"
+                            "$ref": "#/definitions/handlers.EditMapSummaryRequest"
                         }
                     }
                 ],
@@ -526,7 +514,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/controllers.EditMapSummaryRequest"
+                                            "$ref": "#/definitions/handlers.EditMapSummaryRequest"
                                         }
                                     }
                                 }
@@ -570,7 +558,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/controllers.CreateMapSummaryRequest"
+                            "$ref": "#/definitions/handlers.CreateMapSummaryRequest"
                         }
                     }
                 ],
@@ -586,7 +574,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/controllers.CreateMapSummaryRequest"
+                                            "$ref": "#/definitions/handlers.CreateMapSummaryRequest"
                                         }
                                     }
                                 }
@@ -630,7 +618,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/controllers.DeleteMapSummaryRequest"
+                            "$ref": "#/definitions/handlers.DeleteMapSummaryRequest"
                         }
                     }
                 ],
@@ -646,7 +634,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/controllers.DeleteMapSummaryRequest"
+                                            "$ref": "#/definitions/handlers.DeleteMapSummaryRequest"
                                         }
                                     }
                                 }
@@ -695,7 +683,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/controllers.ProfileResponse"
+                                            "$ref": "#/definitions/handlers.ProfileResponse"
                                         }
                                     }
                                 }
@@ -796,7 +784,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/controllers.ProfileResponse"
+                                            "$ref": "#/definitions/handlers.ProfileResponse"
                                         }
                                     }
                                 }
@@ -839,7 +827,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/controllers.RankingsResponse"
+                                            "$ref": "#/definitions/handlers.RankingsResponse"
                                         }
                                     }
                                 }
@@ -884,7 +872,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/controllers.SearchResponse"
+                                            "$ref": "#/definitions/handlers.SearchResponse"
                                         }
                                     }
                                 }
@@ -921,7 +909,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/controllers.LoginResponse"
+                                            "$ref": "#/definitions/handlers.LoginResponse"
                                         }
                                     }
                                 }
@@ -956,7 +944,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/controllers.LoginResponse"
+                                            "$ref": "#/definitions/handlers.LoginResponse"
                                         }
                                     }
                                 }
@@ -1005,7 +993,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/controllers.ProfileResponse"
+                                            "$ref": "#/definitions/handlers.ProfileResponse"
                                         }
                                     }
                                 }
@@ -1029,7 +1017,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "controllers.ChapterMapsResponse": {
+        "handlers.ChapterMapsResponse": {
             "type": "object",
             "properties": {
                 "chapter": {
@@ -1043,7 +1031,7 @@ const docTemplate = `{
                 }
             }
         },
-        "controllers.ChaptersResponse": {
+        "handlers.ChaptersResponse": {
             "type": "object",
             "properties": {
                 "chapters": {
@@ -1057,7 +1045,7 @@ const docTemplate = `{
                 }
             }
         },
-        "controllers.CreateMapSummaryRequest": {
+        "handlers.CreateMapSummaryRequest": {
             "type": "object",
             "required": [
                 "category_id",
@@ -1087,7 +1075,7 @@ const docTemplate = `{
                 }
             }
         },
-        "controllers.DeleteMapSummaryRequest": {
+        "handlers.DeleteMapSummaryRequest": {
             "type": "object",
             "required": [
                 "route_id"
@@ -1098,7 +1086,7 @@ const docTemplate = `{
                 }
             }
         },
-        "controllers.EditMapImageRequest": {
+        "handlers.EditMapImageRequest": {
             "type": "object",
             "required": [
                 "image"
@@ -1109,7 +1097,7 @@ const docTemplate = `{
                 }
             }
         },
-        "controllers.EditMapSummaryRequest": {
+        "handlers.EditMapSummaryRequest": {
             "type": "object",
             "required": [
                 "description",
@@ -1139,7 +1127,7 @@ const docTemplate = `{
                 }
             }
         },
-        "controllers.LoginResponse": {
+        "handlers.LoginResponse": {
             "type": "object",
             "properties": {
                 "token": {
@@ -1147,7 +1135,16 @@ const docTemplate = `{
                 }
             }
         },
-        "controllers.MapSummaryResponse": {
+        "handlers.MapLeaderboardsResponse": {
+            "type": "object",
+            "properties": {
+                "map": {
+                    "$ref": "#/definitions/models.Map"
+                },
+                "records": {}
+            }
+        },
+        "handlers.MapSummaryResponse": {
             "type": "object",
             "properties": {
                 "map": {
@@ -1158,21 +1155,21 @@ const docTemplate = `{
                 }
             }
         },
-        "controllers.ProfileRankings": {
+        "handlers.ProfileRankings": {
             "type": "object",
             "properties": {
                 "cooperative": {
-                    "$ref": "#/definitions/controllers.ProfileRankingsDetails"
+                    "$ref": "#/definitions/handlers.ProfileRankingsDetails"
                 },
                 "overall": {
-                    "$ref": "#/definitions/controllers.ProfileRankingsDetails"
+                    "$ref": "#/definitions/handlers.ProfileRankingsDetails"
                 },
                 "singleplayer": {
-                    "$ref": "#/definitions/controllers.ProfileRankingsDetails"
+                    "$ref": "#/definitions/handlers.ProfileRankingsDetails"
                 }
             }
         },
-        "controllers.ProfileRankingsDetails": {
+        "handlers.ProfileRankingsDetails": {
             "type": "object",
             "properties": {
                 "completion_count": {
@@ -1186,24 +1183,24 @@ const docTemplate = `{
                 }
             }
         },
-        "controllers.ProfileRecords": {
+        "handlers.ProfileRecords": {
             "type": "object",
             "properties": {
                 "portal2_cooperative": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/controllers.ProfileRecordsDetails"
+                        "$ref": "#/definitions/handlers.ProfileRecordsDetails"
                     }
                 },
                 "portal2_singleplayer": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/controllers.ProfileRecordsDetails"
+                        "$ref": "#/definitions/handlers.ProfileRecordsDetails"
                     }
                 }
             }
         },
-        "controllers.ProfileRecordsDetails": {
+        "handlers.ProfileRecordsDetails": {
             "type": "object",
             "properties": {
                 "map_id": {
@@ -1215,12 +1212,12 @@ const docTemplate = `{
                 "scores": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/controllers.ProfileScores"
+                        "$ref": "#/definitions/handlers.ProfileScores"
                     }
                 }
             }
         },
-        "controllers.ProfileResponse": {
+        "handlers.ProfileResponse": {
             "type": "object",
             "properties": {
                 "avatar_link": {
@@ -1236,10 +1233,10 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "rankings": {
-                    "$ref": "#/definitions/controllers.ProfileRankings"
+                    "$ref": "#/definitions/handlers.ProfileRankings"
                 },
                 "records": {
-                    "$ref": "#/definitions/controllers.ProfileRecords"
+                    "$ref": "#/definitions/handlers.ProfileRecords"
                 },
                 "steam_id": {
                     "type": "string"
@@ -1255,7 +1252,7 @@ const docTemplate = `{
                 }
             }
         },
-        "controllers.ProfileScores": {
+        "handlers.ProfileScores": {
             "type": "object",
             "properties": {
                 "date": {
@@ -1272,7 +1269,7 @@ const docTemplate = `{
                 }
             }
         },
-        "controllers.RankingsResponse": {
+        "handlers.RankingsResponse": {
             "type": "object",
             "properties": {
                 "rankings_mp": {
@@ -1289,7 +1286,7 @@ const docTemplate = `{
                 }
             }
         },
-        "controllers.RecordResponse": {
+        "handlers.RecordResponse": {
             "type": "object",
             "properties": {
                 "score_count": {
@@ -1300,7 +1297,7 @@ const docTemplate = `{
                 }
             }
         },
-        "controllers.SearchResponse": {
+        "handlers.SearchResponse": {
             "type": "object",
             "properties": {
                 "maps": {
@@ -1405,12 +1402,6 @@ const docTemplate = `{
                 "score_count": {
                     "type": "integer"
                 }
-            }
-        },
-        "models.MapRecords": {
-            "type": "object",
-            "properties": {
-                "records": {}
             }
         },
         "models.MapRoute": {
