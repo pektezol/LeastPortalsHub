@@ -15,7 +15,7 @@ INSERT INTO maps(game_id, chapter_id, name, description, showcase, is_disabled) 
 (1,2,'Laser Stairs','','',false),
 (1,2,'Dual Lasers','','',false),
 (1,2,'Laser Over Goo','','',false),
-(1,2,'Catapult Intro','','',true),
+(1,2,'Catapult Intro','','',false),
 (1,2,'Trust Fling','','',false),
 (1,2,'Pit Flings','','',false),
 (1,2,'Fizzler Intro','','',false),
@@ -71,7 +71,7 @@ INSERT INTO maps(game_id, chapter_id, name, description, showcase, is_disabled) 
 (1,9,'Finale 4','','',false),
 -- Portal 2 Cooperative
 -- 0
-(2,10,'Calibration','','',false),
+(2,10,'Calibration','','',true),
 (2,10,'Hub','','',true),
 -- 1
 (2,11,'Doors','','',false),
