@@ -139,12 +139,12 @@ func FetchMapLeaderboards(c *gin.Context) {
 		return
 	}
 	response.Map.ID = intID
-	sql := `SELECT g.name, c.name, m.name, is_disabled, m.image
+	sql := `SELECT g.name, c.name, m.name, is_disabled, m.image, g.is_coop
 	FROM maps m
 	INNER JOIN games g ON m.game_id = g.id
 	INNER JOIN chapters c ON m.chapter_id = c.id
 	WHERE m.id = $1`
-	err = database.DB.QueryRow(sql, id).Scan(&response.Map.GameName, &response.Map.ChapterName, &response.Map.MapName, &isDisabled, &response.Map.Image)
+	err = database.DB.QueryRow(sql, id).Scan(&response.Map.GameName, &response.Map.ChapterName, &response.Map.MapName, &isDisabled, &response.Map.Image, &response.Map.IsCoop)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
