@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 	"os"
 	"regexp"
@@ -12,15 +13,15 @@ import (
 )
 
 type ProfileResponse struct {
-	Profile     bool            `json:"profile"`
-	SteamID     string          `json:"steam_id"`
-	UserName    string          `json:"user_name"`
-	AvatarLink  string          `json:"avatar_link"`
-	CountryCode string          `json:"country_code"`
-	Titles      []models.Title  `json:"titles"`
-	Links       models.Links    `json:"links"`
-	Rankings    ProfileRankings `json:"rankings"`
-	Records     ProfileRecords  `json:"records"`
+	Profile     bool             `json:"profile"`
+	SteamID     string           `json:"steam_id"`
+	UserName    string           `json:"user_name"`
+	AvatarLink  string           `json:"avatar_link"`
+	CountryCode string           `json:"country_code"`
+	Titles      []models.Title   `json:"titles"`
+	Links       models.Links     `json:"links"`
+	Rankings    ProfileRankings  `json:"rankings"`
+	Records     []ProfileRecords `json:"records"`
 }
 
 type ProfileRankings struct {
@@ -34,16 +35,13 @@ type ProfileRankingsDetails struct {
 	CompletionCount int `json:"completion_count"`
 	CompletionTotal int `json:"completion_total"`
 }
-
 type ProfileRecords struct {
-	P2Singleplayer []ProfileRecordsDetails `json:"portal2_singleplayer"`
-	P2Cooperative  []ProfileRecordsDetails `json:"portal2_cooperative"`
-}
-
-type ProfileRecordsDetails struct {
-	MapID   int             `json:"map_id"`
-	MapName string          `json:"map_name"`
-	Scores  []ProfileScores `json:"scores"`
+	GameID     int             `json:"game_id"`
+	CategoryID int             `json:"category_id"`
+	MapID      int             `json:"map_id"`
+	MapName    string          `json:"map_name"`
+	MapWRCount int             `json:"map_wr_count"`
+	Scores     []ProfileScores `json:"scores"`
 }
 
 type ProfileScores struct {
@@ -85,42 +83,42 @@ func Profile(c *gin.Context) {
 		return
 	}
 	// TODO: Get rankings (all maps done in one game)
-	records := ProfileRecords{
-		P2Singleplayer: []ProfileRecordsDetails{},
-		P2Cooperative:  []ProfileRecordsDetails{},
-	}
+	records := []ProfileRecords{}
 	// Get singleplayer records
-	sql = `SELECT m.game_id, sp.map_id, m."name", sp.score_count, sp.score_time, sp.demo_id, sp.record_date
+	sql = `SELECT m.game_id, m.chapter_id, sp.map_id, m."name", (SELECT mr.score_count FROM map_routes mr WHERE mr.map_id = sp.map_id ORDER BY mr.score_count ASC LIMIT 1) AS wr_count, sp.score_count, sp.score_time, sp.demo_id, sp.record_date
 	FROM records_sp sp INNER JOIN maps m ON sp.map_id = m.id WHERE sp.user_id = $1 ORDER BY sp.map_id, sp.score_count, sp.score_time;`
 	rows, err := database.DB.Query(sql, user.(models.User).SteamID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
+	log.Println("rows:", rows)
 	for rows.Next() {
+		var gameID int
+		var categoryID int
 		var mapID int
 		var mapName string
-		var gameID int
+		var mapWR int
 		score := ProfileScores{}
-		rows.Scan(&gameID, &mapID, &mapName, &score.ScoreCount, &score.ScoreTime, &score.DemoID, &score.Date)
-		if gameID != 1 {
-			continue
-		}
+		rows.Scan(&gameID, &categoryID, &mapID, &mapName, &mapWR, &score.ScoreCount, &score.ScoreTime, &score.DemoID, &score.Date)
 		// More than one record in one map
-		if len(records.P2Singleplayer) != 0 && mapID == records.P2Singleplayer[len(records.P2Singleplayer)-1].MapID {
-			records.P2Singleplayer[len(records.P2Singleplayer)-1].Scores = append(records.P2Singleplayer[len(records.P2Singleplayer)-1].Scores, score)
+		if len(records) != 0 && mapID == records[len(records)-1].MapID {
+			records[len(records)-1].Scores = append(records[len(records)-1].Scores, score)
 			continue
 		}
 		// New map
-		records.P2Singleplayer = append(records.P2Singleplayer, ProfileRecordsDetails{
-			MapID:   mapID,
-			MapName: mapName,
-			Scores:  []ProfileScores{},
+		records = append(records, ProfileRecords{
+			GameID:     gameID,
+			CategoryID: categoryID,
+			MapID:      mapID,
+			MapName:    mapName,
+			MapWRCount: mapWR,
+			Scores:     []ProfileScores{},
 		})
-		records.P2Singleplayer[len(records.P2Singleplayer)-1].Scores = append(records.P2Singleplayer[len(records.P2Singleplayer)-1].Scores, score)
+		records[len(records)-1].Scores = append(records[len(records)-1].Scores, score)
 	}
 	// Get multiplayer records
-	sql = `SELECT m.game_id, mp.map_id, m."name", mp.score_count, mp.score_time, CASE WHEN host_id = $1 THEN mp.host_demo_id WHEN partner_id = $1 THEN mp.partner_demo_id END demo_id, mp.record_date
+	sql = `SELECT m.game_id, m.chapter_id, mp.map_id, m."name", (SELECT mr.score_count FROM map_routes mr WHERE mr.map_id = mp.map_id ORDER BY mr.score_count ASC LIMIT 1) AS wr_count,  mp.score_count, mp.score_time, CASE WHEN host_id = $1 THEN mp.host_demo_id WHEN partner_id = $1 THEN mp.partner_demo_id END demo_id, mp.record_date
 	FROM records_mp mp INNER JOIN maps m ON mp.map_id = m.id WHERE mp.host_id = $1 OR mp.partner_id = $1 ORDER BY mp.map_id, mp.score_count, mp.score_time;`
 	rows, err = database.DB.Query(sql, user.(models.User).SteamID)
 	if err != nil {
@@ -128,26 +126,28 @@ func Profile(c *gin.Context) {
 		return
 	}
 	for rows.Next() {
+		var gameID int
+		var categoryID int
 		var mapID int
 		var mapName string
-		var gameID int
+		var mapWR int
 		score := ProfileScores{}
-		rows.Scan(&gameID, &mapID, &mapName, &score.ScoreCount, &score.ScoreTime, &score.DemoID, &score.Date)
-		if gameID != 1 {
-			continue
-		}
+		rows.Scan(&gameID, &categoryID, &mapID, &mapName, &mapWR, &score.ScoreCount, &score.ScoreTime, &score.DemoID, &score.Date)
 		// More than one record in one map
-		if len(records.P2Cooperative) != 0 && mapID == records.P2Cooperative[len(records.P2Cooperative)-1].MapID {
-			records.P2Cooperative[len(records.P2Cooperative)-1].Scores = append(records.P2Cooperative[len(records.P2Cooperative)-1].Scores, score)
+		if len(records) != 0 && mapID == records[len(records)-1].MapID {
+			records[len(records)-1].Scores = append(records[len(records)-1].Scores, score)
 			continue
 		}
 		// New map
-		records.P2Cooperative = append(records.P2Cooperative, ProfileRecordsDetails{
-			MapID:   mapID,
-			MapName: mapName,
-			Scores:  []ProfileScores{},
+		records = append(records, ProfileRecords{
+			GameID:     gameID,
+			CategoryID: categoryID,
+			MapID:      mapID,
+			MapName:    mapName,
+			MapWRCount: mapWR,
+			Scores:     []ProfileScores{},
 		})
-		records.P2Cooperative[len(records.P2Cooperative)-1].Scores = append(records.P2Cooperative[len(records.P2Cooperative)-1].Scores, score)
+		records[len(records)-1].Scores = append(records[len(records)-1].Scores, score)
 	}
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
@@ -216,42 +216,42 @@ func FetchUser(c *gin.Context) {
 		user.Titles = append(user.Titles, title)
 	}
 	// TODO: Get rankings (all maps done in one game)
-	records := ProfileRecords{
-		P2Singleplayer: []ProfileRecordsDetails{},
-		P2Cooperative:  []ProfileRecordsDetails{},
-	}
+	records := []ProfileRecords{}
 	// Get singleplayer records
-	sql = `SELECT m.game_id, sp.map_id, m."name", sp.score_count, sp.score_time, sp.demo_id, sp.record_date
+	sql = `SELECT m.game_id, m.chapter_id, sp.map_id, m."name", (SELECT mr.score_count FROM map_routes mr WHERE mr.map_id = sp.map_id ORDER BY mr.score_count ASC LIMIT 1) AS wr_count, sp.score_count, sp.score_time, sp.demo_id, sp.record_date
 	FROM records_sp sp INNER JOIN maps m ON sp.map_id = m.id WHERE sp.user_id = $1 ORDER BY sp.map_id, sp.score_count, sp.score_time;`
 	rows, err = database.DB.Query(sql, user.SteamID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
+	log.Println("rows:", rows)
 	for rows.Next() {
+		var gameID int
+		var categoryID int
 		var mapID int
 		var mapName string
-		var gameID int
+		var mapWR int
 		score := ProfileScores{}
-		rows.Scan(&gameID, &mapID, &mapName, &score.ScoreCount, &score.ScoreTime, &score.DemoID, &score.Date)
-		if gameID != 1 {
-			continue
-		}
+		rows.Scan(&gameID, &categoryID, &mapID, &mapName, &mapWR, &score.ScoreCount, &score.ScoreTime, &score.DemoID, &score.Date)
 		// More than one record in one map
-		if len(records.P2Singleplayer) != 0 && mapID == records.P2Singleplayer[len(records.P2Singleplayer)-1].MapID {
-			records.P2Singleplayer[len(records.P2Singleplayer)-1].Scores = append(records.P2Singleplayer[len(records.P2Singleplayer)-1].Scores, score)
+		if len(records) != 0 && mapID == records[len(records)-1].MapID {
+			records[len(records)-1].Scores = append(records[len(records)-1].Scores, score)
 			continue
 		}
 		// New map
-		records.P2Singleplayer = append(records.P2Singleplayer, ProfileRecordsDetails{
-			MapID:   mapID,
-			MapName: mapName,
-			Scores:  []ProfileScores{},
+		records = append(records, ProfileRecords{
+			GameID:     gameID,
+			CategoryID: categoryID,
+			MapID:      mapID,
+			MapName:    mapName,
+			MapWRCount: mapWR,
+			Scores:     []ProfileScores{},
 		})
-		records.P2Singleplayer[len(records.P2Singleplayer)-1].Scores = append(records.P2Singleplayer[len(records.P2Singleplayer)-1].Scores, score)
+		records[len(records)-1].Scores = append(records[len(records)-1].Scores, score)
 	}
 	// Get multiplayer records
-	sql = `SELECT m.game_id, mp.map_id, m."name", mp.score_count, mp.score_time, CASE WHEN host_id = $1 THEN mp.host_demo_id WHEN partner_id = $1 THEN mp.partner_demo_id END demo_id, mp.record_date
+	sql = `SELECT m.game_id, m.chapter_id, mp.map_id, m."name", (SELECT mr.score_count FROM map_routes mr WHERE mr.map_id = mp.map_id ORDER BY mr.score_count ASC LIMIT 1) AS wr_count,  mp.score_count, mp.score_time, CASE WHEN host_id = $1 THEN mp.host_demo_id WHEN partner_id = $1 THEN mp.partner_demo_id END demo_id, mp.record_date
 	FROM records_mp mp INNER JOIN maps m ON mp.map_id = m.id WHERE mp.host_id = $1 OR mp.partner_id = $1 ORDER BY mp.map_id, mp.score_count, mp.score_time;`
 	rows, err = database.DB.Query(sql, user.SteamID)
 	if err != nil {
@@ -259,26 +259,28 @@ func FetchUser(c *gin.Context) {
 		return
 	}
 	for rows.Next() {
+		var gameID int
+		var categoryID int
 		var mapID int
 		var mapName string
-		var gameID int
+		var mapWR int
 		score := ProfileScores{}
-		rows.Scan(&gameID, &mapID, &mapName, &score.ScoreCount, &score.ScoreTime, &score.DemoID, &score.Date)
-		if gameID != 1 {
-			continue
-		}
+		rows.Scan(&gameID, &categoryID, &mapID, &mapName, &mapWR, &score.ScoreCount, &score.ScoreTime, &score.DemoID, &score.Date)
 		// More than one record in one map
-		if len(records.P2Cooperative) != 0 && mapID == records.P2Cooperative[len(records.P2Cooperative)-1].MapID {
-			records.P2Cooperative[len(records.P2Cooperative)-1].Scores = append(records.P2Cooperative[len(records.P2Cooperative)-1].Scores, score)
+		if len(records) != 0 && mapID == records[len(records)-1].MapID {
+			records[len(records)-1].Scores = append(records[len(records)-1].Scores, score)
 			continue
 		}
 		// New map
-		records.P2Cooperative = append(records.P2Cooperative, ProfileRecordsDetails{
-			MapID:   mapID,
-			MapName: mapName,
-			Scores:  []ProfileScores{},
+		records = append(records, ProfileRecords{
+			GameID:     gameID,
+			CategoryID: categoryID,
+			MapID:      mapID,
+			MapName:    mapName,
+			MapWRCount: mapWR,
+			Scores:     []ProfileScores{},
 		})
-		records.P2Cooperative[len(records.P2Cooperative)-1].Scores = append(records.P2Cooperative[len(records.P2Cooperative)-1].Scores, score)
+		records[len(records)-1].Scores = append(records[len(records)-1].Scores, score)
 	}
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
