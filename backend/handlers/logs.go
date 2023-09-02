@@ -40,6 +40,7 @@ type ScoreLogsResponse struct {
 }
 
 type ScoreLogsResponseDetails struct {
+	Game       models.Game      `json:"game"`
 	User       models.UserShort `json:"user"`
 	Map        models.MapShort  `json:"map"`
 	ScoreCount int              `json:"score_count"`
@@ -87,7 +88,10 @@ func ModLogs(c *gin.Context) {
 
 func ScoreLogs(c *gin.Context) {
 	response := ScoreLogsResponse{Logs: []ScoreLogsResponseDetails{}}
-	sql := `SELECT rs.map_id,
+	sql := `SELECT g.id,
+		g."name",
+		g.is_coop,
+		rs.map_id,
 		m.name AS map_name,
 		u.steam_id,
 		u.user_name,
@@ -97,20 +101,21 @@ func ScoreLogs(c *gin.Context) {
 		rs.record_date
 	FROM (
 		SELECT id, map_id, user_id, score_count, score_time, demo_id, record_date
-		FROM public.records_sp
+		FROM records_sp
 
 		UNION ALL
 
 		SELECT id, map_id, host_id AS user_id, score_count, score_time, host_demo_id AS demo_id, record_date
-		FROM public.records_mp
+		FROM records_mp
 
 		UNION ALL
 
 		SELECT id, map_id, partner_id AS user_id, score_count, score_time, partner_demo_id AS demo_id, record_date
-		FROM public.records_mp
+		FROM records_mp
 	) AS rs
-	JOIN public.users AS u ON rs.user_id = u.steam_id
-	JOIN public.maps AS m ON rs.map_id = m.id
+	JOIN users u ON rs.user_id = u.steam_id
+	JOIN maps m ON rs.map_id = m.id
+	JOIN games g ON m.game_id = g.id 
 	ORDER BY rs.record_date DESC LIMIT 100;`
 	rows, err := database.DB.Query(sql)
 	if err != nil {
@@ -119,7 +124,7 @@ func ScoreLogs(c *gin.Context) {
 	}
 	for rows.Next() {
 		score := ScoreLogsResponseDetails{}
-		err = rows.Scan(&score.Map.ID, &score.Map.Name, &score.User.SteamID, &score.User.UserName, &score.ScoreCount, &score.ScoreTime, &score.DemoID, &score.Date)
+		err = rows.Scan(&score.Game.ID, &score.Game.Name, &score.Game.IsCoop, &score.Map.ID, &score.Map.Name, &score.User.SteamID, &score.User.UserName, &score.ScoreCount, &score.ScoreTime, &score.DemoID, &score.Date)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
