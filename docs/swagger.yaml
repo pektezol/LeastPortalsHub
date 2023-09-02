@@ -498,7 +498,7 @@ paths:
           schema:
             $ref: '#/definitions/models.Response'
       tags:
-      - rankings
+      - logs
   /logs/score:
     get:
       description: Get score logs of every player.
@@ -519,7 +519,7 @@ paths:
           schema:
             $ref: '#/definitions/models.Response'
       tags:
-      - rankings
+      - logs
   /maps/{id}/image:
     put:
       description: Edit map image with specified map id.
