@@ -52,7 +52,7 @@ type ScoreLogsResponseDetails struct {
 // GET Mod Logs
 //
 //	@Description	Get mod logs.
-//	@Tags			rankings
+//	@Tags			logs
 //	@Produce		json
 //	@Param			Authorization	header		string	true	"JWT Token"
 //	@Success		200				{object}	models.Response{data=ScoreLogsResponse}
@@ -98,7 +98,7 @@ func ModLogs(c *gin.Context) {
 // GET Score Logs
 //
 //	@Description	Get score logs of every player.
-//	@Tags			rankings
+//	@Tags			logs
 //	@Produce		json
 //	@Success		200	{object}	models.Response{data=ScoreLogsResponse}
 //	@Failure		400	{object}	models.Response

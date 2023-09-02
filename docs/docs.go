@@ -236,7 +236,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "rankings"
+                    "logs"
                 ],
                 "parameters": [
                     {
@@ -282,7 +282,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "rankings"
+                    "logs"
                 ],
                 "responses": {
                     "200": {

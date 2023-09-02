@@ -229,7 +229,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "rankings"
+                    "logs"
                 ],
                 "parameters": [
                     {
@@ -275,7 +275,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "rankings"
+                    "logs"
                 ],
                 "responses": {
                     "200": {
