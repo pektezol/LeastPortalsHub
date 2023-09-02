@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
 	"os"
 	"regexp"
@@ -92,7 +91,6 @@ func Profile(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	log.Println("rows:", rows)
 	for rows.Next() {
 		var gameID int
 		var categoryID int
@@ -225,7 +223,6 @@ func FetchUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	log.Println("rows:", rows)
 	for rows.Next() {
 		var gameID int
 		var categoryID int
