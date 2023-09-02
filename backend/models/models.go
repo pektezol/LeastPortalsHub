@@ -33,6 +33,12 @@ type UserShort struct {
 	UserName string `json:"user_name"`
 }
 
+type UserShortWithAvatar struct {
+	SteamID    string `json:"steam_id"`
+	UserName   string `json:"user_name"`
+	AvatarLink string `json:"avatar_link"`
+}
+
 type Map struct {
 	ID          int    `json:"id"`
 	GameName    string `json:"game_name"`
@@ -71,9 +77,8 @@ type MapRecords struct {
 }
 
 type UserRanking struct {
-	UserID     string `json:"user_id"`
-	UserName   string `json:"user_name"`
-	TotalScore int    `json:"total_score"`
+	User       UserShort `json:"user"`
+	TotalScore int       `json:"total_score"`
 }
 
 type Game struct {

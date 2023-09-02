@@ -68,7 +68,7 @@ func Rankings(c *gin.Context) {
 		ranking := models.UserRanking{}
 		var currentCount int
 		var totalCount int
-		err = rows.Scan(&ranking.UserID, &ranking.UserName, &currentCount, &totalCount, &ranking.TotalScore)
+		err = rows.Scan(&ranking.User.SteamID, &ranking.User.UserName, &currentCount, &totalCount, &ranking.TotalScore)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
@@ -100,7 +100,7 @@ func Rankings(c *gin.Context) {
 		ranking := models.UserRanking{}
 		var currentCount int
 		var totalCount int
-		err = rows.Scan(&ranking.UserID, &ranking.UserName, &currentCount, &totalCount, &ranking.TotalScore)
+		err = rows.Scan(&ranking.User.SteamID, &ranking.User.UserName, &currentCount, &totalCount, &ranking.TotalScore)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
@@ -113,11 +113,10 @@ func Rankings(c *gin.Context) {
 	// Has both so they are qualified for overall ranking
 	for _, spRanking := range response.Singleplayer {
 		for _, mpRanking := range response.Multiplayer {
-			if spRanking.UserID == mpRanking.UserID {
+			if spRanking.User.SteamID == mpRanking.User.SteamID {
 				totalScore := spRanking.TotalScore + mpRanking.TotalScore
 				overallRanking := models.UserRanking{
-					UserID:     spRanking.UserID,
-					UserName:   spRanking.UserName,
+					User:       spRanking.User,
 					TotalScore: totalScore,
 				}
 				response.Overall = append(response.Overall, overallRanking)
