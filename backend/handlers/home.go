@@ -22,17 +22,6 @@ type RankingsResponse struct {
 	Multiplayer  []models.UserRanking `json:"rankings_multiplayer"`
 }
 
-func Home(c *gin.Context) {
-	user, exists := c.Get("user")
-	if !exists {
-		c.JSON(200, "no id, not auth")
-	} else {
-		c.JSON(200, gin.H{
-			"output": user,
-		})
-	}
-}
-
 // GET Rankings
 //
 //	@Description	Get rankings of every player.
