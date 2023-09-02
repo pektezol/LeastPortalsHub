@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/pektezol/leastportalshub/backend/database"
@@ -11,7 +12,6 @@ import (
 
 const (
 	LogTypeMod   string = "Mod"
-	LogTypeScore string = "Score"
 	LogTypeLogin string = "Login"
 
 	LogDescriptionLoginSuccess      string = "Success"
@@ -33,6 +33,19 @@ type LogsResponse struct {
 type LogsResponseDetails struct {
 	User models.UserShort `json:"user"`
 	Log  string           `json:"detail"`
+}
+
+type ScoreLogsResponse struct {
+	Logs []ScoreLogsResponseDetails `json:"scores"`
+}
+
+type ScoreLogsResponseDetails struct {
+	User       models.UserShort `json:"user"`
+	Map        models.MapShort  `json:"map"`
+	ScoreCount int              `json:"score_count"`
+	ScoreTime  int              `json:"score_time"`
+	DemoID     string           `json:"demo_id"`
+	Date       time.Time        `json:"date"`
 }
 
 func ModLogs(c *gin.Context) {
@@ -73,29 +86,45 @@ func ModLogs(c *gin.Context) {
 }
 
 func ScoreLogs(c *gin.Context) {
-	response := LogsResponse{Logs: []LogsResponseDetails{}}
-	sql := `SELECT u.user_name, l.user_id, l.type, l.description 
-	FROM logs l INNER JOIN users u ON l.user_id = u.steam_id WHERE type = 'Score'`
+	response := ScoreLogsResponse{Logs: []ScoreLogsResponseDetails{}}
+	sql := `SELECT rs.map_id,
+		m.name AS map_name,
+		u.steam_id,
+		u.user_name,
+		rs.score_count,
+		rs.score_time,
+		rs.demo_id,
+		rs.record_date
+	FROM (
+		SELECT id, map_id, user_id, score_count, score_time, demo_id, record_date
+		FROM public.records_sp
+
+		UNION ALL
+
+		SELECT id, map_id, host_id AS user_id, score_count, score_time, host_demo_id AS demo_id, record_date
+		FROM public.records_mp
+
+		UNION ALL
+
+		SELECT id, map_id, partner_id AS user_id, score_count, score_time, partner_demo_id AS demo_id, record_date
+		FROM public.records_mp
+	) AS rs
+	JOIN public.users AS u ON rs.user_id = u.steam_id
+	JOIN public.maps AS m ON rs.map_id = m.id
+	ORDER BY rs.record_date DESC LIMIT 100;`
 	rows, err := database.DB.Query(sql)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
 	for rows.Next() {
-		log := Log{}
-		err = rows.Scan(&log.User.UserName, &log.User.SteamID, &log.Type, &log.Description)
+		score := ScoreLogsResponseDetails{}
+		err = rows.Scan(&score.Map.ID, &score.Map.Name, &score.User.SteamID, &score.User.UserName, &score.ScoreCount, &score.ScoreTime, &score.DemoID, &score.Date)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
-		detail := fmt.Sprintf("%s.%s", log.Type, log.Description)
-		response.Logs = append(response.Logs, LogsResponseDetails{
-			User: models.UserShort{
-				SteamID:  log.User.SteamID,
-				UserName: log.User.UserName,
-			},
-			Log: detail,
-		})
+		response.Logs = append(response.Logs, score)
 	}
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
