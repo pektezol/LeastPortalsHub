@@ -106,7 +106,7 @@ func ScoreLogs(c *gin.Context) {
 
 func CreateLog(user_id string, log_type string, log_description string) (err error) {
 	sql := `INSERT INTO logs (user_id, "type", description) VALUES($1, $2, $3)`
-	_, err = database.DB.Exec(sql)
+	_, err = database.DB.Exec(sql, user_id, log_type, log_description)
 	if err != nil {
 		return err
 	}
