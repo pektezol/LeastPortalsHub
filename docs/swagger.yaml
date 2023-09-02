@@ -165,11 +165,15 @@ definitions:
     type: object
   handlers.RankingsResponse:
     properties:
-      rankings_mp:
+      rankings_multiplayer:
         items:
           $ref: '#/definitions/models.UserRanking'
         type: array
-      rankings_sp:
+      rankings_overall:
+        items:
+          $ref: '#/definitions/models.UserRanking'
+        type: array
+      rankings_singleplayer:
         items:
           $ref: '#/definitions/models.UserRanking'
         type: array
@@ -180,6 +184,30 @@ definitions:
         type: integer
       score_time:
         type: integer
+    type: object
+  handlers.ScoreLogsResponse:
+    properties:
+      scores:
+        items:
+          $ref: '#/definitions/handlers.ScoreLogsResponseDetails'
+        type: array
+    type: object
+  handlers.ScoreLogsResponseDetails:
+    properties:
+      date:
+        type: string
+      demo_id:
+        type: string
+      game:
+        $ref: '#/definitions/models.Game'
+      map:
+        $ref: '#/definitions/models.MapShort'
+      score_count:
+        type: integer
+      score_time:
+        type: integer
+      user:
+        $ref: '#/definitions/models.UserShort'
     type: object
   handlers.SearchResponse:
     properties:
@@ -444,6 +472,54 @@ paths:
             $ref: '#/definitions/models.Response'
       tags:
       - login
+  /logs/mod:
+    get:
+      description: Get mod logs.
+      parameters:
+      - description: JWT Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.ScoreLogsResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+      tags:
+      - rankings
+  /logs/score:
+    get:
+      description: Get score logs of every player.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.ScoreLogsResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+      tags:
+      - rankings
   /maps/{id}/image:
     put:
       description: Edit map image with specified map id.
