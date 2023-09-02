@@ -49,6 +49,15 @@ type ScoreLogsResponseDetails struct {
 	Date       time.Time        `json:"date"`
 }
 
+// GET Mod Logs
+//
+//	@Description	Get mod logs.
+//	@Tags			rankings
+//	@Produce		json
+//	@Param			Authorization	header		string	true	"JWT Token"
+//	@Success		200				{object}	models.Response{data=ScoreLogsResponse}
+//	@Failure		400				{object}	models.Response
+//	@Router			/logs/mod [get]
 func ModLogs(c *gin.Context) {
 	mod, exists := c.Get("mod")
 	if !exists || !mod.(bool) {
@@ -86,6 +95,14 @@ func ModLogs(c *gin.Context) {
 	})
 }
 
+// GET Score Logs
+//
+//	@Description	Get score logs of every player.
+//	@Tags			rankings
+//	@Produce		json
+//	@Success		200	{object}	models.Response{data=ScoreLogsResponse}
+//	@Failure		400	{object}	models.Response
+//	@Router			/logs/score [get]
 func ScoreLogs(c *gin.Context) {
 	response := ScoreLogsResponse{Logs: []ScoreLogsResponseDetails{}}
 	sql := `SELECT g.id,

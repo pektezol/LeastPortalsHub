@@ -229,6 +229,89 @@ const docTemplate = `{
                 }
             }
         },
+        "/logs/mod": {
+            "get": {
+                "description": "Get mod logs.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rankings"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "JWT Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/handlers.ScoreLogsResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/logs/score": {
+            "get": {
+                "description": "Get score logs of every player.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rankings"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/handlers.ScoreLogsResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/maps/{id}/image": {
             "put": {
                 "description": "Edit map image with specified map id.",
@@ -1267,13 +1350,19 @@ const docTemplate = `{
         "handlers.RankingsResponse": {
             "type": "object",
             "properties": {
-                "rankings_mp": {
+                "rankings_multiplayer": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/models.UserRanking"
                     }
                 },
-                "rankings_sp": {
+                "rankings_overall": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.UserRanking"
+                    }
+                },
+                "rankings_singleplayer": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/models.UserRanking"
@@ -1289,6 +1378,43 @@ const docTemplate = `{
                 },
                 "score_time": {
                     "type": "integer"
+                }
+            }
+        },
+        "handlers.ScoreLogsResponse": {
+            "type": "object",
+            "properties": {
+                "scores": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handlers.ScoreLogsResponseDetails"
+                    }
+                }
+            }
+        },
+        "handlers.ScoreLogsResponseDetails": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "demo_id": {
+                    "type": "string"
+                },
+                "game": {
+                    "$ref": "#/definitions/models.Game"
+                },
+                "map": {
+                    "$ref": "#/definitions/models.MapShort"
+                },
+                "score_count": {
+                    "type": "integer"
+                },
+                "score_time": {
+                    "type": "integer"
+                },
+                "user": {
+                    "$ref": "#/definitions/models.UserShort"
                 }
             }
         },
