@@ -18,6 +18,11 @@ const (
 	LogDescriptionLoginFailToken    string = "TokenFail"
 	LogDescriptionLoginFailValidate string = "ValidateFail"
 	LogDescriptionLoginFailSummary  string = "SummaryFail"
+
+	LogDescriptionMapSummaryCreate    string = "MapSummaryCreate"
+	LogDescriptionMapSummaryEdit      string = "MapSummaryEdit"
+	LogDescriptionMapSummaryEditImage string = "MapSummaryEditImage"
+	LogDescriptionMapSummaryDelete    string = "MapSummaryDelete"
 )
 
 type Log struct {

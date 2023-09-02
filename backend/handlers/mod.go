@@ -15,7 +15,7 @@ type CreateMapSummaryRequest struct {
 	Description string    `json:"description" binding:"required"`
 	Showcase    string    `json:"showcase"`
 	UserName    string    `json:"user_name" binding:"required"`
-	ScoreCount  *int      `json:"score_count" binding:"required"`
+	ScoreCount  int       `json:"score_count" binding:"required"`
 	RecordDate  time.Time `json:"record_date" binding:"required"`
 }
 
@@ -24,7 +24,7 @@ type EditMapSummaryRequest struct {
 	Description string    `json:"description" binding:"required"`
 	Showcase    string    `json:"showcase"`
 	UserName    string    `json:"user_name" binding:"required"`
-	ScoreCount  *int      `json:"score_count" binding:"required"`
+	ScoreCount  int       `json:"score_count" binding:"required"`
 	RecordDate  time.Time `json:"record_date" binding:"required"`
 }
 
@@ -49,7 +49,7 @@ type EditMapImageRequest struct {
 //	@Router			/maps/{id}/summary [post]
 func CreateMapSummary(c *gin.Context) {
 	// Check if user exists
-	_, exists := c.Get("user")
+	user, exists := c.Get("user")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, models.ErrorResponse("User not logged in."))
 		return
@@ -109,7 +109,7 @@ func CreateMapSummary(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))
 		return
 	}
-	// Return response
+	CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryCreate)
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully created map summary.",
@@ -130,7 +130,7 @@ func CreateMapSummary(c *gin.Context) {
 //	@Router			/maps/{id}/summary [put]
 func EditMapSummary(c *gin.Context) {
 	// Check if user exists
-	_, exists := c.Get("user")
+	user, exists := c.Get("user")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, models.ErrorResponse("User not logged in."))
 		return
@@ -190,7 +190,7 @@ func EditMapSummary(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))
 		return
 	}
-	// Return response
+	CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryEdit)
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully updated map summary.",
@@ -211,7 +211,7 @@ func EditMapSummary(c *gin.Context) {
 //	@Router			/maps/{id}/summary [delete]
 func DeleteMapSummary(c *gin.Context) {
 	// Check if user exists
-	_, exists := c.Get("user")
+	user, exists := c.Get("user")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, models.ErrorResponse("User not logged in."))
 		return
@@ -275,7 +275,7 @@ func DeleteMapSummary(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))
 		return
 	}
-	// Return response
+	CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryDelete)
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully delete map summary.",
@@ -296,7 +296,7 @@ func DeleteMapSummary(c *gin.Context) {
 //	@Router			/maps/{id}/image [put]
 func EditMapImage(c *gin.Context) {
 	// Check if user exists
-	_, exists := c.Get("user")
+	user, exists := c.Get("user")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, models.ErrorResponse("User not logged in."))
 		return
@@ -325,7 +325,7 @@ func EditMapImage(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	// Return response
+	CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryEditImage)
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully updated map image.",
