@@ -1599,11 +1599,8 @@ const docTemplate = `{
                 "total_score": {
                     "type": "integer"
                 },
-                "user_id": {
-                    "type": "string"
-                },
-                "user_name": {
-                    "type": "string"
+                "user": {
+                    "$ref": "#/definitions/models.UserShort"
                 }
             }
         },
