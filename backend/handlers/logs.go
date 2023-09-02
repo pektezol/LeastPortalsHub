@@ -51,7 +51,7 @@ func ModLogs(c *gin.Context) {
 	}
 	for rows.Next() {
 		log := Log{}
-		err = rows.Scan(log.User.UserName, log.User.SteamID, log.Type, log.Description)
+		err = rows.Scan(&log.User.UserName, &log.User.SteamID, &log.Type, &log.Description)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
@@ -83,7 +83,7 @@ func ScoreLogs(c *gin.Context) {
 	}
 	for rows.Next() {
 		log := Log{}
-		err = rows.Scan(log.User.UserName, log.User.SteamID, log.Type, log.Description)
+		err = rows.Scan(&log.User.UserName, &log.User.SteamID, &log.Type, &log.Description)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
