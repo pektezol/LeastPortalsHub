@@ -31,31 +31,25 @@ type ChapterMapsResponse struct {
 }
 
 type RecordSingleplayer struct {
-	Placement  int       `json:"placement"`
-	RecordID   int       `json:"record_id"`
-	ScoreCount int       `json:"score_count"`
-	ScoreTime  int       `json:"score_time"`
-	UserID     string    `json:"user_id"`
-	UserName   string    `json:"user_name"`
-	UserAvatar string    `json:"user_avatar"`
-	DemoID     string    `json:"demo_id"`
-	RecordDate time.Time `json:"record_date"`
+	Placement  int                        `json:"placement"`
+	RecordID   int                        `json:"record_id"`
+	ScoreCount int                        `json:"score_count"`
+	ScoreTime  int                        `json:"score_time"`
+	User       models.UserShortWithAvatar `json:"user"`
+	DemoID     string                     `json:"demo_id"`
+	RecordDate time.Time                  `json:"record_date"`
 }
 
 type RecordMultiplayer struct {
-	Placement     int       `json:"placement"`
-	RecordID      int       `json:"record_id"`
-	ScoreCount    int       `json:"score_count"`
-	ScoreTime     int       `json:"score_time"`
-	HostID        string    `json:"host_id"`
-	HostName      string    `json:"host_name"`
-	HostAvatar    string    `json:"host_avatar"`
-	PartnerID     string    `json:"partner_id"`
-	PartnerName   string    `json:"partner_name"`
-	PartnerAvatar string    `json:"partner_avatar"`
-	HostDemoID    string    `json:"host_demo_id"`
-	PartnerDemoID string    `json:"partner_demo_id"`
-	RecordDate    time.Time `json:"record_date"`
+	Placement     int                        `json:"placement"`
+	RecordID      int                        `json:"record_id"`
+	ScoreCount    int                        `json:"score_count"`
+	ScoreTime     int                        `json:"score_time"`
+	Host          models.UserShortWithAvatar `json:"host"`
+	Partner       models.UserShortWithAvatar `json:"partner"`
+	HostDemoID    string                     `json:"host_demo_id"`
+	PartnerDemoID string                     `json:"partner_demo_id"`
+	RecordDate    time.Time                  `json:"record_date"`
 }
 
 // GET Map Summary
@@ -195,7 +189,7 @@ func FetchMapLeaderboards(c *gin.Context) {
 		ties := 0
 		for rows.Next() {
 			var record RecordMultiplayer
-			err := rows.Scan(&record.RecordID, &record.HostID, &record.HostName, &record.HostAvatar, &record.PartnerID, &record.PartnerName, &record.PartnerAvatar, &record.ScoreCount, &record.ScoreTime, &record.HostDemoID, &record.PartnerDemoID, &record.RecordDate)
+			err := rows.Scan(&record.RecordID, &record.Host.SteamID, &record.Host.UserName, &record.Host.AvatarLink, &record.Partner.SteamID, &record.Partner.UserName, &record.Partner.AvatarLink, &record.ScoreCount, &record.ScoreTime, &record.HostDemoID, &record.PartnerDemoID, &record.RecordDate)
 			if err != nil {
 				c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 				return
@@ -230,7 +224,7 @@ func FetchMapLeaderboards(c *gin.Context) {
 		ties := 0
 		for rows.Next() {
 			var record RecordSingleplayer
-			err := rows.Scan(&record.RecordID, &record.UserID, &record.UserName, &record.UserAvatar, &record.ScoreCount, &record.ScoreTime, &record.DemoID, &record.RecordDate)
+			err := rows.Scan(&record.RecordID, &record.User.SteamID, &record.User.UserName, &record.User.AvatarLink, &record.ScoreCount, &record.ScoreTime, &record.DemoID, &record.RecordDate)
 			if err != nil {
 				c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 				return
