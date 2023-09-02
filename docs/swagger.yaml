@@ -326,10 +326,8 @@ definitions:
     properties:
       total_score:
         type: integer
-      user_id:
-        type: string
-      user_name:
-        type: string
+      user:
+        $ref: '#/definitions/models.UserShort'
     type: object
   models.UserShort:
     properties:
