@@ -66,6 +66,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 		return
 	}
 	if isDisabled {
+		CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailInvalidRequest)
 		c.JSON(http.StatusBadRequest, models.ErrorResponse("Map is not available for competitive boards."))
 		return
 	}
@@ -75,10 +76,12 @@ func CreateRecordWithDemo(c *gin.Context) {
 	// Get record request
 	var record RecordRequest
 	if err := c.ShouldBind(&record); err != nil {
+		CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailInvalidRequest)
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
 	if isCoop && (record.PartnerDemo == nil || record.PartnerID == "") {
+		CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailInvalidRequest)
 		c.JSON(http.StatusBadRequest, models.ErrorResponse("Invalid entry for coop record submission."))
 		return
 	}
@@ -108,23 +111,27 @@ func CreateRecordWithDemo(c *gin.Context) {
 		// Upload & insert into demos
 		err = c.SaveUploadedFile(header, "backend/parser/"+uuid+".dem")
 		if err != nil {
+			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailSaveDemo)
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
 		defer os.Remove("backend/parser/" + uuid + ".dem")
 		f, err := os.Open("backend/parser/" + uuid + ".dem")
 		if err != nil {
+			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailOpenDemo)
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
 		defer f.Close()
 		file, err := createFile(srv, uuid+".dem", "application/octet-stream", f, os.Getenv("GOOGLE_FOLDER_ID"))
 		if err != nil {
+			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailCreateDemo)
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
 		hostDemoScoreCount, hostDemoScoreTime, err = parser.ProcessDemo("backend/parser/" + uuid + ".dem")
 		if err != nil {
+			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailProcessDemo)
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
@@ -138,6 +145,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 		_, err = tx.Exec(`INSERT INTO demos (id,location_id) VALUES ($1,$2)`, uuid, file.Id)
 		if err != nil {
 			deleteFile(srv, file.Id)
+			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailInsertDemo)
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
@@ -159,6 +167,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 		if err != nil {
 			deleteFile(srv, hostDemoFileID)
 			deleteFile(srv, partnerDemoFileID)
+			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailInsertRecord)
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
@@ -176,6 +185,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 		_, err := tx.Exec(sql, mapId, hostDemoScoreCount, hostDemoScoreTime, user.(models.User).SteamID, hostDemoUUID)
 		if err != nil {
 			deleteFile(srv, hostDemoFileID)
+			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailInsertRecord)
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
@@ -192,6 +202,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))
 		return
 	}
+	CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordSuccess)
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully created record.",
