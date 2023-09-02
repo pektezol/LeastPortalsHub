@@ -11,8 +11,9 @@ import (
 )
 
 const (
-	LogTypeMod   string = "Mod"
-	LogTypeLogin string = "Login"
+	LogTypeMod    string = "Mod"
+	LogTypeLogin  string = "Login"
+	LogTypeRecord string = "Record"
 
 	LogDescriptionLoginSuccess      string = "Success"
 	LogDescriptionLoginFailToken    string = "TokenFail"
@@ -23,6 +24,15 @@ const (
 	LogDescriptionMapSummaryEdit      string = "MapSummaryEdit"
 	LogDescriptionMapSummaryEditImage string = "MapSummaryEditImage"
 	LogDescriptionMapSummaryDelete    string = "MapSummaryDelete"
+
+	LogDescriptionRecordSuccess            string = "Success"
+	LogDescriptionRecordFailInsertRecord   string = "InsertRecordFail"
+	LogDescriptionRecordFailInsertDemo     string = "InsertDemoFail"
+	LogDescriptionRecordFailProcessDemo    string = "ProcessDemoFail"
+	LogDescriptionRecordFailCreateDemo     string = "CreateDemoFail"
+	LogDescriptionRecordFailOpenDemo       string = "OpenDemoFail"
+	LogDescriptionRecordFailSaveDemo       string = "SaveDemoFail"
+	LogDescriptionRecordFailInvalidRequest string = "InvalidRequestFail"
 )
 
 type Log struct {
