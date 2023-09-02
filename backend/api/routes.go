@@ -17,7 +17,6 @@ func InitRoutes(router *gin.Engine) {
 		})
 		v1.GET("/token", handlers.GetCookie)
 		v1.DELETE("/token", handlers.DeleteCookie)
-		v1.GET("/home", CheckAuth, handlers.Home)
 		v1.GET("/login", handlers.Login)
 		v1.GET("/profile", CheckAuth, handlers.Profile)
 		v1.PUT("/profile", CheckAuth, handlers.UpdateCountryCode)
