@@ -36,5 +36,7 @@ func InitRoutes(router *gin.Engine) {
 		v1.GET("/games", handlers.FetchGames)
 		v1.GET("/games/:id", handlers.FetchChapters)
 		v1.GET("/chapters/:id", handlers.FetchChapterMaps)
+		v1.GET("/logs/score", handlers.ScoreLogs)
+		v1.GET("/logs/mod", CheckAuth, handlers.ModLogs)
 	}
 }

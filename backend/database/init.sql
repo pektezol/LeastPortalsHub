@@ -139,3 +139,13 @@ CREATE TABLE countries (
   country_name TEXT NOT NULL,
   PRIMARY KEY (country_code)
 );
+
+CREATE TABLE logs (
+  id SERIAL,
+  user_id TEXT NOT NULL,
+  type TEXT NOT NULL,
+  description TEXT NOT NULL,
+  date TIMESTAMP NOT NULL DEFAULT now(),
+  PRIMARY KEY (id),
+  FOREIGN KEY (user_id) REFERENCES users(steam_id)
+);
