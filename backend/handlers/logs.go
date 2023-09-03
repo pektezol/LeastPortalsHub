@@ -12,13 +12,18 @@ import (
 
 const (
 	LogTypeMod    string = "Mod"
-	LogTypeLogin  string = "User"
+	LogTypeUser   string = "User"
 	LogTypeRecord string = "Record"
 
-	LogDescriptionUserLoginSuccess      string = "LoginSuccess"
-	LogDescriptionUserLoginFailToken    string = "LoginTokenFail"
-	LogDescriptionUserLoginFailValidate string = "LoginValidateFail"
-	LogDescriptionUserLoginFailSummary  string = "LoginSummaryFail"
+	LogDescriptionUserLoginSuccess         string = "LoginSuccess"
+	LogDescriptionUserLoginFailToken       string = "LoginTokenFail"
+	LogDescriptionUserLoginFailValidate    string = "LoginValidateFail"
+	LogDescriptionUserLoginFailSummary     string = "LoginSummaryFail"
+	LogDescriptionUserUpdateSuccess        string = "UpdateSuccess"
+	LogDescriptionUserUpdateFail           string = "UpdateFail"
+	LogDescriptionUserUpdateSummaryFail    string = "UpdateSummaryFail"
+	LogDescriptionUserUpdateCountrySuccess string = "UpdateCountrySuccess"
+	LogDescriptionUserUpdateCountryFail    string = "UpdateCountryFail"
 
 	LogDescriptionMapSummaryCreate    string = "MapSummaryCreate"
 	LogDescriptionMapSummaryEdit      string = "MapSummaryEdit"
