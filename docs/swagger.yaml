@@ -79,6 +79,22 @@ definitions:
       token:
         type: string
     type: object
+  handlers.LogsResponse:
+    properties:
+      logs:
+        items:
+          $ref: '#/definitions/handlers.LogsResponseDetails'
+        type: array
+    type: object
+  handlers.LogsResponseDetails:
+    properties:
+      date:
+        type: string
+      detail:
+        type: string
+      user:
+        $ref: '#/definitions/models.UserShort'
+    type: object
   handlers.MapLeaderboardsResponse:
     properties:
       map:
@@ -489,7 +505,7 @@ paths:
             - $ref: '#/definitions/models.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/handlers.ScoreLogsResponse'
+                  $ref: '#/definitions/handlers.LogsResponse'
               type: object
         "400":
           description: Bad Request
