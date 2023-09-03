@@ -81,12 +81,185 @@ func Profile(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	// TODO: Get rankings (all maps done in one game)
+	// Get rankings (all maps done in one game)
+	rankings := ProfileRankings{
+		Overall:      ProfileRankingsDetails{},
+		Singleplayer: ProfileRankingsDetails{},
+		Cooperative:  ProfileRankingsDetails{},
+	}
+	// Get total map count
+	sql = `SELECT count(id), (SELECT count(id) FROM maps m WHERE m.game_id = 2 AND m.is_disabled = false) FROM maps m WHERE m.game_id = 1  AND m.is_disabled = false;`
+	err = database.DB.QueryRow(sql).Scan(&rankings.Singleplayer.CompletionTotal, &rankings.Cooperative.CompletionTotal)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	rankings.Overall.CompletionTotal = rankings.Singleplayer.CompletionTotal + rankings.Cooperative.CompletionTotal
+	// Get user completion count
+	sql = `SELECT 'records_sp' AS table_name, COUNT(rs.id) AS total_user_scores
+	FROM public.records_sp rs JOIN (
+    	SELECT mr.map_id, MIN(mr.score_count) AS min_score_count
+    	FROM public.map_routes mr WHERE mr.category_id = 1 GROUP BY mr.map_id
+	) AS subquery_sp ON rs.map_id = subquery_sp.map_id AND rs.score_count = subquery_sp.min_score_count
+	WHERE rs.user_id = $1
+	UNION ALL
+	SELECT 'records_mp' AS table_name, COUNT(rm.id) AS total_user_scores
+	FROM public.records_mp rm JOIN (
+    	SELECT mr.map_id, MIN(mr.score_count) AS min_score_count
+    FROM public.map_routes mr WHERE mr.category_id = 1 GROUP BY mr.map_id
+	) AS subquery_mp ON rm.map_id = subquery_mp.map_id AND rm.score_count = subquery_mp.min_score_count
+	WHERE rm.host_id = $1 OR rm.partner_id = $1;`
+	rows, err := database.DB.Query(sql, user.(models.User).SteamID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	for rows.Next() {
+		var tableName string
+		var completionCount int
+		err = rows.Scan(&tableName, &completionCount)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			return
+		}
+		if tableName == "records_sp" {
+			rankings.Singleplayer.CompletionCount = completionCount
+			continue
+		}
+		if tableName == "records_mp" {
+			rankings.Cooperative.CompletionCount = completionCount
+			continue
+		}
+	}
+	rankings.Overall.CompletionCount = rankings.Singleplayer.CompletionCount + rankings.Cooperative.CompletionCount
+	// Get user ranking placement for singleplayer
+	sql = `SELECT u.steam_id, COUNT(DISTINCT map_id), 
+	(SELECT COUNT(maps.name) FROM maps INNER JOIN games g ON maps.game_id = g.id WHERE g.is_coop = FALSE AND is_disabled = false), 
+	(SELECT SUM(min_score_count) AS total_min_score_count FROM (
+		SELECT user_id, MIN(score_count) AS min_score_count FROM records_sp GROUP BY user_id, map_id) AS subquery WHERE user_id = u.steam_id)
+	FROM records_sp sp JOIN users u ON u.steam_id = sp.user_id GROUP BY u.steam_id, u.user_name
+	HAVING COUNT(DISTINCT map_id) = (SELECT COUNT(maps.name) FROM maps INNER JOIN games g ON maps.game_id = g.id WHERE g.is_coop = FALSE AND is_disabled = false)
+	ORDER BY total_min_score_count ASC;`
+	rows, err = database.DB.Query(sql)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	placement := 1
+	for rows.Next() {
+		var steamID string
+		var completionCount int
+		var totalCount int
+		var userPortalCount int
+		err = rows.Scan(&steamID, &completionCount, &totalCount, &userPortalCount)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			return
+		}
+		if completionCount != totalCount {
+			placement++
+			continue
+		}
+		if steamID != user.(models.User).SteamID {
+			placement++
+			continue
+		}
+		rankings.Singleplayer.Rank = placement
+	}
+	// Get user ranking placement for multiplayer
+	sql = `SELECT u.steam_id, COUNT(DISTINCT map_id), 
+	(SELECT COUNT(maps.name) FROM maps INNER JOIN games g ON maps.game_id = g.id WHERE g.is_coop = FALSE AND is_disabled = false), 
+	(SELECT SUM(min_score_count) AS total_min_score_count FROM (
+		SELECT host_id, partner_id, MIN(score_count) AS min_score_count FROM records_mp GROUP BY host_id, partner_id, map_id) AS subquery WHERE host_id = u.steam_id OR partner_id = u.steam_id)
+	FROM records_mp mp JOIN users u ON u.steam_id = mp.host_id OR u.steam_id = mp.partner_id GROUP BY u.steam_id, u.user_name
+	HAVING  COUNT(DISTINCT map_id) = (SELECT COUNT(maps.name) FROM maps INNER JOIN games g ON maps.game_id = g.id WHERE g.is_coop = FALSE AND is_disabled = false)
+	ORDER BY total_min_score_count ASC;`
+	rows, err = database.DB.Query(sql)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	placement = 1
+	for rows.Next() {
+		var steamID string
+		var completionCount int
+		var totalCount int
+		var userPortalCount int
+		err = rows.Scan(&steamID, &completionCount, &totalCount, &userPortalCount)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			return
+		}
+		if completionCount != totalCount {
+			placement++
+			continue
+		}
+		if steamID != user.(models.User).SteamID {
+			placement++
+			continue
+		}
+		rankings.Cooperative.Rank = placement
+	}
+	// TODO: Get user ranking placement for overall if they qualify
+	// if (rankings.Singleplayer.Rank != 0) && (rankings.Cooperative.Rank != 0) {
+	// 	sql = `SELECT steam_id, SUM(total_min_score_count) AS total_score
+	// FROM (
+	// 	SELECT u.steam_id,
+	// 		   (SELECT SUM(min_score_count) AS total_min_score_count FROM (
+	// 				SELECT
+	// 					user_id,
+	// 					MIN(score_count) AS min_score_count
+	// 				FROM records_sp
+	// 				GROUP BY user_id, map_id
+	// 			) AS subquery
+	// 			WHERE user_id = u.steam_id) AS total_min_score_count
+	// 	FROM records_sp sp
+	// 	JOIN users u ON u.steam_id = sp.user_id
+	// 	UNION ALL
+	// 	SELECT u.steam_id,
+	// 		   (SELECT SUM(min_score_count) AS total_min_score_count FROM (
+	// 				SELECT
+	// 					host_id,
+	// 					partner_id,
+	// 					MIN(score_count) AS min_score_count
+	// 				FROM records_mp
+	// 				GROUP BY host_id, partner_id, map_id
+	// 			) AS subquery
+	// 			WHERE host_id = u.steam_id OR partner_id = u.steam_id) AS total_min_score_count
+	// 	FROM records_mp mp
+	// 	JOIN users u ON u.steam_id = mp.host_id OR u.steam_id = mp.partner_id
+	// ) AS combined_scores
+	// GROUP BY steam_id ORDER BY total_score ASC;`
+	// 	rows, err = database.DB.Query(sql)
+	// 	if err != nil {
+	// 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+	// 		return
+	// 	}
+	// 	placement = 1
+	// 	for rows.Next() {
+	// 		var steamID string
+	// 		var userPortalCount int
+	// 		err = rows.Scan(&steamID, &userPortalCount)
+	// 		if err != nil {
+	// 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+	// 			return
+	// 		}
+	// 		if completionCount != totalCount {
+	// 			placement++
+	// 			continue
+	// 		}
+	// 		if steamID != user.(models.User).SteamID {
+	// 			placement++
+	// 			continue
+	// 		}
+	// 		rankings.Cooperative.Rank = placement
+	// 	}
+	// }
 	records := []ProfileRecords{}
 	// Get singleplayer records
 	sql = `SELECT m.game_id, m.chapter_id, sp.map_id, m."name", (SELECT mr.score_count FROM map_routes mr WHERE mr.map_id = sp.map_id ORDER BY mr.score_count ASC LIMIT 1) AS wr_count, sp.score_count, sp.score_time, sp.demo_id, sp.record_date
 	FROM records_sp sp INNER JOIN maps m ON sp.map_id = m.id WHERE sp.user_id = $1 ORDER BY sp.map_id, sp.score_count, sp.score_time;`
-	rows, err := database.DB.Query(sql, user.(models.User).SteamID)
+	rows, err = database.DB.Query(sql, user.(models.User).SteamID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
@@ -158,7 +331,7 @@ func Profile(c *gin.Context) {
 			CountryCode: user.(models.User).CountryCode,
 			Titles:      user.(models.User).Titles,
 			Links:       links,
-			Rankings:    ProfileRankings{},
+			Rankings:    rankings,
 			Records:     records,
 		},
 	})
@@ -197,23 +370,180 @@ func FetchUser(c *gin.Context) {
 		c.JSON(http.StatusNotFound, models.ErrorResponse("User not found."))
 		return
 	}
-	// Get user titles
-	sql = `SELECT t.title_name, t.title_color FROM titles t
-	INNER JOIN user_titles ut ON t.id=ut.title_id WHERE ut.user_id = $1`
+	// Get rankings (all maps done in one game)
+	rankings := ProfileRankings{
+		Overall:      ProfileRankingsDetails{},
+		Singleplayer: ProfileRankingsDetails{},
+		Cooperative:  ProfileRankingsDetails{},
+	}
+	// Get total map count
+	sql = `SELECT count(id), (SELECT count(id) FROM maps m WHERE m.game_id = 2 AND m.is_disabled = false) FROM maps m WHERE m.game_id = 1  AND m.is_disabled = false;`
+	err = database.DB.QueryRow(sql).Scan(&rankings.Singleplayer.CompletionTotal, &rankings.Cooperative.CompletionTotal)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	rankings.Overall.CompletionTotal = rankings.Singleplayer.CompletionTotal + rankings.Cooperative.CompletionTotal
+	// Get user completion count
+	sql = `SELECT 'records_sp' AS table_name, COUNT(rs.id) AS total_user_scores
+	FROM public.records_sp rs JOIN (
+    	SELECT mr.map_id, MIN(mr.score_count) AS min_score_count
+    	FROM public.map_routes mr WHERE mr.category_id = 1 GROUP BY mr.map_id
+	) AS subquery_sp ON rs.map_id = subquery_sp.map_id AND rs.score_count = subquery_sp.min_score_count
+	WHERE rs.user_id = $1
+	UNION ALL
+	SELECT 'records_mp' AS table_name, COUNT(rm.id) AS total_user_scores
+	FROM public.records_mp rm JOIN (
+    	SELECT mr.map_id, MIN(mr.score_count) AS min_score_count
+    FROM public.map_routes mr WHERE mr.category_id = 1 GROUP BY mr.map_id
+	) AS subquery_mp ON rm.map_id = subquery_mp.map_id AND rm.score_count = subquery_mp.min_score_count
+	WHERE rm.host_id = $1 OR rm.partner_id = $1;`
 	rows, err := database.DB.Query(sql, user.SteamID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
 	for rows.Next() {
-		var title models.Title
-		if err := rows.Scan(&title.Name, &title.Color); err != nil {
+		var tableName string
+		var completionCount int
+		err = rows.Scan(&tableName, &completionCount)
+		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
-		user.Titles = append(user.Titles, title)
+		if tableName == "records_sp" {
+			rankings.Singleplayer.CompletionCount = completionCount
+			continue
+		}
+		if tableName == "records_mp" {
+			rankings.Cooperative.CompletionCount = completionCount
+			continue
+		}
 	}
-	// TODO: Get rankings (all maps done in one game)
+	rankings.Overall.CompletionCount = rankings.Singleplayer.CompletionCount + rankings.Cooperative.CompletionCount
+	// Get user ranking placement for singleplayer
+	sql = `SELECT u.steam_id, COUNT(DISTINCT map_id), 
+	(SELECT COUNT(maps.name) FROM maps INNER JOIN games g ON maps.game_id = g.id WHERE g.is_coop = FALSE AND is_disabled = false), 
+	(SELECT SUM(min_score_count) AS total_min_score_count FROM (
+		SELECT user_id, MIN(score_count) AS min_score_count FROM records_sp GROUP BY user_id, map_id) AS subquery WHERE user_id = u.steam_id)
+	FROM records_sp sp JOIN users u ON u.steam_id = sp.user_id GROUP BY u.steam_id, u.user_name
+	HAVING COUNT(DISTINCT map_id) = (SELECT COUNT(maps.name) FROM maps INNER JOIN games g ON maps.game_id = g.id WHERE g.is_coop = FALSE AND is_disabled = false)
+	ORDER BY total_min_score_count ASC;`
+	rows, err = database.DB.Query(sql)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	placement := 1
+	for rows.Next() {
+		var steamID string
+		var completionCount int
+		var totalCount int
+		var userPortalCount int
+		err = rows.Scan(&steamID, &completionCount, &totalCount, &userPortalCount)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			return
+		}
+		if completionCount != totalCount {
+			placement++
+			continue
+		}
+		if steamID != user.SteamID {
+			placement++
+			continue
+		}
+		rankings.Singleplayer.Rank = placement
+	}
+	// Get user ranking placement for multiplayer
+	sql = `SELECT u.steam_id, COUNT(DISTINCT map_id), 
+	(SELECT COUNT(maps.name) FROM maps INNER JOIN games g ON maps.game_id = g.id WHERE g.is_coop = FALSE AND is_disabled = false), 
+	(SELECT SUM(min_score_count) AS total_min_score_count FROM (
+		SELECT host_id, partner_id, MIN(score_count) AS min_score_count FROM records_mp GROUP BY host_id, partner_id, map_id) AS subquery WHERE host_id = u.steam_id OR partner_id = u.steam_id)
+	FROM records_mp mp JOIN users u ON u.steam_id = mp.host_id OR u.steam_id = mp.partner_id GROUP BY u.steam_id, u.user_name
+	HAVING  COUNT(DISTINCT map_id) = (SELECT COUNT(maps.name) FROM maps INNER JOIN games g ON maps.game_id = g.id WHERE g.is_coop = FALSE AND is_disabled = false)
+	ORDER BY total_min_score_count ASC;`
+	rows, err = database.DB.Query(sql)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	placement = 1
+	for rows.Next() {
+		var steamID string
+		var completionCount int
+		var totalCount int
+		var userPortalCount int
+		err = rows.Scan(&steamID, &completionCount, &totalCount, &userPortalCount)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			return
+		}
+		if completionCount != totalCount {
+			placement++
+			continue
+		}
+		if steamID != user.SteamID {
+			placement++
+			continue
+		}
+		rankings.Cooperative.Rank = placement
+	}
+	// TODO: Get user ranking placement for overall if they qualify
+	// if (rankings.Singleplayer.Rank != 0) && (rankings.Cooperative.Rank != 0) {
+	// 	sql = `SELECT steam_id, SUM(total_min_score_count) AS total_score
+	// FROM (
+	// 	SELECT u.steam_id,
+	// 		   (SELECT SUM(min_score_count) AS total_min_score_count FROM (
+	// 				SELECT
+	// 					user_id,
+	// 					MIN(score_count) AS min_score_count
+	// 				FROM records_sp
+	// 				GROUP BY user_id, map_id
+	// 			) AS subquery
+	// 			WHERE user_id = u.steam_id) AS total_min_score_count
+	// 	FROM records_sp sp
+	// 	JOIN users u ON u.steam_id = sp.user_id
+	// 	UNION ALL
+	// 	SELECT u.steam_id,
+	// 		   (SELECT SUM(min_score_count) AS total_min_score_count FROM (
+	// 				SELECT
+	// 					host_id,
+	// 					partner_id,
+	// 					MIN(score_count) AS min_score_count
+	// 				FROM records_mp
+	// 				GROUP BY host_id, partner_id, map_id
+	// 			) AS subquery
+	// 			WHERE host_id = u.steam_id OR partner_id = u.steam_id) AS total_min_score_count
+	// 	FROM records_mp mp
+	// 	JOIN users u ON u.steam_id = mp.host_id OR u.steam_id = mp.partner_id
+	// ) AS combined_scores
+	// GROUP BY steam_id ORDER BY total_score ASC;`
+	// 	rows, err = database.DB.Query(sql)
+	// 	if err != nil {
+	// 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+	// 		return
+	// 	}
+	// 	placement = 1
+	// 	for rows.Next() {
+	// 		var steamID string
+	// 		var userPortalCount int
+	// 		err = rows.Scan(&steamID, &userPortalCount)
+	// 		if err != nil {
+	// 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+	// 			return
+	// 		}
+	// 		if completionCount != totalCount {
+	// 			placement++
+	// 			continue
+	// 		}
+	// 		if steamID != user.SteamID {
+	// 			placement++
+	// 			continue
+	// 		}
+	// 		rankings.Cooperative.Rank = placement
+	// 	}
+	// }
 	records := []ProfileRecords{}
 	// Get singleplayer records
 	sql = `SELECT m.game_id, m.chapter_id, sp.map_id, m."name", (SELECT mr.score_count FROM map_routes mr WHERE mr.map_id = sp.map_id ORDER BY mr.score_count ASC LIMIT 1) AS wr_count, sp.score_count, sp.score_time, sp.demo_id, sp.record_date
@@ -290,7 +620,7 @@ func FetchUser(c *gin.Context) {
 			CountryCode: user.CountryCode,
 			Titles:      user.Titles,
 			Links:       links,
-			Rankings:    ProfileRankings{},
+			Rankings:    rankings,
 			Records:     records,
 		},
 	})
