@@ -83,7 +83,8 @@ func ModLogs(c *gin.Context) {
 	}
 	response := LogsResponse{Logs: []LogsResponseDetails{}}
 	sql := `SELECT u.user_name, l.user_id, l.type, l.description, l.date 
-	FROM logs l INNER JOIN users u ON l.user_id = u.steam_id WHERE type != 'Score'`
+	FROM logs l INNER JOIN users u ON l.user_id = u.steam_id WHERE type != 'Score'
+	ORDER BY l.date DESC LIMIT 100;`
 	rows, err := database.DB.Query(sql)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
