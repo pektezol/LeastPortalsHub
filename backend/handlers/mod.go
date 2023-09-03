@@ -15,7 +15,7 @@ type CreateMapSummaryRequest struct {
 	Description string    `json:"description" binding:"required"`
 	Showcase    string    `json:"showcase"`
 	UserName    string    `json:"user_name" binding:"required"`
-	ScoreCount  int       `json:"score_count" binding:"required"`
+	ScoreCount  *int      `json:"score_count" binding:"required"`
 	RecordDate  time.Time `json:"record_date" binding:"required"`
 }
 
