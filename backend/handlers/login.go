@@ -38,7 +38,7 @@ func Login(c *gin.Context) {
 	default:
 		steamID, err := openID.ValidateAndGetId()
 		if err != nil {
-			CreateLog(steamID, LogTypeLogin, LogDescriptionLoginFailValidate)
+			CreateLog(steamID, LogTypeLogin, LogDescriptionUserLoginFailValidate)
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
@@ -49,7 +49,7 @@ func Login(c *gin.Context) {
 		if checkSteamID == 0 {
 			user, err := GetPlayerSummaries(steamID, os.Getenv("API_KEY"))
 			if err != nil {
-				CreateLog(steamID, LogTypeLogin, LogDescriptionLoginFailSummary)
+				CreateLog(steamID, LogTypeLogin, LogDescriptionUserLoginFailSummary)
 				c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 				return
 			}
@@ -79,12 +79,12 @@ func Login(c *gin.Context) {
 		// Sign and get the complete encoded token as a string using the secret
 		tokenString, err := token.SignedString([]byte(os.Getenv("SECRET_KEY")))
 		if err != nil {
-			CreateLog(steamID, LogTypeLogin, LogDescriptionLoginFailToken)
+			CreateLog(steamID, LogTypeLogin, LogDescriptionUserLoginFailToken)
 			c.JSON(http.StatusBadRequest, models.ErrorResponse("Failed to generate token."))
 			return
 		}
 		c.SetCookie("token", tokenString, 3600*24*30, "/", "", true, true)
-		CreateLog(steamID, LogTypeLogin, LogDescriptionLoginSuccess)
+		CreateLog(steamID, LogTypeLogin, LogDescriptionUserLoginSuccess)
 		c.Redirect(http.StatusTemporaryRedirect, "/")
 		// c.JSON(http.StatusOK, models.Response{
 		// 	Success: true,

@@ -12,13 +12,13 @@ import (
 
 const (
 	LogTypeMod    string = "Mod"
-	LogTypeLogin  string = "Login"
+	LogTypeLogin  string = "User"
 	LogTypeRecord string = "Record"
 
-	LogDescriptionLoginSuccess      string = "Success"
-	LogDescriptionLoginFailToken    string = "TokenFail"
-	LogDescriptionLoginFailValidate string = "ValidateFail"
-	LogDescriptionLoginFailSummary  string = "SummaryFail"
+	LogDescriptionUserLoginSuccess      string = "LoginSuccess"
+	LogDescriptionUserLoginFailToken    string = "LoginTokenFail"
+	LogDescriptionUserLoginFailValidate string = "LoginValidateFail"
+	LogDescriptionUserLoginFailSummary  string = "LoginSummaryFail"
 
 	LogDescriptionMapSummaryCreate    string = "MapSummaryCreate"
 	LogDescriptionMapSummaryEdit      string = "MapSummaryEdit"
@@ -39,6 +39,7 @@ type Log struct {
 	User        models.UserShort `json:"user"`
 	Type        string           `json:"type"`
 	Description string           `json:"description"`
+	Date        time.Time        `json:"date"`
 }
 
 type LogsResponse struct {
@@ -48,6 +49,7 @@ type LogsResponse struct {
 type LogsResponseDetails struct {
 	User models.UserShort `json:"user"`
 	Log  string           `json:"detail"`
+	Date time.Time        `json:"date"`
 }
 
 type ScoreLogsResponse struct {
@@ -70,7 +72,7 @@ type ScoreLogsResponseDetails struct {
 //	@Tags			logs
 //	@Produce		json
 //	@Param			Authorization	header		string	true	"JWT Token"
-//	@Success		200				{object}	models.Response{data=ScoreLogsResponse}
+//	@Success		200				{object}	models.Response{data=LogsResponse}
 //	@Failure		400				{object}	models.Response
 //	@Router			/logs/mod [get]
 func ModLogs(c *gin.Context) {
@@ -80,7 +82,7 @@ func ModLogs(c *gin.Context) {
 		return
 	}
 	response := LogsResponse{Logs: []LogsResponseDetails{}}
-	sql := `SELECT u.user_name, l.user_id, l.type, l.description 
+	sql := `SELECT u.user_name, l.user_id, l.type, l.description, l.date 
 	FROM logs l INNER JOIN users u ON l.user_id = u.steam_id WHERE type != 'Score'`
 	rows, err := database.DB.Query(sql)
 	if err != nil {
@@ -89,7 +91,7 @@ func ModLogs(c *gin.Context) {
 	}
 	for rows.Next() {
 		log := Log{}
-		err = rows.Scan(&log.User.UserName, &log.User.SteamID, &log.Type, &log.Description)
+		err = rows.Scan(&log.User.UserName, &log.User.SteamID, &log.Type, &log.Description, &log.Date)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
@@ -100,7 +102,8 @@ func ModLogs(c *gin.Context) {
 				SteamID:  log.User.SteamID,
 				UserName: log.User.UserName,
 			},
-			Log: detail,
+			Log:  detail,
+			Date: log.Date,
 		})
 	}
 	c.JSON(http.StatusOK, models.Response{
