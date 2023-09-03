@@ -646,6 +646,7 @@ func UpdateUser(c *gin.Context) {
 	}
 	profile, err := GetPlayerSummaries(user.(models.User).SteamID, os.Getenv("API_KEY"))
 	if err != nil {
+		CreateLog(user.(models.User).SteamID, LogTypeUser, LogDescriptionUserUpdateSummaryFail)
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
@@ -653,9 +654,11 @@ func UpdateUser(c *gin.Context) {
 	_, err = database.DB.Exec(`UPDATE users SET username = $1, avatar_link = $2, country_code = $3, updated_at = $4
 	WHERE steam_id = $5`, profile.PersonaName, profile.AvatarFull, profile.LocCountryCode, time.Now().UTC(), user.(models.User).SteamID)
 	if err != nil {
+		CreateLog(user.(models.User).SteamID, LogTypeUser, LogDescriptionUserUpdateFail)
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
+	CreateLog(user.(models.User).SteamID, LogTypeUser, LogDescriptionUserUpdateSuccess)
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully updated user.",
@@ -690,21 +693,25 @@ func UpdateCountryCode(c *gin.Context) {
 	}
 	code := c.Query("country_code")
 	if code == "" {
+		CreateLog(user.(models.User).SteamID, LogTypeUser, LogDescriptionUserUpdateCountryFail)
 		c.JSON(http.StatusNotFound, models.ErrorResponse("Enter a valid country code."))
 		return
 	}
 	var validCode string
 	err := database.DB.QueryRow(`SELECT country_code FROM countries WHERE country_code = $1`, code).Scan(&validCode)
 	if err != nil {
+		CreateLog(user.(models.User).SteamID, LogTypeUser, LogDescriptionUserUpdateCountryFail)
 		c.JSON(http.StatusNotFound, models.ErrorResponse(err.Error()))
 		return
 	}
 	// Valid code, update profile
 	_, err = database.DB.Exec(`UPDATE users SET country_code = $1 WHERE steam_id = $2`, validCode, user.(models.User).SteamID)
 	if err != nil {
+		CreateLog(user.(models.User).SteamID, LogTypeUser, LogDescriptionUserUpdateCountryFail)
 		c.JSON(http.StatusNotFound, models.ErrorResponse(err.Error()))
 		return
 	}
+	CreateLog(user.(models.User).SteamID, LogTypeUser, LogDescriptionUserUpdateCountrySuccess)
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully updated country code.",
