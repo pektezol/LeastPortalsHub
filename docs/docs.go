@@ -259,7 +259,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/handlers.ScoreLogsResponse"
+                                            "$ref": "#/definitions/handlers.LogsResponse"
                                         }
                                     }
                                 }
@@ -1215,6 +1215,31 @@ const docTemplate = `{
             "properties": {
                 "token": {
                     "type": "string"
+                }
+            }
+        },
+        "handlers.LogsResponse": {
+            "type": "object",
+            "properties": {
+                "logs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handlers.LogsResponseDetails"
+                    }
+                }
+            }
+        },
+        "handlers.LogsResponseDetails": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "detail": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/models.UserShort"
                 }
             }
         },
