@@ -1,8 +1,9 @@
-package controllers
+package handlers
 
 import (
 	"log"
 	"net/http"
+	"sort"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -10,15 +11,15 @@ import (
 	"github.com/pektezol/leastportalshub/backend/models"
 )
 
-func Home(c *gin.Context) {
-	user, exists := c.Get("user")
-	if !exists {
-		c.JSON(200, "no id, not auth")
-	} else {
-		c.JSON(200, gin.H{
-			"output": user,
-		})
-	}
+type SearchResponse struct {
+	Players []models.UserShort `json:"players"`
+	Maps    []models.MapShort  `json:"maps"`
+}
+
+type RankingsResponse struct {
+	Overall      []models.UserRanking `json:"rankings_overall"`
+	Singleplayer []models.UserRanking `json:"rankings_singleplayer"`
+	Multiplayer  []models.UserRanking `json:"rankings_multiplayer"`
 }
 
 // GET Rankings
@@ -26,100 +27,104 @@ func Home(c *gin.Context) {
 //	@Description	Get rankings of every player.
 //	@Tags			rankings
 //	@Produce		json
-//	@Success		200	{object}	models.Response{data=models.RankingsResponse}
+//	@Success		200	{object}	models.Response{data=RankingsResponse}
 //	@Failure		400	{object}	models.Response
 //	@Router			/rankings [get]
 func Rankings(c *gin.Context) {
-	rows, err := database.DB.Query(`SELECT steam_id, user_name FROM users`)
+	response := RankingsResponse{
+		Overall:      []models.UserRanking{},
+		Singleplayer: []models.UserRanking{},
+		Multiplayer:  []models.UserRanking{},
+	}
+	// Singleplayer rankings
+	sql := `SELECT u.steam_id, u.user_name, COUNT(DISTINCT map_id), 
+	(SELECT COUNT(maps.name) FROM maps INNER JOIN games g ON maps.game_id = g.id WHERE g.is_coop = FALSE AND is_disabled = false), 
+	(SELECT SUM(min_score_count) AS total_min_score_count FROM (
+			SELECT
+			user_id,
+			MIN(score_count) AS min_score_count
+			FROM records_sp
+			GROUP BY user_id, map_id
+			) AS subquery
+		WHERE user_id = u.steam_id) 
+	FROM records_sp sp JOIN users u ON u.steam_id = sp.user_id GROUP BY u.steam_id, u.user_name`
+	rows, err := database.DB.Query(sql)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 		return
 	}
-	var spRankings []models.UserRanking
-	var mpRankings []models.UserRanking
 	for rows.Next() {
-		var userID, username string
-		err := rows.Scan(&userID, &username)
+		ranking := models.UserRanking{}
+		var currentCount int
+		var totalCount int
+		err = rows.Scan(&ranking.User.SteamID, &ranking.User.UserName, &currentCount, &totalCount, &ranking.TotalScore)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
-		// Getting all sp records for each user
-		var uniqueSingleUserRecords, totalSingleMaps int
-		sql := `SELECT COUNT(DISTINCT map_id), (SELECT COUNT(map_name) FROM maps 
-		WHERE is_coop = FALSE AND is_disabled = false) FROM records_sp WHERE user_id = $1`
-		err = database.DB.QueryRow(sql, userID).Scan(&uniqueSingleUserRecords, &totalSingleMaps)
+		if currentCount != totalCount {
+			continue
+		}
+		response.Singleplayer = append(response.Singleplayer, ranking)
+	}
+	// Multiplayer rankings
+	sql = `SELECT u.steam_id, u.user_name, COUNT(DISTINCT map_id), 
+	(SELECT COUNT(maps.name) FROM maps INNER JOIN games g ON maps.game_id = g.id WHERE g.is_coop = FALSE AND is_disabled = false),
+	(SELECT SUM(min_score_count) AS total_min_score_count FROM (
+			SELECT
+			host_id,
+			partner_id,
+			MIN(score_count) AS min_score_count
+			FROM records_mp
+			GROUP BY host_id, partner_id, map_id
+			) AS subquery
+		WHERE host_id = u.steam_id OR partner_id = u.steam_id) 
+	FROM records_mp mp JOIN users u ON u.steam_id = mp.host_id OR u.steam_id = mp.partner_id GROUP BY u.steam_id, u.user_name`
+	rows, err = database.DB.Query(sql)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		return
+	}
+	for rows.Next() {
+		ranking := models.UserRanking{}
+		var currentCount int
+		var totalCount int
+		err = rows.Scan(&ranking.User.SteamID, &ranking.User.UserName, &currentCount, &totalCount, &ranking.TotalScore)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
-		// Has all singleplayer records
-		if uniqueSingleUserRecords == totalSingleMaps {
-			var ranking models.UserRanking
-			ranking.UserID = userID
-			ranking.UserName = username
-			sql := `SELECT DISTINCT map_id, score_count FROM records_sp WHERE user_id = $1 ORDER BY map_id, score_count`
-			rows, err := database.DB.Query(sql, userID)
-			if err != nil {
-				c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
-				return
-			}
-			totalScore := 0
-			var maps []int
-			for rows.Next() {
-				var mapID, scoreCount int
-				rows.Scan(&mapID, &scoreCount)
-				if len(maps) != 0 && maps[len(maps)-1] == mapID {
-					continue
+		if currentCount != totalCount {
+			continue
+		}
+		response.Multiplayer = append(response.Multiplayer, ranking)
+	}
+	// Has both so they are qualified for overall ranking
+	for _, spRanking := range response.Singleplayer {
+		for _, mpRanking := range response.Multiplayer {
+			if spRanking.User.SteamID == mpRanking.User.SteamID {
+				totalScore := spRanking.TotalScore + mpRanking.TotalScore
+				overallRanking := models.UserRanking{
+					User:       spRanking.User,
+					TotalScore: totalScore,
 				}
-				totalScore += scoreCount
-				maps = append(maps, mapID)
+				response.Overall = append(response.Overall, overallRanking)
 			}
-			ranking.TotalScore = totalScore
-			spRankings = append(spRankings, ranking)
-		}
-		// Getting all mp records for each user
-		var uniqueMultiUserRecords, totalMultiMaps int
-		sql = `SELECT COUNT(DISTINCT map_id), (SELECT COUNT(map_name) FROM maps 
-		WHERE is_coop = TRUE AND is_disabled = false) FROM records_mp WHERE host_id = $1 OR partner_id = $2`
-		err = database.DB.QueryRow(sql, userID, userID).Scan(&uniqueMultiUserRecords, &totalMultiMaps)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
-			return
-		}
-		// Has all singleplayer records
-		if uniqueMultiUserRecords == totalMultiMaps {
-			var ranking models.UserRanking
-			ranking.UserID = userID
-			ranking.UserName = username
-			sql := `SELECT DISTINCT map_id, score_count FROM records_mp WHERE host_id = $1 OR partner_id = $2 ORDER BY map_id, score_count`
-			rows, err := database.DB.Query(sql, userID, userID)
-			if err != nil {
-				c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
-				return
-			}
-			totalScore := 0
-			var maps []int
-			for rows.Next() {
-				var mapID, scoreCount int
-				rows.Scan(&mapID, &scoreCount)
-				if len(maps) != 0 && maps[len(maps)-1] == mapID {
-					continue
-				}
-				totalScore += scoreCount
-				maps = append(maps, mapID)
-			}
-			ranking.TotalScore = totalScore
-			mpRankings = append(mpRankings, ranking)
 		}
 	}
+	sort.Slice(response.Singleplayer, func(i, j int) bool {
+		return response.Singleplayer[i].TotalScore < response.Singleplayer[j].TotalScore
+	})
+	sort.Slice(response.Multiplayer, func(i, j int) bool {
+		return response.Multiplayer[i].TotalScore < response.Multiplayer[j].TotalScore
+	})
+	sort.Slice(response.Overall, func(i, j int) bool {
+		return response.Overall[i].TotalScore < response.Overall[j].TotalScore
+	})
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully retrieved rankings.",
-		Data: models.RankingsResponse{
-			RankingsSP: spRankings,
-			RankingsMP: mpRankings,
-		},
+		Data:    response,
 	})
 }
 
@@ -129,14 +134,14 @@ func Rankings(c *gin.Context) {
 //	@Tags			search
 //	@Produce		json
 //	@Param			q	query		string	false	"Search user or map name."
-//	@Success		200	{object}	models.Response{data=models.SearchResponse}
+//	@Success		200	{object}	models.Response{data=SearchResponse}
 //	@Failure		400	{object}	models.Response
 //	@Router			/search [get]
 func SearchWithQuery(c *gin.Context) {
 	query := c.Query("q")
 	query = strings.ToLower(query)
 	log.Println(query)
-	var response models.SearchResponse
+	var response SearchResponse
 	// Cache all maps for faster response
 	var maps = []models.MapShort{
 		{ID: 1, Name: "Container Ride"},
