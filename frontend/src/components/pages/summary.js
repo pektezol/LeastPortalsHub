@@ -66,6 +66,7 @@ function HisClick() {
     const btn = document.querySelectorAll("#section3 #history span button");
     btn.forEach((e) => {e.style.backgroundColor = "#2b2e46"});
     btn[hisState].style.backgroundColor = "#202232";
+    
 }}
 
 const [selectedRun,setSelectedRun] = React.useState(0)
@@ -82,6 +83,96 @@ function selectRun(x,y){
     if(y===4){x+=data.summary.routes.filter(e=>e.category.id<4).length}
     setSelectedRun(x)
     }
+}
+
+function graph(state) {
+    // this is such a mess
+    let graph = data.summary.routes.filter(e=>e.category.id===catState)
+    let graph_score = []
+    data.summary.routes.filter(e=>e.category.id===catState).forEach(e=>graph_score.push(e.history.score_count))
+    let graph_dates = []
+    data.summary.routes.filter(e=>e.category.id===catState).forEach(e=>graph_dates.push(e.history.date.split("T")[0]))
+    let graph_max = graph[graph.length-1].history.score_count
+    let graph_numbers = []
+    for (let i=graph_max;i>=0;i--){
+        graph_numbers[i]=i
+    }
+
+    switch (state) {
+        case 1: //numbers
+            return graph_numbers
+            .reverse().map(e=>(
+                graph_score.includes(e) || e===0 ?
+                <span>{e}<br/></span>
+                :
+                <span><br/></span>
+                ))
+        case 2: // graph
+        let i = 1
+        let g = 0
+        let h = 0
+        return  graph_numbers.map((e,j)=>(
+            <tr id={'graph_row-'+(graph_max-j)}
+            data-graph={ graph_score.includes(graph_max-j) ? g++ : 0}
+            data-graph2={h=0}
+            
+            >
+                {
+                    graph_score.map((e,i)=>(                    
+                    <>
+                        <td className='graph_ver'
+                        data-graph={ h++ }
+                        style={{outline: 
+                             g==h-1 ? 
+                             "1px solid #2b2e46" : g>=h ? "1px dashed white" : "0" }}
+                        ></td>
+                        
+                        {g==h && graph_score.includes(graph_max-j) ? 
+                        <button className='graph-button'
+                        onClick={()=>{
+                            selectRun(graph_dates.length-(i-1),catState);
+                            }}
+                        style={{left: `calc(100% / ${graph_dates.length} * ${h-1})`}}
+                        ></button> 
+                        : ""}
+                        
+                        <td className='graph_hor' id={'graph_table-'+i++}
+                        style={{
+                            outline: 
+                            graph_score.includes(graph_max-j) ? 
+                            g>=h ? 
+                            g-1>=h ? "1px dashed #2b2e46" : "1px solid white" : "0"  
+                            : "0"}}
+                        ></td>
+
+                        
+
+                        <td className='graph_hor' id={'graph_table-'+i++}
+                        style={{outline: 
+                            graph_score.includes(graph_max-j) ?
+                            g>=h ? 
+                            g-1>=h ? "1px dashed #2b2e46" : "1px solid white" : "0"  
+                            : "0"}}
+                        ></td>
+
+                    </>
+                    ))
+                    
+                }
+                
+            </tr>
+        )) 
+
+        case 3: // dates
+                return graph_dates
+                .reverse().map(e=>(
+                    <span>{e}</span>
+                    ))
+            default:
+                break;
+
+    }
+       
 }
 
 const [vid,setVid] = React.useState("")
@@ -140,7 +231,10 @@ return (
             </div>
             
             <div id='history'>
-                <div>
+
+                <div style={{display: hisState ? "none" : "block"}}>
+                {data.summary.routes.filter(e=>e.category.id===catState).length===0 ? <h5>There are no records for this map.</h5> : 
+                    <>
                     <div className='record-top'>
                         <span>Date</span>
                         <span>Record</span>
@@ -163,17 +257,28 @@ return (
                             <span>{r.history.runner_name}</span>
                         </button>
                     ))}
-
                     </div>
-                </div>
+                    </>
+                    }
+                    </div>
+
+                    <div style={{display: hisState ? "block" : "none"}}>
+                        {data.summary.routes.filter(e=>e.category.id===catState).length===0 ? <h5>There are no records for this map.</h5> : 
+                        <div id='graph'>
+                            <div>{graph(1)}</div>
+                            <div>{graph(2)}</div>
+                            <div>{graph(3)}</div>
+                        </div>
+                            }
+                    </div> 
                     <span>
                         <button onClick={()=>setHisState(0)}>List</button>
                         <button onClick={()=>setHisState(1)}>Graph</button>
                     </span>
-            </div>
+                </div>
+                
                 
         </section>
-
         <section id='section4'>
         <div id='difficulty'>
                 <span>Difficulty</span>
