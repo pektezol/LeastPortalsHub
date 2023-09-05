@@ -1,4 +1,4 @@
-package middleware
+package api
 
 import (
 	"fmt"
@@ -16,7 +16,7 @@ func CheckAuth(c *gin.Context) {
 	// Validate token
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 		return []byte(os.Getenv("SECRET_KEY")), nil
 	})
@@ -44,14 +44,19 @@ func CheckAuth(c *gin.Context) {
 			return
 		}
 		// Get user titles from DB
-		user.Titles = []string{}
-		rows, _ := database.DB.Query(`SELECT t.title_name FROM titles t WHERE t.user_id = $1`, user.SteamID)
+		var moderator bool
+		user.Titles = []models.Title{}
+		rows, _ := database.DB.Query(`SELECT t.title_name, t.title_color FROM titles t INNER JOIN user_titles ut ON t.id=ut.title_id WHERE ut.user_id = $1`, user.SteamID)
 		for rows.Next() {
-			var title string
-			rows.Scan(&title)
+			var title models.Title
+			rows.Scan(&title.Name, &title.Color)
+			if title.Name == "Moderator" {
+				moderator = true
+			}
 			user.Titles = append(user.Titles, title)
 		}
 		c.Set("user", user)
+		c.Set("mod", moderator)
 		c.Next()
 	} else {
 		c.Next()

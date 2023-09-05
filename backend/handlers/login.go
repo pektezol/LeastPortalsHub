@@ -1,9 +1,9 @@
-package controllers
+package handlers
 
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"time"
@@ -15,13 +15,17 @@ import (
 	"github.com/solovev/steam_go"
 )
 
+type LoginResponse struct {
+	Token string `json:"token"`
+}
+
 // Login
 //
 //	@Description	Get (redirect) login page for Steam auth.
 //	@Tags			login
 //	@Accept			json
 //	@Produce		json
-//	@Success		200	{object}	models.Response{data=models.LoginResponse}
+//	@Success		200	{object}	models.Response{data=LoginResponse}
 //	@Failure		400	{object}	models.Response
 //	@Router			/login [get]
 func Login(c *gin.Context) {
@@ -34,20 +38,18 @@ func Login(c *gin.Context) {
 	default:
 		steamID, err := openID.ValidateAndGetId()
 		if err != nil {
+			CreateLog(steamID, LogTypeUser, LogDescriptionUserLoginFailValidate)
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
 		// Create user if new
 		var checkSteamID int64
-		err = database.DB.QueryRow("SELECT steam_id FROM users WHERE steam_id = $1", steamID).Scan(&checkSteamID)
-		// if err != nil {
-		// 	c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
-		// 	return
-		// }
+		database.DB.QueryRow("SELECT steam_id FROM users WHERE steam_id = $1", steamID).Scan(&checkSteamID)
 		// User does not exist
 		if checkSteamID == 0 {
 			user, err := GetPlayerSummaries(steamID, os.Getenv("API_KEY"))
 			if err != nil {
+				CreateLog(steamID, LogTypeUser, LogDescriptionUserLoginFailSummary)
 				c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 				return
 			}
@@ -60,7 +62,7 @@ func Login(c *gin.Context) {
 			VALUES ($1, $2, $3, $4)`, steamID, user.PersonaName, user.AvatarFull, user.LocCountryCode)
 		}
 		moderator := false
-		rows, _ := database.DB.Query("SELECT title_name FROM titles WHERE user_id = $1", steamID)
+		rows, _ := database.DB.Query("SELECT title_name FROM titles t INNER JOIN user_titles ut ON t.id=ut.title_id WHERE ut.user_id = $1", steamID)
 		for rows.Next() {
 			var title string
 			rows.Scan(&title)
@@ -77,15 +79,17 @@ func Login(c *gin.Context) {
 		// Sign and get the complete encoded token as a string using the secret
 		tokenString, err := token.SignedString([]byte(os.Getenv("SECRET_KEY")))
 		if err != nil {
+			CreateLog(steamID, LogTypeUser, LogDescriptionUserLoginFailToken)
 			c.JSON(http.StatusBadRequest, models.ErrorResponse("Failed to generate token."))
 			return
 		}
 		c.SetCookie("token", tokenString, 3600*24*30, "/", "", true, true)
+		CreateLog(steamID, LogTypeUser, LogDescriptionUserLoginSuccess)
 		c.Redirect(http.StatusTemporaryRedirect, "/")
 		// c.JSON(http.StatusOK, models.Response{
 		// 	Success: true,
 		// 	Message: "Successfully generated token.",
-		// 	Data: models.LoginResponse{
+		// 	Data: LoginResponse{
 		// 		Token: tokenString,
 		// 	},
 		// })
@@ -99,7 +103,7 @@ func Login(c *gin.Context) {
 //	@Tags			auth
 //	@Produce		json
 //
-//	@Success		200	{object}	models.Response{data=models.LoginResponse}
+//	@Success		200	{object}	models.Response{data=LoginResponse}
 //	@Failure		404	{object}	models.Response
 //	@Router			/token [get]
 func GetCookie(c *gin.Context) {
@@ -111,7 +115,7 @@ func GetCookie(c *gin.Context) {
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Token cookie successfully retrieved.",
-		Data: models.LoginResponse{
+		Data: LoginResponse{
 			Token: cookie,
 		},
 	})
@@ -123,7 +127,7 @@ func GetCookie(c *gin.Context) {
 //	@Tags			auth
 //	@Produce		json
 //
-//	@Success		200	{object}	models.Response{data=models.LoginResponse}
+//	@Success		200	{object}	models.Response{data=LoginResponse}
 //	@Failure		404	{object}	models.Response
 //	@Router			/token [delete]
 func DeleteCookie(c *gin.Context) {
@@ -136,7 +140,7 @@ func DeleteCookie(c *gin.Context) {
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Token cookie successfully deleted.",
-		Data: models.LoginResponse{
+		Data: LoginResponse{
 			Token: cookie,
 		},
 	})
@@ -148,7 +152,7 @@ func GetPlayerSummaries(steamId, apiKey string) (*models.PlayerSummaries, error)
 	if err != nil {
 		return nil, err
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}

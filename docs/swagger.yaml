@@ -1,20 +1,6 @@
 basePath: /v1
 definitions:
-  models.Category:
-    properties:
-      id:
-        type: integer
-      name:
-        type: string
-    type: object
-  models.Chapter:
-    properties:
-      id:
-        type: integer
-      name:
-        type: string
-    type: object
-  models.ChapterMapsResponse:
+  handlers.ChapterMapsResponse:
     properties:
       chapter:
         $ref: '#/definitions/models.Chapter'
@@ -23,7 +9,7 @@ definitions:
           $ref: '#/definitions/models.MapShort'
         type: array
     type: object
-  models.ChaptersResponse:
+  handlers.ChaptersResponse:
     properties:
       chapters:
         items:
@@ -32,7 +18,7 @@ definitions:
       game:
         $ref: '#/definitions/models.Game'
     type: object
-  models.CreateMapSummaryRequest:
+  handlers.CreateMapSummaryRequest:
     properties:
       category_id:
         type: integer
@@ -53,21 +39,21 @@ definitions:
     - score_count
     - user_name
     type: object
-  models.DeleteMapSummaryRequest:
+  handlers.DeleteMapSummaryRequest:
     properties:
       route_id:
         type: integer
     required:
     - route_id
     type: object
-  models.EditMapImageRequest:
+  handlers.EditMapImageRequest:
     properties:
       image:
         type: string
     required:
     - image
     type: object
-  models.EditMapSummaryRequest:
+  handlers.EditMapSummaryRequest:
     properties:
       description:
         type: string
@@ -88,6 +74,182 @@ definitions:
     - score_count
     - user_name
     type: object
+  handlers.LoginResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  handlers.LogsResponse:
+    properties:
+      logs:
+        items:
+          $ref: '#/definitions/handlers.LogsResponseDetails'
+        type: array
+    type: object
+  handlers.LogsResponseDetails:
+    properties:
+      date:
+        type: string
+      detail:
+        type: string
+      user:
+        $ref: '#/definitions/models.UserShort'
+    type: object
+  handlers.MapLeaderboardsResponse:
+    properties:
+      map:
+        $ref: '#/definitions/models.Map'
+      records: {}
+    type: object
+  handlers.MapSummaryResponse:
+    properties:
+      map:
+        $ref: '#/definitions/models.Map'
+      summary:
+        $ref: '#/definitions/models.MapSummary'
+    type: object
+  handlers.ProfileRankings:
+    properties:
+      cooperative:
+        $ref: '#/definitions/handlers.ProfileRankingsDetails'
+      overall:
+        $ref: '#/definitions/handlers.ProfileRankingsDetails'
+      singleplayer:
+        $ref: '#/definitions/handlers.ProfileRankingsDetails'
+    type: object
+  handlers.ProfileRankingsDetails:
+    properties:
+      completion_count:
+        type: integer
+      completion_total:
+        type: integer
+      rank:
+        type: integer
+    type: object
+  handlers.ProfileRecords:
+    properties:
+      category_id:
+        type: integer
+      game_id:
+        type: integer
+      map_id:
+        type: integer
+      map_name:
+        type: string
+      map_wr_count:
+        type: integer
+      scores:
+        items:
+          $ref: '#/definitions/handlers.ProfileScores'
+        type: array
+    type: object
+  handlers.ProfileResponse:
+    properties:
+      avatar_link:
+        type: string
+      country_code:
+        type: string
+      links:
+        $ref: '#/definitions/models.Links'
+      profile:
+        type: boolean
+      rankings:
+        $ref: '#/definitions/handlers.ProfileRankings'
+      records:
+        items:
+          $ref: '#/definitions/handlers.ProfileRecords'
+        type: array
+      steam_id:
+        type: string
+      titles:
+        items:
+          $ref: '#/definitions/models.Title'
+        type: array
+      user_name:
+        type: string
+    type: object
+  handlers.ProfileScores:
+    properties:
+      date:
+        type: string
+      demo_id:
+        type: string
+      score_count:
+        type: integer
+      score_time:
+        type: integer
+    type: object
+  handlers.RankingsResponse:
+    properties:
+      rankings_multiplayer:
+        items:
+          $ref: '#/definitions/models.UserRanking'
+        type: array
+      rankings_overall:
+        items:
+          $ref: '#/definitions/models.UserRanking'
+        type: array
+      rankings_singleplayer:
+        items:
+          $ref: '#/definitions/models.UserRanking'
+        type: array
+    type: object
+  handlers.RecordResponse:
+    properties:
+      score_count:
+        type: integer
+      score_time:
+        type: integer
+    type: object
+  handlers.ScoreLogsResponse:
+    properties:
+      scores:
+        items:
+          $ref: '#/definitions/handlers.ScoreLogsResponseDetails'
+        type: array
+    type: object
+  handlers.ScoreLogsResponseDetails:
+    properties:
+      date:
+        type: string
+      demo_id:
+        type: string
+      game:
+        $ref: '#/definitions/models.Game'
+      map:
+        $ref: '#/definitions/models.MapShort'
+      score_count:
+        type: integer
+      score_time:
+        type: integer
+      user:
+        $ref: '#/definitions/models.UserShort'
+    type: object
+  handlers.SearchResponse:
+    properties:
+      maps:
+        items:
+          $ref: '#/definitions/models.MapShort'
+        type: array
+      players:
+        items:
+          $ref: '#/definitions/models.UserShort'
+        type: array
+    type: object
+  models.Category:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  models.Chapter:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
   models.Game:
     properties:
       id:
@@ -97,9 +259,15 @@ definitions:
       name:
         type: string
     type: object
-  models.LoginResponse:
+  models.Links:
     properties:
-      token:
+      p2sr:
+        type: string
+      stream:
+        type: string
+      twitch:
+        type: string
+      youtube:
         type: string
     type: object
   models.Map:
@@ -125,10 +293,6 @@ definitions:
         type: string
       score_count:
         type: integer
-    type: object
-  models.MapRecords:
-    properties:
-      records: {}
     type: object
   models.MapRoute:
     properties:
@@ -159,52 +323,6 @@ definitions:
           $ref: '#/definitions/models.MapRoute'
         type: array
     type: object
-  models.MapSummaryResponse:
-    properties:
-      map:
-        $ref: '#/definitions/models.Map'
-      summary:
-        $ref: '#/definitions/models.MapSummary'
-    type: object
-  models.ProfileResponse:
-    properties:
-      avatar_link:
-        type: string
-      country_code:
-        type: string
-      profile:
-        type: boolean
-      scores_mp:
-        items:
-          $ref: '#/definitions/models.ScoreResponse'
-        type: array
-      scores_sp:
-        items:
-          $ref: '#/definitions/models.ScoreResponse'
-        type: array
-      steam_id:
-        type: string
-      user_name:
-        type: string
-    type: object
-  models.RankingsResponse:
-    properties:
-      rankings_mp:
-        items:
-          $ref: '#/definitions/models.UserRanking'
-        type: array
-      rankings_sp:
-        items:
-          $ref: '#/definitions/models.UserRanking'
-        type: array
-    type: object
-  models.RecordResponse:
-    properties:
-      score_count:
-        type: integer
-      score_time:
-        type: integer
-    type: object
   models.Response:
     properties:
       data: {}
@@ -213,31 +331,19 @@ definitions:
       success:
         type: boolean
     type: object
-  models.ScoreResponse:
+  models.Title:
     properties:
-      map_id:
-        type: integer
-      records: {}
-    type: object
-  models.SearchResponse:
-    properties:
-      maps:
-        items:
-          $ref: '#/definitions/models.MapShort'
-        type: array
-      players:
-        items:
-          $ref: '#/definitions/models.UserShort'
-        type: array
+      color:
+        type: string
+      name:
+        type: string
     type: object
   models.UserRanking:
     properties:
       total_score:
         type: integer
-      user_id:
-        type: string
-      user_name:
-        type: string
+      user:
+        $ref: '#/definitions/models.UserShort'
     type: object
   models.UserShort:
     properties:
@@ -275,7 +381,7 @@ paths:
             - $ref: '#/definitions/models.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/models.ChapterMapsResponse'
+                  $ref: '#/definitions/handlers.ChapterMapsResponse'
               type: object
         "400":
           description: Bad Request
@@ -349,7 +455,7 @@ paths:
             - $ref: '#/definitions/models.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/models.ChaptersResponse'
+                  $ref: '#/definitions/handlers.ChaptersResponse'
               type: object
         "400":
           description: Bad Request
@@ -372,7 +478,7 @@ paths:
             - $ref: '#/definitions/models.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/models.LoginResponse'
+                  $ref: '#/definitions/handlers.LoginResponse'
               type: object
         "400":
           description: Bad Request
@@ -380,6 +486,54 @@ paths:
             $ref: '#/definitions/models.Response'
       tags:
       - login
+  /logs/mod:
+    get:
+      description: Get mod logs.
+      parameters:
+      - description: JWT Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.LogsResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+      tags:
+      - logs
+  /logs/score:
+    get:
+      description: Get score logs of every player.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.ScoreLogsResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Response'
+      tags:
+      - logs
   /maps/{id}/image:
     put:
       description: Edit map image with specified map id.
@@ -399,7 +553,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/models.EditMapImageRequest'
+          $ref: '#/definitions/handlers.EditMapImageRequest'
       produces:
       - application/json
       responses:
@@ -410,7 +564,7 @@ paths:
             - $ref: '#/definitions/models.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/models.EditMapImageRequest'
+                  $ref: '#/definitions/handlers.EditMapImageRequest'
               type: object
         "400":
           description: Bad Request
@@ -437,12 +591,7 @@ paths:
             - $ref: '#/definitions/models.Response'
             - properties:
                 data:
-                  allOf:
-                  - $ref: '#/definitions/models.Map'
-                  - properties:
-                      data:
-                        $ref: '#/definitions/models.MapRecords'
-                    type: object
+                  $ref: '#/definitions/handlers.MapLeaderboardsResponse'
               type: object
         "400":
           description: Bad Request
@@ -493,7 +642,7 @@ paths:
             - $ref: '#/definitions/models.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/models.RecordResponse'
+                  $ref: '#/definitions/handlers.RecordResponse'
               type: object
         "400":
           description: Bad Request
@@ -524,7 +673,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/models.DeleteMapSummaryRequest'
+          $ref: '#/definitions/handlers.DeleteMapSummaryRequest'
       produces:
       - application/json
       responses:
@@ -535,7 +684,7 @@ paths:
             - $ref: '#/definitions/models.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/models.DeleteMapSummaryRequest'
+                  $ref: '#/definitions/handlers.DeleteMapSummaryRequest'
               type: object
         "400":
           description: Bad Request
@@ -561,7 +710,7 @@ paths:
             - $ref: '#/definitions/models.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/models.MapSummaryResponse'
+                  $ref: '#/definitions/handlers.MapSummaryResponse'
               type: object
         "400":
           description: Bad Request
@@ -587,7 +736,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/models.CreateMapSummaryRequest'
+          $ref: '#/definitions/handlers.CreateMapSummaryRequest'
       produces:
       - application/json
       responses:
@@ -598,7 +747,7 @@ paths:
             - $ref: '#/definitions/models.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/models.CreateMapSummaryRequest'
+                  $ref: '#/definitions/handlers.CreateMapSummaryRequest'
               type: object
         "400":
           description: Bad Request
@@ -624,7 +773,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/models.EditMapSummaryRequest'
+          $ref: '#/definitions/handlers.EditMapSummaryRequest'
       produces:
       - application/json
       responses:
@@ -635,7 +784,7 @@ paths:
             - $ref: '#/definitions/models.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/models.EditMapSummaryRequest'
+                  $ref: '#/definitions/handlers.EditMapSummaryRequest'
               type: object
         "400":
           description: Bad Request
@@ -664,7 +813,7 @@ paths:
             - $ref: '#/definitions/models.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/models.ProfileResponse'
+                  $ref: '#/definitions/handlers.ProfileResponse'
               type: object
         "400":
           description: Bad Request
@@ -696,7 +845,7 @@ paths:
             - $ref: '#/definitions/models.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/models.ProfileResponse'
+                  $ref: '#/definitions/handlers.ProfileResponse'
               type: object
         "400":
           description: Bad Request
@@ -753,7 +902,7 @@ paths:
             - $ref: '#/definitions/models.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/models.RankingsResponse'
+                  $ref: '#/definitions/handlers.RankingsResponse'
               type: object
         "400":
           description: Bad Request
@@ -779,7 +928,7 @@ paths:
             - $ref: '#/definitions/models.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/models.SearchResponse'
+                  $ref: '#/definitions/handlers.SearchResponse'
               type: object
         "400":
           description: Bad Request
@@ -800,7 +949,7 @@ paths:
             - $ref: '#/definitions/models.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/models.LoginResponse'
+                  $ref: '#/definitions/handlers.LoginResponse'
               type: object
         "404":
           description: Not Found
@@ -820,7 +969,7 @@ paths:
             - $ref: '#/definitions/models.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/models.LoginResponse'
+                  $ref: '#/definitions/handlers.LoginResponse'
               type: object
         "404":
           description: Not Found
@@ -849,7 +998,7 @@ paths:
             - $ref: '#/definitions/models.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/models.ProfileResponse'
+                  $ref: '#/definitions/handlers.ProfileResponse'
               type: object
         "400":
           description: Bad Request

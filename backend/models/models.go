@@ -4,6 +4,20 @@ import (
 	"time"
 )
 
+type Response struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+	Data    any    `json:"data"`
+}
+
+func ErrorResponse(message string) Response {
+	return Response{
+		Success: false,
+		Message: message,
+		Data:    nil,
+	}
+}
+
 type User struct {
 	SteamID     string    `json:"steam_id"`
 	UserName    string    `json:"user_name"`
@@ -11,12 +25,18 @@ type User struct {
 	CountryCode string    `json:"country_code"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
-	Titles      []string  `json:"titles"`
+	Titles      []Title   `json:"titles"`
 }
 
 type UserShort struct {
 	SteamID  string `json:"steam_id"`
 	UserName string `json:"user_name"`
+}
+
+type UserShortWithAvatar struct {
+	SteamID    string `json:"steam_id"`
+	UserName   string `json:"user_name"`
+	AvatarLink string `json:"avatar_link"`
 }
 
 type Map struct {
@@ -57,9 +77,8 @@ type MapRecords struct {
 }
 
 type UserRanking struct {
-	UserID     string `json:"user_id"`
-	UserName   string `json:"user_name"`
-	TotalScore int    `json:"total_score"`
+	User       UserShort `json:"user"`
+	TotalScore int       `json:"total_score"`
 }
 
 type Game struct {
@@ -78,32 +97,16 @@ type Category struct {
 	Name string `json:"name"`
 }
 
-type RecordSP struct {
-	RecordID   int       `json:"record_id"`
-	Placement  int       `json:"placement"`
-	UserID     string    `json:"user_id"`
-	UserName   string    `json:"user_name"`
-	UserAvatar string    `json:"user_avatar"`
-	ScoreCount int       `json:"score_count"`
-	ScoreTime  int       `json:"score_time"`
-	DemoID     string    `json:"demo_id"`
-	RecordDate time.Time `json:"record_date"`
+type Title struct {
+	Name  string `json:"name"`
+	Color string `json:"color"`
 }
 
-type RecordMP struct {
-	RecordID      int       `json:"record_id"`
-	Placement     int       `json:"placement"`
-	HostID        string    `json:"host_id"`
-	HostName      string    `json:"host_name"`
-	HostAvatar    string    `json:"host_avatar"`
-	PartnerID     string    `json:"partner_id"`
-	PartnerName   string    `json:"partner_name"`
-	PartnerAvatar string    `json:"partner_avatar"`
-	ScoreCount    int       `json:"score_count"`
-	ScoreTime     int       `json:"score_time"`
-	HostDemoID    string    `json:"host_demo_id"`
-	PartnerDemoID string    `json:"partner_demo_id"`
-	RecordDate    time.Time `json:"record_date"`
+type Links struct {
+	P2SR    string `json:"p2sr"`
+	Steam   string `json:"stream"`
+	YouTube string `json:"youtube"`
+	Twitch  string `json:"twitch"`
 }
 
 type PlayerSummaries struct {

@@ -7,8 +7,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/pektezol/leastportalshub/backend/api"
 	"github.com/pektezol/leastportalshub/backend/database"
-	"github.com/pektezol/leastportalshub/backend/routes"
 	_ "github.com/pektezol/leastportalshub/docs"
 )
 
@@ -31,6 +31,6 @@ func main() {
 	}
 	router := gin.Default()
 	database.ConnectDB()
-	routes.InitRoutes(router)
+	api.InitRoutes(router)
 	router.Run(fmt.Sprintf(":%s", os.Getenv("PORT")))
 }

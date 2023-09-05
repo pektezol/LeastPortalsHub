@@ -36,6 +36,15 @@ If you have any questions or feedback, please feel free to contact us at our [Di
 
 If you want to support the creator, you can do it via using GitHub sponsorships by clicking [here](https://github.com/sponsors/pektezol).
 
+## Privacy Policy
+
+* We store a JWT (JSON Web Token) on your device as a cookie to facilitate authentication to LPHUB.
+* We collect and store your publicly available id, username, avatar link, and country code from Steam during your first login to LPHUB. The exact date and time of your LPHUB account creation is also stored.
+* In a case of profile update, newly changed values replaces the old data, and the update time is also stored.
+* All of the demo proof submitted by users are stored in a publicly accessible Google Drive folder. By submitting demo as a proof, you agree that your demo proof becomes available to the public.
+* Any information, ideas, or solutions shared on LPHUB are intended to be openly accessible and available for collaborative purposes. Users should understand that the content they contribute might be viewed and used by others for the purpose of generating insights and solutions. Sharing content on this platform does not transfer ownership of intellectual property rights to the platform owner or other users. Contributors retain their rights to their own content while granting others the opportunity to engage and collaborate. We do not place emphasis on determining ownership of individual contributions.
+* At any time, Privacy Policy may get updated to reflect changes in LPHUB. The effective date at the bottom of the README indicates when the most recent changes were made.
+
 ## Disclaimer
 
 This project, "Portal 2 Least Portals Hub" (hereafter referred to as "LPHUB"), is an unofficial community-driven resource providing strategies, routes, leaderboards, and other information related to the "Least Portals" category of the game "Portal 2". LPHUB is not affiliated with or endorsed by the creators, developers, or publishers of "Portal 2", including but not limited to Valve Corporation.
@@ -49,3 +58,7 @@ The source code for LPHUB is licensed under the GNU Affero General Public Licens
 Your use of LPHUB is at your own risk. LPHUB and its administrators and moderators disclaim all liability for any damages, whether direct, indirect, incidental, or consequential, that may result from your use of LPHUB or the strategies, routes, or other information provided therein.
 
 By using LPHUB, you acknowledge that you have read and understood this disclaimer and agree to its terms.
+
+## Last Update
+
+2023-08-30
