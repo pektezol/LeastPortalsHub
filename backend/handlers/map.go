@@ -16,8 +16,9 @@ type MapSummaryResponse struct {
 }
 
 type MapLeaderboardsResponse struct {
-	Map     models.Map `json:"map"`
-	Records any        `json:"records"`
+	Map        models.Map        `json:"map"`
+	Records    any               `json:"records"`
+	Pagination models.Pagination `json:"pagination"`
 }
 
 type ChaptersResponse struct {
@@ -115,17 +116,24 @@ func FetchMapSummary(c *gin.Context) {
 //	@Description	Get map leaderboards with specified id.
 //	@Tags			maps
 //	@Produce		json
-//	@Param			id	path		int	true	"Map ID"
-//	@Success		200	{object}	models.Response{data=MapLeaderboardsResponse}
-//	@Failure		400	{object}	models.Response
+//	@Param			id			path		int	true	"Map ID"
+//	@Param			page		query		int	false	"Page Number (default: 1)"
+//	@Param			pageSize	query		int	false	"Number of Records Per Page (default: 10)"
+//	@Success		200			{object}	models.Response{data=MapLeaderboardsResponse}
+//	@Failure		400			{object}	models.Response
 //	@Router			/maps/{id}/leaderboards [get]
 func FetchMapLeaderboards(c *gin.Context) {
-	// TODO: make new response type
 	id := c.Param("id")
 	// Get map data
-	response := MapLeaderboardsResponse{Map: models.Map{}, Records: nil}
-	// var mapData models.Map
-	// var mapRecordsData models.MapRecords
+	response := MapLeaderboardsResponse{Map: models.Map{}, Records: nil, Pagination: models.Pagination{}}
+	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
+	if err != nil || page < 1 {
+		page = 1
+	}
+	pageSize, err := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
+	if err != nil || pageSize < 1 {
+		pageSize = 10
+	}
 	var isDisabled bool
 	intID, err := strconv.Atoi(id)
 	if err != nil {
@@ -147,7 +155,8 @@ func FetchMapLeaderboards(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.ErrorResponse("Map is not available for competitive boards."))
 		return
 	}
-	// TODO: avatar and names for host & partner
+	totalRecords := 0
+	totalPages := 0
 	if response.Map.GameName == "Portal 2 - Cooperative" {
 		records := []RecordMultiplayer{}
 		sql = `SELECT
@@ -179,7 +188,7 @@ func FetchMapLeaderboards(c *gin.Context) {
 	) sub
 	JOIN users AS host ON sub.host_id = host.steam_id 
 	JOIN users AS partner ON sub.partner_id = partner.steam_id 
-	WHERE sub.rn = 1;`
+	WHERE sub.rn = 1`
 		rows, err := database.DB.Query(sql, id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
@@ -203,7 +212,18 @@ func FetchMapLeaderboards(c *gin.Context) {
 			records = append(records, record)
 			placement++
 		}
-		response.Records = records
+		totalRecords = len(records)
+		totalPages = (totalRecords + pageSize - 1) / pageSize
+		if page > totalPages {
+			c.JSON(http.StatusBadRequest, models.ErrorResponse("Invalid page number."))
+			return
+		}
+		startIndex := (page - 1) * pageSize
+		endIndex := startIndex + pageSize
+		if endIndex > totalRecords {
+			endIndex = totalRecords
+		}
+		response.Records = records[startIndex:endIndex]
 	} else {
 		records := []RecordSingleplayer{}
 		sql = `SELECT id, user_id, users.user_name, users.avatar_link, score_count, score_time, demo_id, record_date
@@ -238,7 +258,24 @@ func FetchMapLeaderboards(c *gin.Context) {
 			records = append(records, record)
 			placement++
 		}
-		response.Records = records
+		totalRecords = len(records)
+		totalPages = (totalRecords + pageSize - 1) / pageSize
+		if page > totalPages {
+			c.JSON(http.StatusBadRequest, models.ErrorResponse("Invalid page number."))
+			return
+		}
+		startIndex := (page - 1) * pageSize
+		endIndex := startIndex + pageSize
+		if endIndex > totalRecords {
+			endIndex = totalRecords
+		}
+		response.Records = records[startIndex:endIndex]
+	}
+	response.Pagination = models.Pagination{
+		TotalRecords: totalRecords,
+		TotalPages:   totalPages,
+		CurrentPage:  page,
+		PageSize:     pageSize,
 	}
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,

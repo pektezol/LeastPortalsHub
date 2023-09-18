@@ -109,6 +109,13 @@ type Links struct {
 	Twitch  string `json:"twitch"`
 }
 
+type Pagination struct {
+	TotalRecords int `json:"total_records"`
+	TotalPages   int `json:"total_pages"`
+	CurrentPage  int `json:"current_page"`
+	PageSize     int `json:"page_size"`
+}
+
 type PlayerSummaries struct {
 	SteamId                  string `json:"steamid"`
 	CommunityVisibilityState int    `json:"communityvisibilitystate"`
