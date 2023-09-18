@@ -390,6 +390,18 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page Number (default: 1)",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of Records Per Page (default: 20)",
+                        "name": "pageSize",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1249,6 +1261,9 @@ const docTemplate = `{
                 "map": {
                     "$ref": "#/definitions/models.Map"
                 },
+                "pagination": {
+                    "$ref": "#/definitions/models.Pagination"
+                },
                 "records": {}
             }
         },
@@ -1592,6 +1607,23 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/models.MapRoute"
                     }
+                }
+            }
+        },
+        "models.Pagination": {
+            "type": "object",
+            "properties": {
+                "current_page": {
+                    "type": "integer"
+                },
+                "page_size": {
+                    "type": "integer"
+                },
+                "total_pages": {
+                    "type": "integer"
+                },
+                "total_records": {
+                    "type": "integer"
                 }
             }
         },
