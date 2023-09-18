@@ -118,7 +118,7 @@ func FetchMapSummary(c *gin.Context) {
 //	@Produce		json
 //	@Param			id			path		int	true	"Map ID"
 //	@Param			page		query		int	false	"Page Number (default: 1)"
-//	@Param			pageSize	query		int	false	"Number of Records Per Page (default: 10)"
+//	@Param			pageSize	query		int	false	"Number of Records Per Page (default: 20)"
 //	@Success		200			{object}	models.Response{data=MapLeaderboardsResponse}
 //	@Failure		400			{object}	models.Response
 //	@Router			/maps/{id}/leaderboards [get]
@@ -130,9 +130,9 @@ func FetchMapLeaderboards(c *gin.Context) {
 	if err != nil || page < 1 {
 		page = 1
 	}
-	pageSize, err := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
+	pageSize, err := strconv.Atoi(c.DefaultQuery("pageSize", "20"))
 	if err != nil || pageSize < 1 {
-		pageSize = 10
+		pageSize = 20
 	}
 	var isDisabled bool
 	intID, err := strconv.Atoi(id)
