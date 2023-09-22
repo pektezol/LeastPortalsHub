@@ -64,12 +64,13 @@ type MapHistory struct {
 }
 
 type MapRoute struct {
-	RouteID     int        `json:"route_id"`
-	Category    Category   `json:"category"`
-	History     MapHistory `json:"history"`
-	Rating      float32    `json:"rating"`
-	Description string     `json:"description"`
-	Showcase    string     `json:"showcase"`
+	RouteID         int        `json:"route_id"`
+	Category        Category   `json:"category"`
+	History         MapHistory `json:"history"`
+	Rating          float32    `json:"rating"`
+	CompletionCount int        `json:"completion_count"`
+	Description     string     `json:"description"`
+	Showcase        string     `json:"showcase"`
 }
 
 type MapRecords struct {
