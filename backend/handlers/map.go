@@ -213,18 +213,21 @@ func FetchMapLeaderboards(c *gin.Context) {
 			records = append(records, record)
 			placement++
 		}
+		response.Records = records
 		totalRecords = len(records)
-		totalPages = (totalRecords + pageSize - 1) / pageSize
-		if page > totalPages {
-			c.JSON(http.StatusBadRequest, models.ErrorResponse("Invalid page number."))
-			return
+		if totalRecords != 0 {
+			totalPages = (totalRecords + pageSize - 1) / pageSize
+			if page > totalPages {
+				c.JSON(http.StatusBadRequest, models.ErrorResponse("Invalid page number."))
+				return
+			}
+			startIndex := (page - 1) * pageSize
+			endIndex := startIndex + pageSize
+			if endIndex > totalRecords {
+				endIndex = totalRecords
+			}
+			response.Records = records[startIndex:endIndex]
 		}
-		startIndex := (page - 1) * pageSize
-		endIndex := startIndex + pageSize
-		if endIndex > totalRecords {
-			endIndex = totalRecords
-		}
-		response.Records = records[startIndex:endIndex]
 	} else {
 		records := []RecordSingleplayer{}
 		sql = `SELECT id, user_id, users.user_name, users.avatar_link, score_count, score_time, demo_id, record_date
@@ -260,18 +263,21 @@ func FetchMapLeaderboards(c *gin.Context) {
 			records = append(records, record)
 			placement++
 		}
+		response.Records = records
 		totalRecords = len(records)
-		totalPages = (totalRecords + pageSize - 1) / pageSize
-		if page > totalPages {
-			c.JSON(http.StatusBadRequest, models.ErrorResponse("Invalid page number."))
-			return
+		if totalRecords != 0 {
+			totalPages = (totalRecords + pageSize - 1) / pageSize
+			if page > totalPages {
+				c.JSON(http.StatusBadRequest, models.ErrorResponse("Invalid page number."))
+				return
+			}
+			startIndex := (page - 1) * pageSize
+			endIndex := startIndex + pageSize
+			if endIndex > totalRecords {
+				endIndex = totalRecords
+			}
+			response.Records = records[startIndex:endIndex]
 		}
-		startIndex := (page - 1) * pageSize
-		endIndex := startIndex + pageSize
-		if endIndex > totalRecords {
-			endIndex = totalRecords
-		}
-		response.Records = records[startIndex:endIndex]
 	}
 	response.Pagination = models.Pagination{
 		TotalRecords: totalRecords,
