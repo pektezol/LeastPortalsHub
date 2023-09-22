@@ -188,7 +188,8 @@ func FetchMapLeaderboards(c *gin.Context) {
 	) sub
 	JOIN users AS host ON sub.host_id = host.steam_id 
 	JOIN users AS partner ON sub.partner_id = partner.steam_id 
-	WHERE sub.rn = 1`
+	WHERE sub.rn = 1
+	ORDER BY score_count, score_time`
 		rows, err := database.DB.Query(sql, id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
@@ -203,7 +204,7 @@ func FetchMapLeaderboards(c *gin.Context) {
 				c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 				return
 			}
-			if len(records) != 0 && records[len(records)-1].ScoreTime == record.ScoreTime {
+			if len(records) != 0 && records[len(records)-1].ScoreCount == record.ScoreCount && records[len(records)-1].ScoreTime == record.ScoreTime {
 				ties++
 				record.Placement = placement - ties
 			} else {
@@ -234,7 +235,8 @@ func FetchMapLeaderboards(c *gin.Context) {
 		  WHERE map_id = $1
 		) sub
 		INNER JOIN users ON user_id = users.steam_id
-		WHERE rn = 1`
+		WHERE rn = 1
+		ORDER BY score_count, score_time`
 		rows, err := database.DB.Query(sql, id)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
@@ -249,7 +251,7 @@ func FetchMapLeaderboards(c *gin.Context) {
 				c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 				return
 			}
-			if len(records) != 0 && records[len(records)-1].ScoreTime == record.ScoreTime {
+			if len(records) != 0 && records[len(records)-1].ScoreCount == record.ScoreCount && records[len(records)-1].ScoreTime == record.ScoreTime {
 				ties++
 				record.Placement = placement - ties
 			} else {
