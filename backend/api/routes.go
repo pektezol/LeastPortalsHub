@@ -21,15 +21,15 @@ const (
 	mapImagePath        string = "/maps/:mapid/image"
 	mapLeaderboardsPath string = "/maps/:mapid/leaderboards"
 	mapRecordPath       string = "/maps/:mapid/record"
-	// mapDiscussionsPath  string = "/maps/:id/discussions"
-	// mapDiscussionPath   string = "/maps/:id/discussions/:did"
-	rankingsPath    string = "/rankings"
-	searchPath      string = "/search"
-	gamesPath       string = "/games"
-	chaptersPath    string = "/games/:gameid"
-	chapterMapsPath string = "/chapters/:chapterid"
-	scoreLogsPath   string = "/logs/score"
-	modLogsPath     string = "/logs/mod"
+	mapDiscussionsPath  string = "/maps/:mapid/discussions"
+	mapDiscussionPath   string = "/maps/:mapid/discussions/:discussionid"
+	rankingsPath        string = "/rankings"
+	searchPath          string = "/search"
+	gamesPath           string = "/games"
+	chaptersPath        string = "/games/:gameid"
+	chapterMapsPath     string = "/chapters/:chapterid"
+	scoreLogsPath       string = "/logs/score"
+	modLogsPath         string = "/logs/mod"
 )
 
 func InitRoutes(router *gin.Engine) {
@@ -59,10 +59,11 @@ func InitRoutes(router *gin.Engine) {
 		v1.GET(mapLeaderboardsPath, handlers.FetchMapLeaderboards)
 		v1.POST(mapRecordPath, CheckAuth, handlers.CreateRecordWithDemo)
 		v1.GET(demosPath, handlers.DownloadDemoWithID)
-		// v1.GET(mapDiscussionsPath, handlers.FetchMapDiscussions)
-		// v1.POST(mapDiscussionsPath, CheckAuth, handlers.CreateMapSummary)
-		// v1.PUT(mapDiscussionsPath, CheckAuth, handlers.EditMapSummary)
-		// v1.DELETE(mapDiscussionsPath, CheckAuth, handlers.DeleteMapSummary)
+		v1.GET(mapDiscussionsPath, handlers.FetchMapDiscussions)
+		v1.GET(mapDiscussionsPath, handlers.FetchMapDiscussion)
+		v1.POST(mapDiscussionsPath, CheckAuth, handlers.CreateMapDiscussion)
+		v1.PUT(mapDiscussionsPath, CheckAuth, handlers.EditMapDiscussion)
+		v1.DELETE(mapDiscussionsPath, CheckAuth, handlers.DeleteMapDiscussion)
 		// Rankings, search
 		v1.GET(rankingsPath, handlers.Rankings)
 		v1.GET(searchPath, handlers.SearchWithQuery)
