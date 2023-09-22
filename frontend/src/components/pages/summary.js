@@ -36,7 +36,6 @@ const fakedata={} //for debug
         fetch(`https://lp.ardapektezol.com/api/v1/maps/${location.pathname.split('/')[2]}/leaderboards?page=${pageNumber}`)
         .then(r => r.json())
         .then(d => setLbData(d))
-        console.log(lbData)
         // eslint-disable-next-line
     }, [pageNumber]);
 
@@ -318,22 +317,23 @@ return (
         <section id='section4' className='summary1'>
         <div id='difficulty'>
                 <span>Difficulty</span>
-                {data.summary.routes.sort((a,b)=>a.category.id - b.category.id)[selectedRun].rating === 0 ? (<span style={{color:"lime"}}>Very easy</span>):null}
-                {data.summary.routes.sort((a,b)=>a.category.id - b.category.id)[selectedRun].rating === 1 ? (<span style={{color:"green"}}>Easy</span>):null}
-                {data.summary.routes.sort((a,b)=>a.category.id - b.category.id)[selectedRun].rating === 2 ? (<span style={{color:"yellow"}}>Medium</span>):null}
-                {data.summary.routes.sort((a,b)=>a.category.id - b.category.id)[selectedRun].rating === 3 ? (<span style={{color:"orange"}}>Hard</span>):null}
-                {data.summary.routes.sort((a,b)=>a.category.id - b.category.id)[selectedRun].rating === 4 ? (<span style={{color:"red"}}>Very hard</span>):null}
+                {data.summary.routes.sort((a,b)=>a.category.id - b.category.id)[selectedRun].rating === 0 ? (<span>N/A</span>):null}
+                {data.summary.routes.sort((a,b)=>a.category.id - b.category.id)[selectedRun].rating === 1 ? (<span style={{color:"lime"}}>Very easy</span>):null}
+                {data.summary.routes.sort((a,b)=>a.category.id - b.category.id)[selectedRun].rating === 2 ? (<span style={{color:"green"}}>Easy</span>):null}
+                {data.summary.routes.sort((a,b)=>a.category.id - b.category.id)[selectedRun].rating === 3 ? (<span style={{color:"yellow"}}>Medium</span>):null}
+                {data.summary.routes.sort((a,b)=>a.category.id - b.category.id)[selectedRun].rating === 4 ? (<span style={{color:"orange"}}>Hard</span>):null}
+                {data.summary.routes.sort((a,b)=>a.category.id - b.category.id)[selectedRun].rating === 5 ? (<span style={{color:"red"}}>Very hard</span>):null}
                 <div>
-                    {data.summary.routes.sort((a,b)=>a.category.id - b.category.id)[selectedRun].rating === 0 ? (<div className='difficulty-rating' style={{backgroundColor:"lime"}}></div>) : (<div className='difficulty-rating'></div>)}
-                    {data.summary.routes.sort((a,b)=>a.category.id - b.category.id)[selectedRun].rating === 1 ? (<div className='difficulty-rating' style={{backgroundColor:"green"}}></div>) : (<div className='difficulty-rating'></div>)}
-                    {data.summary.routes.sort((a,b)=>a.category.id - b.category.id)[selectedRun].rating === 2 ? (<div className='difficulty-rating' style={{backgroundColor:"yellow"}}></div>) : (<div className='difficulty-rating'></div>)}
-                    {data.summary.routes.sort((a,b)=>a.category.id - b.category.id)[selectedRun].rating === 3 ? (<div className='difficulty-rating' style={{backgroundColor:"orange"}}></div>) : (<div className='difficulty-rating'></div>)}
-                    {data.summary.routes.sort((a,b)=>a.category.id - b.category.id)[selectedRun].rating === 4 ? (<div className='difficulty-rating' style={{backgroundColor:"red"}}></div>) : (<div className='difficulty-rating'></div>)}
+                    {data.summary.routes.sort((a,b)=>a.category.id - b.category.id)[selectedRun].rating === 1 ? (<div className='difficulty-rating' style={{backgroundColor:"lime"}}></div>) : (<div className='difficulty-rating'></div>)}
+                    {data.summary.routes.sort((a,b)=>a.category.id - b.category.id)[selectedRun].rating === 2 ? (<div className='difficulty-rating' style={{backgroundColor:"green"}}></div>) : (<div className='difficulty-rating'></div>)}
+                    {data.summary.routes.sort((a,b)=>a.category.id - b.category.id)[selectedRun].rating === 3 ? (<div className='difficulty-rating' style={{backgroundColor:"yellow"}}></div>) : (<div className='difficulty-rating'></div>)}
+                    {data.summary.routes.sort((a,b)=>a.category.id - b.category.id)[selectedRun].rating === 4 ? (<div className='difficulty-rating' style={{backgroundColor:"orange"}}></div>) : (<div className='difficulty-rating'></div>)}
+                    {data.summary.routes.sort((a,b)=>a.category.id - b.category.id)[selectedRun].rating === 5 ? (<div className='difficulty-rating' style={{backgroundColor:"red"}}></div>) : (<div className='difficulty-rating'></div>)}
                 </div>
             </div>
             <div id='count'>
                 <span>Completion count</span>
-                <div>6275</div>
+                <div>{catState===1?data.summary.routes[selectedRun].completion_count:"N/A"}</div>
             </div>
         </section>
 
@@ -350,8 +350,7 @@ return (
                 </span>
             </div>    
         </section>
-
-        {lbData===null?(
+        {lbData===null?"":lbData.success===false?(
             <section id='section6' className='summary2'>
                 <h1 style={{textAlign:"center"}}>Map is not available for competitive boards.</h1>
             </section>
@@ -396,7 +395,6 @@ return (
                         </span>
                     </span>
                     ))}
-                    {console.log(lbData.data.records.length)}
             </div>
         </section>
         )}

@@ -83,7 +83,7 @@ type ScoreLogsResponseDetails struct {
 func ModLogs(c *gin.Context) {
 	mod, exists := c.Get("mod")
 	if !exists || !mod.(bool) {
-		c.JSON(http.StatusUnauthorized, models.ErrorResponse("Insufficient permissions."))
+		c.JSON(http.StatusOK, models.ErrorResponse("Insufficient permissions."))
 		return
 	}
 	response := LogsResponse{Logs: []LogsResponseDetails{}}
@@ -92,14 +92,14 @@ func ModLogs(c *gin.Context) {
 	ORDER BY l.date DESC LIMIT 100;`
 	rows, err := database.DB.Query(sql)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	for rows.Next() {
 		log := Log{}
 		err = rows.Scan(&log.User.UserName, &log.User.SteamID, &log.Type, &log.Description, &log.Date)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 		detail := fmt.Sprintf("%s.%s", log.Type, log.Description)
@@ -160,14 +160,14 @@ func ScoreLogs(c *gin.Context) {
 	ORDER BY rs.record_date DESC LIMIT 100;`
 	rows, err := database.DB.Query(sql)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	for rows.Next() {
 		score := ScoreLogsResponseDetails{}
 		err = rows.Scan(&score.Game.ID, &score.Game.Name, &score.Game.IsCoop, &score.Map.ID, &score.Map.Name, &score.User.SteamID, &score.User.UserName, &score.ScoreCount, &score.ScoreTime, &score.DemoID, &score.Date)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 		response.Logs = append(response.Logs, score)

@@ -99,6 +99,8 @@ definitions:
     properties:
       map:
         $ref: '#/definitions/models.Map'
+      pagination:
+        $ref: '#/definitions/models.Pagination'
       records: {}
     type: object
   handlers.MapSummaryResponse:
@@ -298,6 +300,8 @@ definitions:
     properties:
       category:
         $ref: '#/definitions/models.Category'
+      completion_count:
+        type: integer
       description:
         type: string
       history:
@@ -322,6 +326,17 @@ definitions:
         items:
           $ref: '#/definitions/models.MapRoute'
         type: array
+    type: object
+  models.Pagination:
+    properties:
+      current_page:
+        type: integer
+      page_size:
+        type: integer
+      total_pages:
+        type: integer
+      total_records:
+        type: integer
     type: object
   models.Response:
     properties:
@@ -580,6 +595,14 @@ paths:
         in: path
         name: id
         required: true
+        type: integer
+      - description: 'Page Number (default: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Number of Records Per Page (default: 20)'
+        in: query
+        name: pageSize
         type: integer
       produces:
       - application/json

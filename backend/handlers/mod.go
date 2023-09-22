@@ -51,30 +51,30 @@ func CreateMapSummary(c *gin.Context) {
 	// Check if user exists
 	user, exists := c.Get("user")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, models.ErrorResponse("User not logged in."))
+		c.JSON(http.StatusOK, models.ErrorResponse("User not logged in."))
 		return
 	}
 	mod, exists := c.Get("mod")
 	if !exists || !mod.(bool) {
-		c.JSON(http.StatusUnauthorized, models.ErrorResponse("Insufficient permissions."))
+		c.JSON(http.StatusOK, models.ErrorResponse("Insufficient permissions."))
 		return
 	}
 	// Bind parameter and body
 	id := c.Param("id")
 	mapID, err := strconv.Atoi(id)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	var request CreateMapSummaryRequest
 	if err := c.BindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	// Start database transaction
 	tx, err := database.DB.Begin()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	defer tx.Rollback()
@@ -83,11 +83,11 @@ func CreateMapSummary(c *gin.Context) {
 	sql := `SELECT m.id FROM maps m WHERE m.id = $1`
 	err = database.DB.QueryRow(sql, mapID).Scan(&checkMapID)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	if mapID != checkMapID {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse("Map ID does not exist."))
+		c.JSON(http.StatusOK, models.ErrorResponse("Map ID does not exist."))
 		return
 	}
 	// Update database with new data
@@ -95,18 +95,18 @@ func CreateMapSummary(c *gin.Context) {
 	VALUES ($1,$2,$3,$4,$5)`
 	_, err = tx.Exec(sql, mapID, request.CategoryID, request.ScoreCount, request.Description, request.Showcase)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	sql = `INSERT INTO map_history (map_id,category_id,user_name,score_count,record_date)
 	VALUES ($1,$2,$3,$4,$5)`
 	_, err = tx.Exec(sql, mapID, request.CategoryID, request.UserName, request.ScoreCount, request.RecordDate)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	if err = tx.Commit(); err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryCreate)
@@ -132,30 +132,30 @@ func EditMapSummary(c *gin.Context) {
 	// Check if user exists
 	user, exists := c.Get("user")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, models.ErrorResponse("User not logged in."))
+		c.JSON(http.StatusOK, models.ErrorResponse("User not logged in."))
 		return
 	}
 	mod, exists := c.Get("mod")
 	if !exists || !mod.(bool) {
-		c.JSON(http.StatusUnauthorized, models.ErrorResponse("Insufficient permissions."))
+		c.JSON(http.StatusOK, models.ErrorResponse("Insufficient permissions."))
 		return
 	}
 	// Bind parameter and body
 	id := c.Param("id")
 	mapID, err := strconv.Atoi(id)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	var request EditMapSummaryRequest
 	if err := c.BindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	// Start database transaction
 	tx, err := database.DB.Begin()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	defer tx.Rollback()
@@ -164,30 +164,30 @@ func EditMapSummary(c *gin.Context) {
 	sql := `SELECT mr.category_id, mr.score_count FROM map_routes mr INNER JOIN maps m ON m.id = mr.map_id WHERE m.id = $1 AND mr.id = $2`
 	err = database.DB.QueryRow(sql, mapID, request.RouteID).Scan(&categoryID, &scoreCount)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	sql = `SELECT mh.id FROM map_history mh WHERE mh.score_count = $1 AND mh.category_id = $2 AND mh.map_id = $3`
 	err = database.DB.QueryRow(sql, scoreCount, categoryID, mapID).Scan(&historyID)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	// Update database with new data
 	sql = `UPDATE map_routes SET score_count = $2, description = $3, showcase = $4 WHERE id = $1`
 	_, err = tx.Exec(sql, request.RouteID, request.ScoreCount, request.Description, request.Showcase)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	sql = `UPDATE map_history SET user_name = $2, score_count = $3, record_date = $4 WHERE id = $1`
 	_, err = tx.Exec(sql, historyID, request.UserName, request.ScoreCount, request.RecordDate)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	if err = tx.Commit(); err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryEdit)
@@ -213,30 +213,30 @@ func DeleteMapSummary(c *gin.Context) {
 	// Check if user exists
 	user, exists := c.Get("user")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, models.ErrorResponse("User not logged in."))
+		c.JSON(http.StatusOK, models.ErrorResponse("User not logged in."))
 		return
 	}
 	mod, exists := c.Get("mod")
 	if !exists || !mod.(bool) {
-		c.JSON(http.StatusUnauthorized, models.ErrorResponse("Insufficient permissions."))
+		c.JSON(http.StatusOK, models.ErrorResponse("Insufficient permissions."))
 		return
 	}
 	// Bind parameter and body
 	id := c.Param("id")
 	mapID, err := strconv.Atoi(id)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	var request DeleteMapSummaryRequest
 	if err := c.BindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	// Start database transaction
 	tx, err := database.DB.Begin()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	defer tx.Rollback()
@@ -245,34 +245,34 @@ func DeleteMapSummary(c *gin.Context) {
 	sql := `SELECT m.id, mr.score_count FROM maps m INNER JOIN map_routes mr ON m.id=mr.map_id WHERE m.id = $1 AND mr.id = $2`
 	err = database.DB.QueryRow(sql, mapID, request.RouteID).Scan(&checkMapID, &scoreCount)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	if mapID != checkMapID {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse("Map ID does not exist."))
+		c.JSON(http.StatusOK, models.ErrorResponse("Map ID does not exist."))
 		return
 	}
 	sql = `SELECT mh.id FROM maps m INNER JOIN map_routes mr ON m.id=mr.map_id INNER JOIN map_history mh ON m.id=mh.map_id WHERE m.id = $1 AND mr.id = $2 AND mh.score_count = $3`
 	err = database.DB.QueryRow(sql, mapID, request.RouteID, scoreCount).Scan(&mapHistoryID)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	// Update database with new data
 	sql = `DELETE FROM map_routes mr WHERE mr.id = $1 `
 	_, err = tx.Exec(sql, request.RouteID)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	sql = `DELETE FROM map_history mh WHERE mh.id = $1`
 	_, err = tx.Exec(sql, mapHistoryID)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	if err = tx.Commit(); err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryDelete)
@@ -298,31 +298,31 @@ func EditMapImage(c *gin.Context) {
 	// Check if user exists
 	user, exists := c.Get("user")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, models.ErrorResponse("User not logged in."))
+		c.JSON(http.StatusOK, models.ErrorResponse("User not logged in."))
 		return
 	}
 	mod, exists := c.Get("mod")
 	if !exists || !mod.(bool) {
-		c.JSON(http.StatusUnauthorized, models.ErrorResponse("Insufficient permissions."))
+		c.JSON(http.StatusOK, models.ErrorResponse("Insufficient permissions."))
 		return
 	}
 	// Bind parameter and body
 	id := c.Param("id")
 	mapID, err := strconv.Atoi(id)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	var request EditMapImageRequest
 	if err := c.BindJSON(&request); err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	// Update database with new data
 	sql := `UPDATE maps SET image = $2 WHERE id = $1`
 	_, err = database.DB.Exec(sql, mapID, request.Image)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryEditImage)
