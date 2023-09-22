@@ -60,7 +60,6 @@ type RecordMultiplayer struct {
 //	@Produce		json
 //	@Param			mapid	path		int	true	"Map ID"
 //	@Success		200		{object}	models.Response{data=MapSummaryResponse}
-//	@Failure		400		{object}	models.Response
 //	@Router			/maps/{mapid}/summary [get]
 func FetchMapSummary(c *gin.Context) {
 	id := c.Param("mapid")
@@ -142,7 +141,6 @@ func FetchMapSummary(c *gin.Context) {
 //	@Param			page		query		int	false	"Page Number (default: 1)"
 //	@Param			pageSize	query		int	false	"Number of Records Per Page (default: 20)"
 //	@Success		200			{object}	models.Response{data=MapLeaderboardsResponse}
-//	@Failure		400			{object}	models.Response
 //	@Router			/maps/{mapid}/leaderboards [get]
 func FetchMapLeaderboards(c *gin.Context) {
 	id := c.Param("mapid")
@@ -351,7 +349,6 @@ func FetchGames(c *gin.Context) {
 //	@Produce		json
 //	@Param			gameid	path		int	true	"Game ID"
 //	@Success		200		{object}	models.Response{data=ChaptersResponse}
-//	@Failure		400		{object}	models.Response
 //	@Router			/games/{gameid} [get]
 func FetchChapters(c *gin.Context) {
 	gameID := c.Param("gameid")

@@ -63,8 +63,6 @@ type ScoreResponse struct {
 //	@Produce		json
 //	@Param			Authorization	header		string	true	"JWT Token"
 //	@Success		200				{object}	models.Response{data=ProfileResponse}
-//	@Failure		400				{object}	models.Response
-//	@Failure		401				{object}	models.Response
 //	@Router			/profile [get]
 func Profile(c *gin.Context) {
 	// Check if user exists
@@ -345,8 +343,6 @@ func Profile(c *gin.Context) {
 //	@Produce		json
 //	@Param			userid	path		int	true	"User ID"
 //	@Success		200		{object}	models.Response{data=ProfileResponse}
-//	@Failure		400		{object}	models.Response
-//	@Failure		404		{object}	models.Response
 //	@Router			/users/{userid} [get]
 func FetchUser(c *gin.Context) {
 	id := c.Param("userid")
@@ -634,8 +630,6 @@ func FetchUser(c *gin.Context) {
 //	@Produce		json
 //	@Param			Authorization	header		string	true	"JWT Token"
 //	@Success		200				{object}	models.Response{data=ProfileResponse}
-//	@Failure		400				{object}	models.Response
-//	@Failure		401				{object}	models.Response
 //	@Router			/profile [post]
 func UpdateUser(c *gin.Context) {
 	// Check if user exists
@@ -681,8 +675,6 @@ func UpdateUser(c *gin.Context) {
 //	@Param			Authorization	header		string	true	"JWT Token"
 //	@Param			country_code	query		string	true	"Country Code [XX]"
 //	@Success		200				{object}	models.Response
-//	@Failure		400				{object}	models.Response
-//	@Failure		401				{object}	models.Response
 //	@Router			/profile [put]
 func UpdateCountryCode(c *gin.Context) {
 	// Check if user exists

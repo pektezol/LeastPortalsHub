@@ -44,8 +44,6 @@ type RecordResponse struct {
 //	@Param			is_partner_orange	formData	boolean	false	"Is Partner Orange"
 //	@Param			partner_id			formData	string	false	"Partner ID"
 //	@Success		200					{object}	models.Response{data=RecordResponse}
-//	@Failure		400					{object}	models.Response
-//	@Failure		401					{object}	models.Response
 //	@Router			/maps/{mapid}/record [post]
 func CreateRecordWithDemo(c *gin.Context) {
 	mapId := c.Param("mapid")
@@ -216,9 +214,8 @@ func CreateRecordWithDemo(c *gin.Context) {
 //	@Tags			demo
 //	@Accept			json
 //	@Produce		octet-stream
-//	@Param			uuid	query		string	true	"Demo UUID"
-//	@Success		200		{file}		binary	"Demo File"
-//	@Failure		400		{object}	models.Response
+//	@Param			uuid	query	string	true	"Demo UUID"
+//	@Success		200		{file}	binary	"Demo File"
 //	@Router			/demos [get]
 func DownloadDemoWithID(c *gin.Context) {
 	uuid := c.Query("uuid")

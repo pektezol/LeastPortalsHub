@@ -78,7 +78,6 @@ type ScoreLogsResponseDetails struct {
 //	@Produce		json
 //	@Param			Authorization	header		string	true	"JWT Token"
 //	@Success		200				{object}	models.Response{data=LogsResponse}
-//	@Failure		400				{object}	models.Response
 //	@Router			/logs/mod [get]
 func ModLogs(c *gin.Context) {
 	mod, exists := c.Get("mod")
@@ -125,7 +124,6 @@ func ModLogs(c *gin.Context) {
 //	@Tags			logs
 //	@Produce		json
 //	@Success		200	{object}	models.Response{data=ScoreLogsResponse}
-//	@Failure		400	{object}	models.Response
 //	@Router			/logs/score [get]
 func ScoreLogs(c *gin.Context) {
 	response := ScoreLogsResponse{Logs: []ScoreLogsResponseDetails{}}

@@ -45,7 +45,6 @@ type EditMapImageRequest struct {
 //	@Param			mapid			path		int						true	"Map ID"
 //	@Param			request			body		CreateMapSummaryRequest	true	"Body"
 //	@Success		200				{object}	models.Response{data=CreateMapSummaryRequest}
-//	@Failure		400				{object}	models.Response
 //	@Router			/maps/{mapid}/summary [post]
 func CreateMapSummary(c *gin.Context) {
 	// Check if user exists
@@ -126,7 +125,6 @@ func CreateMapSummary(c *gin.Context) {
 //	@Param			mapid			path		int						true	"Map ID"
 //	@Param			request			body		EditMapSummaryRequest	true	"Body"
 //	@Success		200				{object}	models.Response{data=EditMapSummaryRequest}
-//	@Failure		400				{object}	models.Response
 //	@Router			/maps/{mapid}/summary [put]
 func EditMapSummary(c *gin.Context) {
 	// Check if user exists
@@ -207,7 +205,6 @@ func EditMapSummary(c *gin.Context) {
 //	@Param			mapid			path		int						true	"Map ID"
 //	@Param			request			body		DeleteMapSummaryRequest	true	"Body"
 //	@Success		200				{object}	models.Response{data=DeleteMapSummaryRequest}
-//	@Failure		400				{object}	models.Response
 //	@Router			/maps/{mapid}/summary [delete]
 func DeleteMapSummary(c *gin.Context) {
 	// Check if user exists
@@ -292,7 +289,6 @@ func DeleteMapSummary(c *gin.Context) {
 //	@Param			mapid			path		int					true	"Map ID"
 //	@Param			request			body		EditMapImageRequest	true	"Body"
 //	@Success		200				{object}	models.Response{data=EditMapImageRequest}
-//	@Failure		400				{object}	models.Response
 //	@Router			/maps/{mapid}/image [put]
 func EditMapImage(c *gin.Context) {
 	// Check if user exists
