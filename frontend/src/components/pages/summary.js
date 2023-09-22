@@ -424,10 +424,21 @@ return (
                         <span> </span>
                         <span>{TicksToTime(r.score_time)}</span>
                         <span className='hover-popup' popup-text={r.record_date.replace("T",' ').split(".")[0]}>{ TimeAgo(new Date(r.record_date.replace("T"," ").replace("Z",""))) }</span>
+                        
+                        {lbData.data.map.is_coop?(
                         <span>
-                            <button onClick={()=>{window.alert(r.demo_id)}}><img src={img13} alt="demo_id" /></button>
+                            <button onClick={()=>{window.alert(`Host demo ID: ${r.host_demo_id} \nParnter demo ID: ${r.partner_demo_id}`)}}><img src={img13} alt="demo_id" /></button>
+                            <button onClick={()=>window.location.href=`https://lp.ardapektezol.com/api/v1/demos?uuid=${r.partner_demo_id}`}><img src={img12} alt="download" style={{filter:"hue-rotate(160deg) contrast(60%) saturate(1000%)"}}/></button>
+                            <button onClick={()=>window.location.href=`https://lp.ardapektezol.com/api/v1/demos?uuid=${r.host_demo_id}`}><img src={img12} alt="download" style={{filter:"hue-rotate(300deg) contrast(60%) saturate(1000%)"}}/></button>
+                        </span>
+                        ):(
+
+                        <span>
+                            <button onClick={()=>{window.alert(`Demo ID: ${r.demo_id}`)}}><img src={img13} alt="demo_id" /></button>
                             <button onClick={()=>window.location.href=`https://lp.ardapektezol.com/api/v1/demos?uuid=${r.demo_id}`}><img src={img12} alt="download" /></button>
                         </span>
+                            )}
+                    {console.log(lbData)}
                     </span>
                     ))}
             </div>
