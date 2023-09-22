@@ -65,7 +65,7 @@
 #section3{
     margin: 40px 0 0 0;
 
-    display: grid; 
+    display: none; 
     grid-template-columns: 1fr 1fr;
     gap: 20px;
 }
@@ -73,7 +73,7 @@
 #category{
     display: grid;
     height: 350px;
-    border-radius: 30px;
+    border-radius: 24px;
     overflow: hidden;
     
 }
@@ -121,7 +121,7 @@ p>span.portal-count{font-weight: bold;font-size: 100px;vertical-align: -15%;}
 #history{
     min-width: 560px;
     background-color: #202232;
-    border-radius: 30px;
+    border-radius: 24px;
 
 }
 
@@ -162,8 +162,8 @@ p>span.portal-count{font-weight: bold;font-size: 100px;vertical-align: -15%;}
     cursor: pointer;
     transition: background-color .1s;
 }
-#history>span>button:nth-child(1){border-radius: 0 0 0 30px;}
-#history>span>button:nth-child(2){border-radius: 0 0 30px 0;}
+#history>span>button:nth-child(1){border-radius: 0 0 0 24px;}
+#history>span>button:nth-child(2){border-radius: 0 0 24px 0;}
 
 #graph{
     display: grid;
@@ -239,7 +239,7 @@ p>span.portal-count{font-weight: bold;font-size: 100px;vertical-align: -15%;}
 /* Section 4: Difficulty + count */
 
 #section4{
-    display: grid;
+    display: none;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
     margin: 40px 0 0 0;
@@ -252,7 +252,7 @@ p>span.portal-count{font-weight: bold;font-size: 100px;vertical-align: -15%;}
     text-align: center;
     cursor: default;
 
-    border-radius: 20px;
+    border-radius: 24px;
     display: grid;
     grid-template-rows: 20px 40px 40px;
 }
@@ -273,7 +273,7 @@ p>span.portal-count{font-weight: bold;font-size: 100px;vertical-align: -15%;}
 }
 
 .difficulty-rating{
-    border-radius: 20px;
+    border-radius: 24px;
     width: 40px; height: 3px;
     background-color: #2b2e46;
 }
@@ -302,7 +302,7 @@ p>span.portal-count{font-weight: bold;font-size: 100px;vertical-align: -15%;}
     margin: 4px;
     float:right; 
     border: 0;
-    border-radius: 20px;
+    border-radius: 24px;
     width: 608px;    height: 342px;
 }
 
@@ -314,6 +314,126 @@ p>span.portal-count{font-weight: bold;font-size: 100px;vertical-align: -15%;}
 }
 #description-text>b{font-size: inherit;}
 #description-text>a{font-size: inherit;color: #3c91e6;}
+
+
+/* Section 6: leaderboards */
+#section6{
+    margin: 40px 0 20px 0;
+    min-height: 600px;
+    background-color: #202232;
+
+    border-radius: 24px;
+    padding: 10px 10px 0 10px;
+
+}
+#leaderboard-top>span{
+    display: flex;
+    place-items: flex-end;
+}
+
+
+#section6>hr{border: 1px solid #2b2e46;margin: 8px 20px 0px 20px;}
+#leaderboard-top{
+    display: grid;
+    grid-template-columns: 7.5% 25% 7.5% 25% 20% 15%;
+    font-size: 20px;
+    height: 34px;
+    padding-left: 60px;
+    margin: 0 20px 0 20px;
+}
+#page-number{
+    display: flex;
+    width: auto;
+    flex-direction: row-reverse;
+}
+#page-number>div{
+width: 100px;   
+place-items: center;
+display: grid;
+grid-template-columns: 1fr 1fr 1fr;
+text-align: center;
+}
+#page-number>div>button{
+    width: 30px;
+    height: 30px;
+    background-color: #202232;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+}
+
+.leaderboard-record{
+    margin: 10px 20px 0px 20px;
+    height: 44px; width: calc(100% - 40px);
+    width: auto;
+
+    color: inherit;
+    border-radius: 40px;
+    text-align: left;
+    padding: 0 0 0 60px;
+    font-size: 20px;
+    font-family: inherit;
+    
+    
+    grid-template-columns: 3% 4.5% 25% 4% 3.5% 25% 20% 15%;
+    display: grid;
+
+    border: 0;
+    transition: background-color .1s;
+    background-color: #2b2e46;
+}
+
+.leaderboard-record>span:nth-child(1){display: grid;}
+.leaderboard-record>span:nth-child(4){display: grid;}
+.leaderboard-record>span:last-child{flex-direction: row-reverse;}
+.leaderboard-record>span{
+    display: flex;
+    place-items: center;
+    height: 44px;
+}
+.leaderboard-record>span>img{
+    height: 36px;
+    border-radius: 50px;
+    padding: 0;
+    scale: .95;
+}
+.leaderboard-record>span>button{
+    background-color: #0000;
+    border: 0;
+    cursor: pointer;
+    transition: opacity 0.1s;
+}
+
+.hover-popup {
+    position: relative;
+  }
+  
+  .hover-popup::after {
+    content: attr(popup-text);
+    position: absolute;
+    /* top: 0%; */
+    /* left: 80%; */
+    /* transform: translateX(-100%); */
+    /* padding: 5px; */
+    background-color: #2b2e46;
+    /* border: 1px solid #161723; */
+    border-radius: 8px;
+    visibility: hidden;
+    opacity: 0;
+    /* transition: visibility 0s, opacity 0.3s ease; */
+  }
+  
+  .hover-popup:hover::after {
+    visibility: visible;
+    opacity: 1;
+  }
+
+.leaderboard-record:last-child{margin: 10px 20px 10px 20px;}
+
+
+
+
+
 
 .triangle{
     display: inline-block;
