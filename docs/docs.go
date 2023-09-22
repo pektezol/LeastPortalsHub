@@ -1571,6 +1571,9 @@ const docTemplate = `{
                 "category": {
                     "$ref": "#/definitions/models.Category"
                 },
+                "completion_count": {
+                    "type": "integer"
+                },
                 "description": {
                     "type": "string"
                 },
