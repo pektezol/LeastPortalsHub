@@ -70,7 +70,7 @@ func Profile(c *gin.Context) {
 	// Check if user exists
 	user, exists := c.Get("user")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, models.ErrorResponse("User not logged in."))
+		c.JSON(http.StatusOK, models.ErrorResponse("User not logged in."))
 		return
 	}
 	// Get user links
@@ -78,7 +78,7 @@ func Profile(c *gin.Context) {
 	sql := `SELECT u.p2sr, u.steam, u.youtube, u.twitch FROM users u WHERE u.steam_id = $1`
 	err := database.DB.QueryRow(sql, user.(models.User).SteamID).Scan(&links.P2SR, &links.Steam, &links.YouTube, &links.Twitch)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	// Get rankings (all maps done in one game)
@@ -91,7 +91,7 @@ func Profile(c *gin.Context) {
 	sql = `SELECT count(id), (SELECT count(id) FROM maps m WHERE m.game_id = 2 AND m.is_disabled = false) FROM maps m WHERE m.game_id = 1  AND m.is_disabled = false;`
 	err = database.DB.QueryRow(sql).Scan(&rankings.Singleplayer.CompletionTotal, &rankings.Cooperative.CompletionTotal)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	rankings.Overall.CompletionTotal = rankings.Singleplayer.CompletionTotal + rankings.Cooperative.CompletionTotal
@@ -111,7 +111,7 @@ func Profile(c *gin.Context) {
 	WHERE rm.host_id = $1 OR rm.partner_id = $1;`
 	rows, err := database.DB.Query(sql, user.(models.User).SteamID)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	for rows.Next() {
@@ -119,7 +119,7 @@ func Profile(c *gin.Context) {
 		var completionCount int
 		err = rows.Scan(&tableName, &completionCount)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 		if tableName == "records_sp" {
@@ -142,7 +142,7 @@ func Profile(c *gin.Context) {
 	ORDER BY total_min_score_count ASC;`
 	rows, err = database.DB.Query(sql)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	placement := 1
@@ -153,7 +153,7 @@ func Profile(c *gin.Context) {
 		var userPortalCount int
 		err = rows.Scan(&steamID, &completionCount, &totalCount, &userPortalCount)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 		if completionCount != totalCount {
@@ -176,7 +176,7 @@ func Profile(c *gin.Context) {
 	ORDER BY total_min_score_count ASC;`
 	rows, err = database.DB.Query(sql)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	placement = 1
@@ -187,7 +187,7 @@ func Profile(c *gin.Context) {
 		var userPortalCount int
 		err = rows.Scan(&steamID, &completionCount, &totalCount, &userPortalCount)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 		if completionCount != totalCount {
@@ -232,7 +232,7 @@ func Profile(c *gin.Context) {
 	// GROUP BY steam_id ORDER BY total_score ASC;`
 	// 	rows, err = database.DB.Query(sql)
 	// 	if err != nil {
-	// 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+	// 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 	// 		return
 	// 	}
 	// 	placement = 1
@@ -241,7 +241,7 @@ func Profile(c *gin.Context) {
 	// 		var userPortalCount int
 	// 		err = rows.Scan(&steamID, &userPortalCount)
 	// 		if err != nil {
-	// 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+	// 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 	// 			return
 	// 		}
 	// 		if completionCount != totalCount {
@@ -261,7 +261,7 @@ func Profile(c *gin.Context) {
 	FROM records_sp sp INNER JOIN maps m ON sp.map_id = m.id WHERE sp.user_id = $1 ORDER BY sp.map_id, sp.score_count, sp.score_time;`
 	rows, err = database.DB.Query(sql, user.(models.User).SteamID)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	for rows.Next() {
@@ -293,7 +293,7 @@ func Profile(c *gin.Context) {
 	FROM records_mp mp INNER JOIN maps m ON mp.map_id = m.id WHERE mp.host_id = $1 OR mp.partner_id = $1 ORDER BY mp.map_id, mp.score_count, mp.score_time;`
 	rows, err = database.DB.Query(sql, user.(models.User).SteamID)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	for rows.Next() {
@@ -353,7 +353,7 @@ func FetchUser(c *gin.Context) {
 	// Check if id is all numbers and 17 length
 	match, _ := regexp.MatchString("^[0-9]{17}$", id)
 	if !match {
-		c.JSON(http.StatusNotFound, models.ErrorResponse("User not found."))
+		c.JSON(http.StatusOK, models.ErrorResponse("User not found."))
 		return
 	}
 	// Check if user exists
@@ -362,12 +362,12 @@ func FetchUser(c *gin.Context) {
 	sql := `SELECT u.steam_id, u.user_name, u.avatar_link, u.country_code, u.created_at, u.updated_at, u.p2sr, u.steam, u.youtube, u.twitch FROM users u WHERE u.steam_id = $1`
 	err := database.DB.QueryRow(sql, id).Scan(&user.SteamID, &user.UserName, &user.AvatarLink, &user.CountryCode, &user.CreatedAt, &user.UpdatedAt, &links.P2SR, &links.Steam, &links.YouTube, &links.Twitch)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	if user.SteamID == "" {
 		// User does not exist
-		c.JSON(http.StatusNotFound, models.ErrorResponse("User not found."))
+		c.JSON(http.StatusOK, models.ErrorResponse("User not found."))
 		return
 	}
 	// Get rankings (all maps done in one game)
@@ -380,7 +380,7 @@ func FetchUser(c *gin.Context) {
 	sql = `SELECT count(id), (SELECT count(id) FROM maps m WHERE m.game_id = 2 AND m.is_disabled = false) FROM maps m WHERE m.game_id = 1  AND m.is_disabled = false;`
 	err = database.DB.QueryRow(sql).Scan(&rankings.Singleplayer.CompletionTotal, &rankings.Cooperative.CompletionTotal)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	rankings.Overall.CompletionTotal = rankings.Singleplayer.CompletionTotal + rankings.Cooperative.CompletionTotal
@@ -400,7 +400,7 @@ func FetchUser(c *gin.Context) {
 	WHERE rm.host_id = $1 OR rm.partner_id = $1;`
 	rows, err := database.DB.Query(sql, user.SteamID)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	for rows.Next() {
@@ -408,7 +408,7 @@ func FetchUser(c *gin.Context) {
 		var completionCount int
 		err = rows.Scan(&tableName, &completionCount)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 		if tableName == "records_sp" {
@@ -431,7 +431,7 @@ func FetchUser(c *gin.Context) {
 	ORDER BY total_min_score_count ASC;`
 	rows, err = database.DB.Query(sql)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	placement := 1
@@ -442,7 +442,7 @@ func FetchUser(c *gin.Context) {
 		var userPortalCount int
 		err = rows.Scan(&steamID, &completionCount, &totalCount, &userPortalCount)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 		if completionCount != totalCount {
@@ -465,7 +465,7 @@ func FetchUser(c *gin.Context) {
 	ORDER BY total_min_score_count ASC;`
 	rows, err = database.DB.Query(sql)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	placement = 1
@@ -476,7 +476,7 @@ func FetchUser(c *gin.Context) {
 		var userPortalCount int
 		err = rows.Scan(&steamID, &completionCount, &totalCount, &userPortalCount)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 		if completionCount != totalCount {
@@ -521,7 +521,7 @@ func FetchUser(c *gin.Context) {
 	// GROUP BY steam_id ORDER BY total_score ASC;`
 	// 	rows, err = database.DB.Query(sql)
 	// 	if err != nil {
-	// 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+	// 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 	// 		return
 	// 	}
 	// 	placement = 1
@@ -530,7 +530,7 @@ func FetchUser(c *gin.Context) {
 	// 		var userPortalCount int
 	// 		err = rows.Scan(&steamID, &userPortalCount)
 	// 		if err != nil {
-	// 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+	// 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 	// 			return
 	// 		}
 	// 		if completionCount != totalCount {
@@ -550,7 +550,7 @@ func FetchUser(c *gin.Context) {
 	FROM records_sp sp INNER JOIN maps m ON sp.map_id = m.id WHERE sp.user_id = $1 ORDER BY sp.map_id, sp.score_count, sp.score_time;`
 	rows, err = database.DB.Query(sql, user.SteamID)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	for rows.Next() {
@@ -582,7 +582,7 @@ func FetchUser(c *gin.Context) {
 	FROM records_mp mp INNER JOIN maps m ON mp.map_id = m.id WHERE mp.host_id = $1 OR mp.partner_id = $1 ORDER BY mp.map_id, mp.score_count, mp.score_time;`
 	rows, err = database.DB.Query(sql, user.SteamID)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	for rows.Next() {
@@ -641,13 +641,13 @@ func UpdateUser(c *gin.Context) {
 	// Check if user exists
 	user, exists := c.Get("user")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, models.ErrorResponse("User not logged in."))
+		c.JSON(http.StatusOK, models.ErrorResponse("User not logged in."))
 		return
 	}
 	profile, err := GetPlayerSummaries(user.(models.User).SteamID, os.Getenv("API_KEY"))
 	if err != nil {
 		CreateLog(user.(models.User).SteamID, LogTypeUser, LogDescriptionUserUpdateSummaryFail)
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	// Update profile
@@ -655,7 +655,7 @@ func UpdateUser(c *gin.Context) {
 	WHERE steam_id = $5`, profile.PersonaName, profile.AvatarFull, profile.LocCountryCode, time.Now().UTC(), user.(models.User).SteamID)
 	if err != nil {
 		CreateLog(user.(models.User).SteamID, LogTypeUser, LogDescriptionUserUpdateFail)
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	CreateLog(user.(models.User).SteamID, LogTypeUser, LogDescriptionUserUpdateSuccess)
@@ -688,27 +688,27 @@ func UpdateCountryCode(c *gin.Context) {
 	// Check if user exists
 	user, exists := c.Get("user")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, models.ErrorResponse("User not logged in."))
+		c.JSON(http.StatusOK, models.ErrorResponse("User not logged in."))
 		return
 	}
 	code := c.Query("country_code")
 	if code == "" {
 		CreateLog(user.(models.User).SteamID, LogTypeUser, LogDescriptionUserUpdateCountryFail)
-		c.JSON(http.StatusNotFound, models.ErrorResponse("Enter a valid country code."))
+		c.JSON(http.StatusOK, models.ErrorResponse("Enter a valid country code."))
 		return
 	}
 	var validCode string
 	err := database.DB.QueryRow(`SELECT country_code FROM countries WHERE country_code = $1`, code).Scan(&validCode)
 	if err != nil {
 		CreateLog(user.(models.User).SteamID, LogTypeUser, LogDescriptionUserUpdateCountryFail)
-		c.JSON(http.StatusNotFound, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	// Valid code, update profile
 	_, err = database.DB.Exec(`UPDATE users SET country_code = $1 WHERE steam_id = $2`, validCode, user.(models.User).SteamID)
 	if err != nil {
 		CreateLog(user.(models.User).SteamID, LogTypeUser, LogDescriptionUserUpdateCountryFail)
-		c.JSON(http.StatusNotFound, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	CreateLog(user.(models.User).SteamID, LogTypeUser, LogDescriptionUserUpdateCountrySuccess)
