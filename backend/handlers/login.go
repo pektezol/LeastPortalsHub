@@ -39,7 +39,7 @@ func Login(c *gin.Context) {
 		steamID, err := openID.ValidateAndGetId()
 		if err != nil {
 			CreateLog(steamID, LogTypeUser, LogDescriptionUserLoginFailValidate)
-			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 		// Create user if new
@@ -50,7 +50,7 @@ func Login(c *gin.Context) {
 			user, err := GetPlayerSummaries(steamID, os.Getenv("API_KEY"))
 			if err != nil {
 				CreateLog(steamID, LogTypeUser, LogDescriptionUserLoginFailSummary)
-				c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+				c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 				return
 			}
 			// Empty country code check
@@ -80,7 +80,7 @@ func Login(c *gin.Context) {
 		tokenString, err := token.SignedString([]byte(os.Getenv("SECRET_KEY")))
 		if err != nil {
 			CreateLog(steamID, LogTypeUser, LogDescriptionUserLoginFailToken)
-			c.JSON(http.StatusBadRequest, models.ErrorResponse("Failed to generate token."))
+			c.JSON(http.StatusOK, models.ErrorResponse("Failed to generate token."))
 			return
 		}
 		c.SetCookie("token", tokenString, 3600*24*30, "/", "", true, true)
@@ -109,7 +109,7 @@ func Login(c *gin.Context) {
 func GetCookie(c *gin.Context) {
 	cookie, err := c.Cookie("token")
 	if err != nil {
-		c.JSON(http.StatusNotFound, models.ErrorResponse("No token cookie found."))
+		c.JSON(http.StatusOK, models.ErrorResponse("No token cookie found."))
 		return
 	}
 	c.JSON(http.StatusOK, models.Response{
@@ -133,7 +133,7 @@ func GetCookie(c *gin.Context) {
 func DeleteCookie(c *gin.Context) {
 	cookie, err := c.Cookie("token")
 	if err != nil {
-		c.JSON(http.StatusNotFound, models.ErrorResponse("No token cookie found."))
+		c.JSON(http.StatusOK, models.ErrorResponse("No token cookie found."))
 		return
 	}
 	c.SetCookie("token", "", -1, "/", "", true, true)

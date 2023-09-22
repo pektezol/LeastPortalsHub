@@ -67,7 +67,7 @@ func FetchMapSummary(c *gin.Context) {
 	response := MapSummaryResponse{Map: models.Map{}, Summary: models.MapSummary{Routes: []models.MapRoute{}}}
 	intID, err := strconv.Atoi(id)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	// Get map data
@@ -79,7 +79,7 @@ func FetchMapSummary(c *gin.Context) {
 	WHERE m.id = $1`
 	err = database.DB.QueryRow(sql, id).Scan(&response.Map.ID, &response.Map.GameName, &response.Map.ChapterName, &response.Map.MapName, &response.Map.Image, &response.Map.IsCoop)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	// Get map routes and histories
@@ -91,14 +91,14 @@ func FetchMapSummary(c *gin.Context) {
 	ORDER BY h.record_date ASC;`
 	rows, err := database.DB.Query(sql, id)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	for rows.Next() {
 		route := models.MapRoute{Category: models.Category{}, History: models.MapHistory{}}
 		err = rows.Scan(&route.RouteID, &route.Category.ID, &route.Category.Name, &route.History.RunnerName, &route.History.ScoreCount, &route.History.Date, &route.Description, &route.Showcase, &route.Rating)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 		// Get completion count
@@ -109,7 +109,7 @@ func FetchMapSummary(c *gin.Context) {
 				) sub WHERE sub.rn = 1 AND score_count = $2`
 			err = database.DB.QueryRow(sql, response.Map.ID, route.History.ScoreCount).Scan(&route.CompletionCount)
 			if err != nil {
-				c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+				c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 				return
 			}
 		} else {
@@ -119,7 +119,7 @@ func FetchMapSummary(c *gin.Context) {
 				) sub WHERE rn = 1 AND score_count = $2`
 			err = database.DB.QueryRow(sql, response.Map.ID, route.History.ScoreCount).Scan(&route.CompletionCount)
 			if err != nil {
-				c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+				c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 				return
 			}
 		}
@@ -159,7 +159,7 @@ func FetchMapLeaderboards(c *gin.Context) {
 	var isDisabled bool
 	intID, err := strconv.Atoi(id)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	response.Map.ID = intID
@@ -170,11 +170,11 @@ func FetchMapLeaderboards(c *gin.Context) {
 	WHERE m.id = $1`
 	err = database.DB.QueryRow(sql, id).Scan(&response.Map.GameName, &response.Map.ChapterName, &response.Map.MapName, &isDisabled, &response.Map.Image, &response.Map.IsCoop)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	if isDisabled {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse("Map is not available for competitive boards."))
+		c.JSON(http.StatusOK, models.ErrorResponse("Map is not available for competitive boards."))
 		return
 	}
 	totalRecords := 0
@@ -214,7 +214,7 @@ func FetchMapLeaderboards(c *gin.Context) {
 	ORDER BY score_count, score_time`
 		rows, err := database.DB.Query(sql, id)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 		placement := 1
@@ -223,7 +223,7 @@ func FetchMapLeaderboards(c *gin.Context) {
 			var record RecordMultiplayer
 			err := rows.Scan(&record.RecordID, &record.Host.SteamID, &record.Host.UserName, &record.Host.AvatarLink, &record.Partner.SteamID, &record.Partner.UserName, &record.Partner.AvatarLink, &record.ScoreCount, &record.ScoreTime, &record.HostDemoID, &record.PartnerDemoID, &record.RecordDate)
 			if err != nil {
-				c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+				c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 				return
 			}
 			if len(records) != 0 && records[len(records)-1].ScoreCount == record.ScoreCount && records[len(records)-1].ScoreTime == record.ScoreTime {
@@ -240,7 +240,7 @@ func FetchMapLeaderboards(c *gin.Context) {
 		if totalRecords != 0 {
 			totalPages = (totalRecords + pageSize - 1) / pageSize
 			if page > totalPages {
-				c.JSON(http.StatusBadRequest, models.ErrorResponse("Invalid page number."))
+				c.JSON(http.StatusOK, models.ErrorResponse("Invalid page number."))
 				return
 			}
 			startIndex := (page - 1) * pageSize
@@ -264,7 +264,7 @@ func FetchMapLeaderboards(c *gin.Context) {
 		ORDER BY score_count, score_time`
 		rows, err := database.DB.Query(sql, id)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 		placement := 1
@@ -273,7 +273,7 @@ func FetchMapLeaderboards(c *gin.Context) {
 			var record RecordSingleplayer
 			err := rows.Scan(&record.RecordID, &record.User.SteamID, &record.User.UserName, &record.User.AvatarLink, &record.ScoreCount, &record.ScoreTime, &record.DemoID, &record.RecordDate)
 			if err != nil {
-				c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+				c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 				return
 			}
 			if len(records) != 0 && records[len(records)-1].ScoreCount == record.ScoreCount && records[len(records)-1].ScoreTime == record.ScoreTime {
@@ -290,7 +290,7 @@ func FetchMapLeaderboards(c *gin.Context) {
 		if totalRecords != 0 {
 			totalPages = (totalRecords + pageSize - 1) / pageSize
 			if page > totalPages {
-				c.JSON(http.StatusBadRequest, models.ErrorResponse("Invalid page number."))
+				c.JSON(http.StatusOK, models.ErrorResponse("Invalid page number."))
 				return
 			}
 			startIndex := (page - 1) * pageSize
@@ -325,14 +325,14 @@ func FetchMapLeaderboards(c *gin.Context) {
 func FetchGames(c *gin.Context) {
 	rows, err := database.DB.Query(`SELECT id, name, is_coop FROM games`)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	var games []models.Game
 	for rows.Next() {
 		var game models.Game
 		if err := rows.Scan(&game.ID, &game.Name, &game.IsCoop); err != nil {
-			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 		games = append(games, game)
@@ -357,13 +357,13 @@ func FetchChapters(c *gin.Context) {
 	gameID := c.Param("id")
 	intID, err := strconv.Atoi(gameID)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	var response ChaptersResponse
 	rows, err := database.DB.Query(`SELECT c.id, c.name, g.name FROM chapters c INNER JOIN games g ON c.game_id = g.id WHERE game_id = $1`, gameID)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	var chapters []models.Chapter
@@ -371,7 +371,7 @@ func FetchChapters(c *gin.Context) {
 	for rows.Next() {
 		var chapter models.Chapter
 		if err := rows.Scan(&chapter.ID, &chapter.Name, &gameName); err != nil {
-			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 		chapters = append(chapters, chapter)
@@ -399,13 +399,13 @@ func FetchChapterMaps(c *gin.Context) {
 	chapterID := c.Param("id")
 	intID, err := strconv.Atoi(chapterID)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	var response ChapterMapsResponse
 	rows, err := database.DB.Query(`SELECT m.id, m.name, c.name FROM maps m INNER JOIN chapters c ON m.chapter_id = c.id WHERE chapter_id = $1`, chapterID)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	var maps []models.MapShort
@@ -413,7 +413,7 @@ func FetchChapterMaps(c *gin.Context) {
 	for rows.Next() {
 		var mapShort models.MapShort
 		if err := rows.Scan(&mapShort.ID, &mapShort.Name, &chapterName); err != nil {
-			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 		maps = append(maps, mapShort)
