@@ -103,6 +103,17 @@ definitions:
         $ref: '#/definitions/models.Pagination'
       records: {}
     type: object
+  handlers.MapShortWithGame:
+    properties:
+      chapter:
+        type: string
+      game:
+        type: string
+      id:
+        type: integer
+      map:
+        type: string
+    type: object
   handlers.MapSummaryResponse:
     properties:
       map:
@@ -231,11 +242,11 @@ definitions:
     properties:
       maps:
         items:
-          $ref: '#/definitions/models.MapShort'
+          $ref: '#/definitions/handlers.MapShortWithGame'
         type: array
       players:
         items:
-          $ref: '#/definitions/models.UserShort'
+          $ref: '#/definitions/models.UserShortWithAvatar'
         type: array
     type: object
   models.Category:
@@ -362,6 +373,15 @@ definitions:
     type: object
   models.UserShort:
     properties:
+      steam_id:
+        type: string
+      user_name:
+        type: string
+    type: object
+  models.UserShortWithAvatar:
+    properties:
+      avatar_link:
+        type: string
       steam_id:
         type: string
       user_name:
