@@ -225,6 +225,19 @@ function TimeAgo(date) {
     return Math.floor(seconds) + ' seconds ago';
   };
 
+function TicksToTime(ticks) {
+
+    let seconds = Math.floor(ticks/60)
+    let minutes = Math.floor(seconds/60)
+    let hours = Math.floor(minutes/60)
+
+    let milliseconds = Math.floor((ticks%60)*1000/60)
+    seconds = seconds % 60;
+    minutes = minutes % 60;
+
+  return `${hours===0?"":hours+":"}${minutes===0?"":hours>0?minutes.toString().padStart(2, '0')+":":(minutes+":")}${minutes>0?seconds.toString().padStart(2, '0'):seconds}.${milliseconds.toString().padStart(3, '0')} (${ticks})`;
+}
+
 if(data!==null){
 return (
     <>
@@ -362,9 +375,20 @@ return (
         ):(
         <section id='section6' className='summary2'>
             
-            <div id='leaderboard-top'>
+            <div id='leaderboard-top'
+            style={lbData.data.map.is_coop?{gridTemplateColumns:"7.5% 40% 7.5% 15% 15% 15%"}:{gridTemplateColumns:"7.5% 30% 10% 20% 17.5% 15%"}}
+            >
                 <span>Place</span>
-                <span>Runner</span>
+                
+                {lbData.data.map.is_coop?(
+                    <div id='runner'>
+                        <span>Host</span>
+                        <span>Partner</span>
+                    </div>
+                ):(
+                    <span>Runner</span>
+                )}
+                
                 <span>Portals</span>
                 <span>Time</span>
                 <span>Date</span>
@@ -382,13 +406,23 @@ return (
             <hr/>
             <div id='leaderboard-records'>
             {lbData.data.records.map((r, index) => (
-                    <span className='leaderboard-record' key={index} >
+                    <span className='leaderboard-record' key={index} 
+                    style={lbData.data.map.is_coop?{gridTemplateColumns:"3% 4.5% 40% 4% 3.5% 15% 15% 14.5%"}:{gridTemplateColumns:"3% 4.5% 30% 4% 6% 20% 17% 15%"}}
+                    >
                         <span>{r.placement}</span>
                         <span> </span>
-                        <span><img src={r.user.avatar_link} alt='' /> &nbsp; {r.user.user_name}</span>
+                        {lbData.data.map.is_coop?(
+                        <div>
+                            <span><img src={r.host.avatar_link} alt='' /> &nbsp; {r.host.user_name}</span>
+                            <span><img src={r.partner.avatar_link} alt='' /> &nbsp; {r.partner.user_name}</span>
+                        </div>
+                        ):(
+                        <div><span><img src={r.user.avatar_link} alt='' /> &nbsp; {r.user.user_name}</span></div>
+                        )}
+                        
                         <span>{r.score_count}</span>
                         <span> </span>
-                        <span>{r.score_time}</span>
+                        <span>{TicksToTime(r.score_time)}</span>
                         <span className='hover-popup' popup-text={r.record_date.replace("T",' ').split(".")[0]}>{ TimeAgo(new Date(r.record_date.replace("T"," ").replace("Z",""))) }</span>
                         <span>
                             <button onClick={()=>{window.alert(r.demo_id)}}><img src={img13} alt="demo_id" /></button>
