@@ -351,7 +351,7 @@ return (
             </div>    
         </section>
 
-        {lbData===null?(
+        {lbData.data===null?(
             <section id='section6' className='summary2'>
                 <h1 style={{textAlign:"center"}}>Map is not available for competitive boards.</h1>
             </section>
