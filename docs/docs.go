@@ -1267,6 +1267,23 @@ const docTemplate = `{
                 "records": {}
             }
         },
+        "handlers.MapShortWithGame": {
+            "type": "object",
+            "properties": {
+                "chapter": {
+                    "type": "string"
+                },
+                "game": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "map": {
+                    "type": "string"
+                }
+            }
+        },
         "handlers.MapSummaryResponse": {
             "type": "object",
             "properties": {
@@ -1464,13 +1481,13 @@ const docTemplate = `{
                 "maps": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.MapShort"
+                        "$ref": "#/definitions/handlers.MapShortWithGame"
                     }
                 },
                 "players": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.UserShort"
+                        "$ref": "#/definitions/models.UserShortWithAvatar"
                     }
                 }
             }
@@ -1667,6 +1684,20 @@ const docTemplate = `{
         "models.UserShort": {
             "type": "object",
             "properties": {
+                "steam_id": {
+                    "type": "string"
+                },
+                "user_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.UserShortWithAvatar": {
+            "type": "object",
+            "properties": {
+                "avatar_link": {
+                    "type": "string"
+                },
                 "steam_id": {
                     "type": "string"
                 },
