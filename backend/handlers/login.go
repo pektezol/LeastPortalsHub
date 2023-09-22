@@ -26,7 +26,6 @@ type LoginResponse struct {
 //	@Accept			json
 //	@Produce		json
 //	@Success		200	{object}	models.Response{data=LoginResponse}
-//	@Failure		400	{object}	models.Response
 //	@Router			/login [get]
 func Login(c *gin.Context) {
 	openID := steam_go.NewOpenId(c.Request)

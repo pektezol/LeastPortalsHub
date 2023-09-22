@@ -37,18 +37,16 @@ type RecordResponse struct {
 //	@Tags			maps
 //	@Accept			mpfd
 //	@Produce		json
-//	@Param			id					path		int		true	"Map ID"
+//	@Param			mapid				path		int		true	"Map ID"
 //	@Param			Authorization		header		string	true	"JWT Token"
 //	@Param			host_demo			formData	file	true	"Host Demo"
 //	@Param			partner_demo		formData	file	false	"Partner Demo"
 //	@Param			is_partner_orange	formData	boolean	false	"Is Partner Orange"
 //	@Param			partner_id			formData	string	false	"Partner ID"
 //	@Success		200					{object}	models.Response{data=RecordResponse}
-//	@Failure		400					{object}	models.Response
-//	@Failure		401					{object}	models.Response
-//	@Router			/maps/{id}/record [post]
+//	@Router			/maps/{mapid}/record [post]
 func CreateRecordWithDemo(c *gin.Context) {
-	mapId := c.Param("id")
+	mapId := c.Param("mapid")
 	// Check if user exists
 	user, exists := c.Get("user")
 	if !exists {
@@ -216,9 +214,8 @@ func CreateRecordWithDemo(c *gin.Context) {
 //	@Tags			demo
 //	@Accept			json
 //	@Produce		octet-stream
-//	@Param			uuid	query		string	true	"Demo UUID"
-//	@Success		200		{file}		binary	"Demo File"
-//	@Failure		400		{object}	models.Response
+//	@Param			uuid	query	string	true	"Demo UUID"
+//	@Success		200		{file}	binary	"Demo File"
 //	@Router			/demos [get]
 func DownloadDemoWithID(c *gin.Context) {
 	uuid := c.Query("uuid")

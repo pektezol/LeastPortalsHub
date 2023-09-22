@@ -18,6 +18,16 @@ definitions:
       game:
         $ref: '#/definitions/models.Game'
     type: object
+  handlers.CreateMapDiscussionRequest:
+    properties:
+      content:
+        type: string
+      title:
+        type: string
+    required:
+    - content
+    - title
+    type: object
   handlers.CreateMapSummaryRequest:
     properties:
       category_id:
@@ -45,6 +55,16 @@ definitions:
         type: integer
     required:
     - route_id
+    type: object
+  handlers.EditMapDiscussionRequest:
+    properties:
+      content:
+        type: string
+      title:
+        type: string
+    required:
+    - content
+    - title
     type: object
   handlers.EditMapImageRequest:
     properties:
@@ -94,6 +114,61 @@ definitions:
         type: string
       user:
         $ref: '#/definitions/models.UserShort'
+    type: object
+  handlers.MapDiscussion:
+    properties:
+      comments:
+        items:
+          $ref: '#/definitions/handlers.MapDiscussionComment'
+        type: array
+      content:
+        type: string
+      creator:
+        $ref: '#/definitions/models.UserShortWithAvatar'
+      id:
+        type: integer
+      title:
+        type: string
+      updated_at:
+        description: Upvotes   int                        `json:"upvotes"`
+        type: string
+    type: object
+  handlers.MapDiscussionComment:
+    properties:
+      comment:
+        type: string
+      date:
+        type: string
+      user:
+        $ref: '#/definitions/models.UserShortWithAvatar'
+    type: object
+  handlers.MapDiscussionOnlyTitle:
+    properties:
+      comments:
+        items:
+          $ref: '#/definitions/handlers.MapDiscussionComment'
+        type: array
+      creator:
+        $ref: '#/definitions/models.UserShortWithAvatar'
+      id:
+        type: integer
+      title:
+        type: string
+      updated_at:
+        description: Upvotes   int                        `json:"upvotes"`
+        type: string
+    type: object
+  handlers.MapDiscussionResponse:
+    properties:
+      discussion:
+        $ref: '#/definitions/handlers.MapDiscussion'
+    type: object
+  handlers.MapDiscussionsResponse:
+    properties:
+      discussions:
+        items:
+          $ref: '#/definitions/handlers.MapDiscussionOnlyTitle'
+        type: array
     type: object
   handlers.MapLeaderboardsResponse:
     properties:
@@ -397,13 +472,13 @@ info:
   title: Least Portals Database API
   version: "1.0"
 paths:
-  /chapters/{id}:
+  /chapters/{chapterid}:
     get:
       description: Get maps from the specified chapter id.
       parameters:
       - description: Chapter ID
         in: path
-        name: id
+        name: chapterid
         required: true
         type: integer
       produces:
@@ -442,10 +517,6 @@ paths:
           description: Demo File
           schema:
             type: file
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Response'
       tags:
       - demo
   /games:
@@ -471,13 +542,13 @@ paths:
             $ref: '#/definitions/models.Response'
       tags:
       - games & chapters
-  /games/{id}:
+  /games/{gameid}:
     get:
       description: Get chapters from the specified game id.
       parameters:
       - description: Game ID
         in: path
-        name: id
+        name: gameid
         required: true
         type: integer
       produces:
@@ -492,10 +563,6 @@ paths:
                 data:
                   $ref: '#/definitions/handlers.ChaptersResponse'
               type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Response'
       tags:
       - games & chapters
   /login:
@@ -515,10 +582,6 @@ paths:
                 data:
                   $ref: '#/definitions/handlers.LoginResponse'
               type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Response'
       tags:
       - login
   /logs/mod:
@@ -542,10 +605,6 @@ paths:
                 data:
                   $ref: '#/definitions/handlers.LogsResponse'
               type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Response'
       tags:
       - logs
   /logs/score:
@@ -563,13 +622,163 @@ paths:
                 data:
                   $ref: '#/definitions/handlers.ScoreLogsResponse'
               type: object
-        "400":
-          description: Bad Request
+      tags:
+      - logs
+  /maps/{mapid}/discussions:
+    get:
+      description: Get map discussions with specified map id.
+      parameters:
+      - description: Map ID
+        in: path
+        name: mapid
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.MapDiscussionsResponse'
+              type: object
+      tags:
+      - maps
+    post:
+      description: Create map discussion with specified map id.
+      parameters:
+      - description: JWT Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Map ID
+        in: path
+        name: mapid
+        required: true
+        type: integer
+      - description: Discussion ID
+        in: path
+        name: discussionid
+        required: true
+        type: integer
+      - description: Body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateMapDiscussionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.CreateMapDiscussionRequest'
+              type: object
+      tags:
+      - maps
+  /maps/{mapid}/discussions/{discussionid}:
+    delete:
+      description: Delete map summary with specified map id.
+      parameters:
+      - description: JWT Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Map ID
+        in: path
+        name: mapid
+        required: true
+        type: integer
+      - description: Discussion ID
+        in: path
+        name: discussionid
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
           schema:
             $ref: '#/definitions/models.Response'
       tags:
-      - logs
-  /maps/{id}/image:
+      - maps
+    get:
+      description: Get map discussion with specified map and discussion id.
+      parameters:
+      - description: Map ID
+        in: path
+        name: mapid
+        required: true
+        type: integer
+      - description: Discussion ID
+        in: path
+        name: discussionid
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.MapDiscussionResponse'
+              type: object
+      tags:
+      - maps
+    put:
+      description: Edit map discussion with specified map id.
+      parameters:
+      - description: JWT Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Map ID
+        in: path
+        name: mapid
+        required: true
+        type: integer
+      - description: Discussion ID
+        in: path
+        name: discussionid
+        required: true
+        type: integer
+      - description: Body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.EditMapDiscussionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.EditMapDiscussionRequest'
+              type: object
+      tags:
+      - maps
+  /maps/{mapid}/image:
     put:
       description: Edit map image with specified map id.
       parameters:
@@ -580,7 +789,7 @@ paths:
         type: string
       - description: Map ID
         in: path
-        name: id
+        name: mapid
         required: true
         type: integer
       - description: Body
@@ -601,19 +810,15 @@ paths:
                 data:
                   $ref: '#/definitions/handlers.EditMapImageRequest'
               type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Response'
       tags:
       - maps
-  /maps/{id}/leaderboards:
+  /maps/{mapid}/leaderboards:
     get:
       description: Get map leaderboards with specified id.
       parameters:
       - description: Map ID
         in: path
-        name: id
+        name: mapid
         required: true
         type: integer
       - description: 'Page Number (default: 1)'
@@ -636,13 +841,9 @@ paths:
                 data:
                   $ref: '#/definitions/handlers.MapLeaderboardsResponse'
               type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Response'
       tags:
       - maps
-  /maps/{id}/record:
+  /maps/{mapid}/record:
     post:
       consumes:
       - multipart/form-data
@@ -650,7 +851,7 @@ paths:
       parameters:
       - description: Map ID
         in: path
-        name: id
+        name: mapid
         required: true
         type: integer
       - description: JWT Token
@@ -687,17 +888,9 @@ paths:
                 data:
                   $ref: '#/definitions/handlers.RecordResponse'
               type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Response'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/models.Response'
       tags:
       - maps
-  /maps/{id}/summary:
+  /maps/{mapid}/summary:
     delete:
       description: Delete map summary with specified map id.
       parameters:
@@ -708,7 +901,7 @@ paths:
         type: string
       - description: Map ID
         in: path
-        name: id
+        name: mapid
         required: true
         type: integer
       - description: Body
@@ -729,10 +922,6 @@ paths:
                 data:
                   $ref: '#/definitions/handlers.DeleteMapSummaryRequest'
               type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Response'
       tags:
       - maps
     get:
@@ -740,7 +929,7 @@ paths:
       parameters:
       - description: Map ID
         in: path
-        name: id
+        name: mapid
         required: true
         type: integer
       produces:
@@ -755,10 +944,6 @@ paths:
                 data:
                   $ref: '#/definitions/handlers.MapSummaryResponse'
               type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Response'
       tags:
       - maps
     post:
@@ -771,7 +956,7 @@ paths:
         type: string
       - description: Map ID
         in: path
-        name: id
+        name: mapid
         required: true
         type: integer
       - description: Body
@@ -792,10 +977,6 @@ paths:
                 data:
                   $ref: '#/definitions/handlers.CreateMapSummaryRequest'
               type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Response'
       tags:
       - maps
     put:
@@ -808,7 +989,7 @@ paths:
         type: string
       - description: Map ID
         in: path
-        name: id
+        name: mapid
         required: true
         type: integer
       - description: Body
@@ -829,10 +1010,6 @@ paths:
                 data:
                   $ref: '#/definitions/handlers.EditMapSummaryRequest'
               type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Response'
       tags:
       - maps
   /profile:
@@ -858,14 +1035,6 @@ paths:
                 data:
                   $ref: '#/definitions/handlers.ProfileResponse'
               type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Response'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/models.Response'
       tags:
       - users
     post:
@@ -890,14 +1059,6 @@ paths:
                 data:
                   $ref: '#/definitions/handlers.ProfileResponse'
               type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Response'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/models.Response'
       tags:
       - users
     put:
@@ -922,14 +1083,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/models.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Response'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/models.Response'
       tags:
       - users
   /rankings:
@@ -947,10 +1100,6 @@ paths:
                 data:
                   $ref: '#/definitions/handlers.RankingsResponse'
               type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Response'
       tags:
       - rankings
   /search:
@@ -973,10 +1122,6 @@ paths:
                 data:
                   $ref: '#/definitions/handlers.SearchResponse'
               type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Response'
       tags:
       - search
   /token:
@@ -1020,7 +1165,7 @@ paths:
             $ref: '#/definitions/models.Response'
       tags:
       - auth
-  /users/{id}:
+  /users/{userid}:
     get:
       consumes:
       - application/json
@@ -1028,7 +1173,7 @@ paths:
       parameters:
       - description: User ID
         in: path
-        name: id
+        name: userid
         required: true
         type: integer
       produces:
@@ -1043,14 +1188,6 @@ paths:
                 data:
                   $ref: '#/definitions/handlers.ProfileResponse'
               type: object
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.Response'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/models.Response'
       tags:
       - users
 swagger: "2.0"

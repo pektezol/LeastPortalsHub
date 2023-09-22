@@ -58,12 +58,11 @@ type RecordMultiplayer struct {
 //	@Description	Get map summary with specified id.
 //	@Tags			maps
 //	@Produce		json
-//	@Param			id	path		int	true	"Map ID"
-//	@Success		200	{object}	models.Response{data=MapSummaryResponse}
-//	@Failure		400	{object}	models.Response
-//	@Router			/maps/{id}/summary [get]
+//	@Param			mapid	path		int	true	"Map ID"
+//	@Success		200		{object}	models.Response{data=MapSummaryResponse}
+//	@Router			/maps/{mapid}/summary [get]
 func FetchMapSummary(c *gin.Context) {
-	id := c.Param("id")
+	id := c.Param("mapid")
 	response := MapSummaryResponse{Map: models.Map{}, Summary: models.MapSummary{Routes: []models.MapRoute{}}}
 	intID, err := strconv.Atoi(id)
 	if err != nil {
@@ -138,14 +137,13 @@ func FetchMapSummary(c *gin.Context) {
 //	@Description	Get map leaderboards with specified id.
 //	@Tags			maps
 //	@Produce		json
-//	@Param			id			path		int	true	"Map ID"
+//	@Param			mapid		path		int	true	"Map ID"
 //	@Param			page		query		int	false	"Page Number (default: 1)"
 //	@Param			pageSize	query		int	false	"Number of Records Per Page (default: 20)"
 //	@Success		200			{object}	models.Response{data=MapLeaderboardsResponse}
-//	@Failure		400			{object}	models.Response
-//	@Router			/maps/{id}/leaderboards [get]
+//	@Router			/maps/{mapid}/leaderboards [get]
 func FetchMapLeaderboards(c *gin.Context) {
-	id := c.Param("id")
+	id := c.Param("mapid")
 	// Get map data
 	response := MapLeaderboardsResponse{Map: models.Map{}, Records: nil, Pagination: models.Pagination{}}
 	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
@@ -349,12 +347,11 @@ func FetchGames(c *gin.Context) {
 //	@Description	Get chapters from the specified game id.
 //	@Tags			games & chapters
 //	@Produce		json
-//	@Param			id	path		int	true	"Game ID"
-//	@Success		200	{object}	models.Response{data=ChaptersResponse}
-//	@Failure		400	{object}	models.Response
-//	@Router			/games/{id} [get]
+//	@Param			gameid	path		int	true	"Game ID"
+//	@Success		200		{object}	models.Response{data=ChaptersResponse}
+//	@Router			/games/{gameid} [get]
 func FetchChapters(c *gin.Context) {
-	gameID := c.Param("id")
+	gameID := c.Param("gameid")
 	intID, err := strconv.Atoi(gameID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
@@ -391,12 +388,12 @@ func FetchChapters(c *gin.Context) {
 //	@Description	Get maps from the specified chapter id.
 //	@Tags			games & chapters
 //	@Produce		json
-//	@Param			id	path		int	true	"Chapter ID"
-//	@Success		200	{object}	models.Response{data=ChapterMapsResponse}
-//	@Failure		400	{object}	models.Response
-//	@Router			/chapters/{id} [get]
+//	@Param			chapterid	path		int	true	"Chapter ID"
+//	@Success		200			{object}	models.Response{data=ChapterMapsResponse}
+//	@Failure		400			{object}	models.Response
+//	@Router			/chapters/{chapterid} [get]
 func FetchChapterMaps(c *gin.Context) {
-	chapterID := c.Param("id")
+	chapterID := c.Param("chapterid")
 	intID, err := strconv.Atoi(chapterID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))

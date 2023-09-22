@@ -35,7 +35,6 @@ type MapShortWithGame struct {
 //	@Tags			rankings
 //	@Produce		json
 //	@Success		200	{object}	models.Response{data=RankingsResponse}
-//	@Failure		400	{object}	models.Response
 //	@Router			/rankings [get]
 func Rankings(c *gin.Context) {
 	response := RankingsResponse{
@@ -142,7 +141,6 @@ func Rankings(c *gin.Context) {
 //	@Produce		json
 //	@Param			q	query		string	false	"Search user or map name."
 //	@Success		200	{object}	models.Response{data=SearchResponse}
-//	@Failure		400	{object}	models.Response
 //	@Router			/search [get]
 func SearchWithQuery(c *gin.Context) {
 	query := c.Query("q")
