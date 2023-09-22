@@ -18,6 +18,16 @@ definitions:
       game:
         $ref: '#/definitions/models.Game'
     type: object
+  handlers.CreateMapDiscussionRequest:
+    properties:
+      content:
+        type: string
+      title:
+        type: string
+    required:
+    - content
+    - title
+    type: object
   handlers.CreateMapSummaryRequest:
     properties:
       category_id:
@@ -45,6 +55,16 @@ definitions:
         type: integer
     required:
     - route_id
+    type: object
+  handlers.EditMapDiscussionRequest:
+    properties:
+      content:
+        type: string
+      title:
+        type: string
+    required:
+    - content
+    - title
     type: object
   handlers.EditMapImageRequest:
     properties:
@@ -94,6 +114,61 @@ definitions:
         type: string
       user:
         $ref: '#/definitions/models.UserShort'
+    type: object
+  handlers.MapDiscussion:
+    properties:
+      comments:
+        items:
+          $ref: '#/definitions/handlers.MapDiscussionComment'
+        type: array
+      content:
+        type: string
+      creator:
+        $ref: '#/definitions/models.UserShortWithAvatar'
+      id:
+        type: integer
+      title:
+        type: string
+      updated_at:
+        description: Upvotes   int                        `json:"upvotes"`
+        type: string
+    type: object
+  handlers.MapDiscussionComment:
+    properties:
+      comment:
+        type: string
+      date:
+        type: string
+      user:
+        $ref: '#/definitions/models.UserShortWithAvatar'
+    type: object
+  handlers.MapDiscussionOnlyTitle:
+    properties:
+      comments:
+        items:
+          $ref: '#/definitions/handlers.MapDiscussionComment'
+        type: array
+      creator:
+        $ref: '#/definitions/models.UserShortWithAvatar'
+      id:
+        type: integer
+      title:
+        type: string
+      updated_at:
+        description: Upvotes   int                        `json:"upvotes"`
+        type: string
+    type: object
+  handlers.MapDiscussionResponse:
+    properties:
+      discussion:
+        $ref: '#/definitions/handlers.MapDiscussion'
+    type: object
+  handlers.MapDiscussionsResponse:
+    properties:
+      discussions:
+        items:
+          $ref: '#/definitions/handlers.MapDiscussionOnlyTitle'
+        type: array
     type: object
   handlers.MapLeaderboardsResponse:
     properties:
@@ -367,6 +442,15 @@ definitions:
       user_name:
         type: string
     type: object
+  models.UserShortWithAvatar:
+    properties:
+      avatar_link:
+        type: string
+      steam_id:
+        type: string
+      user_name:
+        type: string
+    type: object
 host: lp.ardapektezol.com/api
 info:
   contact: {}
@@ -549,6 +633,160 @@ paths:
             $ref: '#/definitions/models.Response'
       tags:
       - logs
+  /maps/{mapid}/discussions:
+    get:
+      description: Get map discussions with specified map id.
+      parameters:
+      - description: Map ID
+        in: path
+        name: mapid
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.MapDiscussionsResponse'
+              type: object
+      tags:
+      - maps
+    post:
+      description: Create map discussion with specified map id.
+      parameters:
+      - description: JWT Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Map ID
+        in: path
+        name: mapid
+        required: true
+        type: integer
+      - description: Discussion ID
+        in: path
+        name: discussionid
+        required: true
+        type: integer
+      - description: Body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateMapDiscussionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.CreateMapDiscussionRequest'
+              type: object
+      tags:
+      - maps
+  /maps/{mapid}/discussions/{discussionid}:
+    delete:
+      description: Delete map summary with specified map id.
+      parameters:
+      - description: JWT Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Map ID
+        in: path
+        name: mapid
+        required: true
+        type: integer
+      - description: Discussion ID
+        in: path
+        name: discussionid
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
+      tags:
+      - maps
+    get:
+      description: Get map discussion with specified map and discussion id.
+      parameters:
+      - description: Map ID
+        in: path
+        name: mapid
+        required: true
+        type: integer
+      - description: Discussion ID
+        in: path
+        name: discussionid
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.MapDiscussionResponse'
+              type: object
+      tags:
+      - maps
+    put:
+      description: Edit map discussion with specified map id.
+      parameters:
+      - description: JWT Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Map ID
+        in: path
+        name: mapid
+        required: true
+        type: integer
+      - description: Discussion ID
+        in: path
+        name: discussionid
+        required: true
+        type: integer
+      - description: Body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.EditMapDiscussionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.EditMapDiscussionRequest'
+              type: object
+      tags:
+      - maps
   /maps/{mapid}/image:
     put:
       description: Edit map image with specified map id.

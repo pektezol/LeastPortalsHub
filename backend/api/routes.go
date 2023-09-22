@@ -22,7 +22,7 @@ const (
 	mapLeaderboardsPath string = "/maps/:mapid/leaderboards"
 	mapRecordPath       string = "/maps/:mapid/record"
 	mapDiscussionsPath  string = "/maps/:mapid/discussions"
-	mapDiscussionPath   string = "/maps/:mapid/discussions/:discussionid"
+	mapDiscussionIDPath string = "/maps/:mapid/discussions/:discussionid"
 	rankingsPath        string = "/rankings"
 	searchPath          string = "/search"
 	gamesPath           string = "/games"
@@ -60,10 +60,10 @@ func InitRoutes(router *gin.Engine) {
 		v1.POST(mapRecordPath, CheckAuth, handlers.CreateRecordWithDemo)
 		v1.GET(demosPath, handlers.DownloadDemoWithID)
 		v1.GET(mapDiscussionsPath, handlers.FetchMapDiscussions)
-		v1.GET(mapDiscussionsPath, handlers.FetchMapDiscussion)
+		v1.GET(mapDiscussionIDPath, handlers.FetchMapDiscussion)
 		v1.POST(mapDiscussionsPath, CheckAuth, handlers.CreateMapDiscussion)
-		v1.PUT(mapDiscussionsPath, CheckAuth, handlers.EditMapDiscussion)
-		v1.DELETE(mapDiscussionsPath, CheckAuth, handlers.DeleteMapDiscussion)
+		v1.PUT(mapDiscussionIDPath, CheckAuth, handlers.EditMapDiscussion)
+		v1.DELETE(mapDiscussionIDPath, CheckAuth, handlers.DeleteMapDiscussion)
 		// Rankings, search
 		v1.GET(rankingsPath, handlers.Rankings)
 		v1.GET(searchPath, handlers.SearchWithQuery)

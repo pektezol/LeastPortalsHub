@@ -88,6 +88,8 @@ CREATE TABLE map_discussions (
   user_id TEXT NOT NULL,
   title TEXT NOT NULL,
   content TEXT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT now(),
+  updated_at TIMESTAMP NOT NULL DEFAULT now(),
   PRIMARY KEY (id),
   FOREIGN KEY (map_id) REFERENCES maps(id),
   FOREIGN KEY (user_id) REFERENCES users(steam_id)
@@ -98,6 +100,7 @@ CREATE TABLE map_discussions_comments (
   discussion_id INT NOT NULL,
   user_id TEXT NOT NULL,
   comment TEXT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT now(),
   PRIMARY KEY (id),
   FOREIGN KEY (discussion_id) REFERENCES map_discussions(id),
   FOREIGN KEY (user_id) REFERENCES users(steam_id)
