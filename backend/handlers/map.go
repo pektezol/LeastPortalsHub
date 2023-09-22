@@ -101,6 +101,28 @@ func FetchMapSummary(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
 			return
 		}
+		// Get completion count
+		if response.Map.IsCoop {
+			sql = `SELECT count(*) FROM ( SELECT host_id, partner_id, score_count, score_time,
+				ROW_NUMBER() OVER (PARTITION BY host_id, partner_id ORDER BY score_count, score_time) AS rn
+				FROM records_mp WHERE map_id = $1
+				) sub WHERE sub.rn = 1 AND score_count = $2`
+			err = database.DB.QueryRow(sql, response.Map.ID, route.History.ScoreCount).Scan(&route.CompletionCount)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+				return
+			}
+		} else {
+			sql = `SELECT count(*) FROM ( SELECT user_id, score_count, score_time, 
+				ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY score_count, score_time) AS rn
+				FROM records_sp WHERE map_id = $1
+				) sub WHERE rn = 1 AND score_count = $2`
+			err = database.DB.QueryRow(sql, response.Map.ID, route.History.ScoreCount).Scan(&route.CompletionCount)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+				return
+			}
+		}
 		response.Summary.Routes = append(response.Summary.Routes, route)
 	}
 	// Return response
