@@ -343,13 +343,13 @@ func Profile(c *gin.Context) {
 //	@Tags			users
 //	@Accept			json
 //	@Produce		json
-//	@Param			id	path		int	true	"User ID"
-//	@Success		200	{object}	models.Response{data=ProfileResponse}
-//	@Failure		400	{object}	models.Response
-//	@Failure		404	{object}	models.Response
-//	@Router			/users/{id} [get]
+//	@Param			userid	path		int	true	"User ID"
+//	@Success		200		{object}	models.Response{data=ProfileResponse}
+//	@Failure		400		{object}	models.Response
+//	@Failure		404		{object}	models.Response
+//	@Router			/users/{userid} [get]
 func FetchUser(c *gin.Context) {
-	id := c.Param("id")
+	id := c.Param("userid")
 	// Check if id is all numbers and 17 length
 	match, _ := regexp.MatchString("^[0-9]{17}$", id)
 	if !match {

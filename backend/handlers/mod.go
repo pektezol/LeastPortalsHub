@@ -42,11 +42,11 @@ type EditMapImageRequest struct {
 //	@Tags			maps
 //	@Produce		json
 //	@Param			Authorization	header		string					true	"JWT Token"
-//	@Param			id				path		int						true	"Map ID"
+//	@Param			mapid			path		int						true	"Map ID"
 //	@Param			request			body		CreateMapSummaryRequest	true	"Body"
 //	@Success		200				{object}	models.Response{data=CreateMapSummaryRequest}
 //	@Failure		400				{object}	models.Response
-//	@Router			/maps/{id}/summary [post]
+//	@Router			/maps/{mapid}/summary [post]
 func CreateMapSummary(c *gin.Context) {
 	// Check if user exists
 	user, exists := c.Get("user")
@@ -60,7 +60,7 @@ func CreateMapSummary(c *gin.Context) {
 		return
 	}
 	// Bind parameter and body
-	id := c.Param("id")
+	id := c.Param("mapid")
 	mapID, err := strconv.Atoi(id)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
@@ -123,11 +123,11 @@ func CreateMapSummary(c *gin.Context) {
 //	@Tags			maps
 //	@Produce		json
 //	@Param			Authorization	header		string					true	"JWT Token"
-//	@Param			id				path		int						true	"Map ID"
+//	@Param			mapid			path		int						true	"Map ID"
 //	@Param			request			body		EditMapSummaryRequest	true	"Body"
 //	@Success		200				{object}	models.Response{data=EditMapSummaryRequest}
 //	@Failure		400				{object}	models.Response
-//	@Router			/maps/{id}/summary [put]
+//	@Router			/maps/{mapid}/summary [put]
 func EditMapSummary(c *gin.Context) {
 	// Check if user exists
 	user, exists := c.Get("user")
@@ -141,7 +141,7 @@ func EditMapSummary(c *gin.Context) {
 		return
 	}
 	// Bind parameter and body
-	id := c.Param("id")
+	id := c.Param("mapid")
 	mapID, err := strconv.Atoi(id)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
@@ -204,11 +204,11 @@ func EditMapSummary(c *gin.Context) {
 //	@Tags			maps
 //	@Produce		json
 //	@Param			Authorization	header		string					true	"JWT Token"
-//	@Param			id				path		int						true	"Map ID"
+//	@Param			mapid			path		int						true	"Map ID"
 //	@Param			request			body		DeleteMapSummaryRequest	true	"Body"
 //	@Success		200				{object}	models.Response{data=DeleteMapSummaryRequest}
 //	@Failure		400				{object}	models.Response
-//	@Router			/maps/{id}/summary [delete]
+//	@Router			/maps/{mapid}/summary [delete]
 func DeleteMapSummary(c *gin.Context) {
 	// Check if user exists
 	user, exists := c.Get("user")
@@ -222,7 +222,7 @@ func DeleteMapSummary(c *gin.Context) {
 		return
 	}
 	// Bind parameter and body
-	id := c.Param("id")
+	id := c.Param("mapid")
 	mapID, err := strconv.Atoi(id)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
@@ -289,11 +289,11 @@ func DeleteMapSummary(c *gin.Context) {
 //	@Tags			maps
 //	@Produce		json
 //	@Param			Authorization	header		string				true	"JWT Token"
-//	@Param			id				path		int					true	"Map ID"
+//	@Param			mapid			path		int					true	"Map ID"
 //	@Param			request			body		EditMapImageRequest	true	"Body"
 //	@Success		200				{object}	models.Response{data=EditMapImageRequest}
 //	@Failure		400				{object}	models.Response
-//	@Router			/maps/{id}/image [put]
+//	@Router			/maps/{mapid}/image [put]
 func EditMapImage(c *gin.Context) {
 	// Check if user exists
 	user, exists := c.Get("user")
@@ -307,7 +307,7 @@ func EditMapImage(c *gin.Context) {
 		return
 	}
 	// Bind parameter and body
-	id := c.Param("id")
+	id := c.Param("mapid")
 	mapID, err := strconv.Atoi(id)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))

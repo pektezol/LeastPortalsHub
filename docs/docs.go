@@ -20,7 +20,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/chapters/{id}": {
+        "/chapters/{chapterid}": {
             "get": {
                 "description": "Get maps from the specified chapter id.",
                 "produces": [
@@ -33,7 +33,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Chapter ID",
-                        "name": "id",
+                        "name": "chapterid",
                         "in": "path",
                         "required": true
                     }
@@ -143,7 +143,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/games/{id}": {
+        "/games/{gameid}": {
             "get": {
                 "description": "Get chapters from the specified game id.",
                 "produces": [
@@ -156,7 +156,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Game ID",
-                        "name": "id",
+                        "name": "gameid",
                         "in": "path",
                         "required": true
                     }
@@ -312,7 +312,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/maps/{id}/image": {
+        "/maps/{mapid}/image": {
             "put": {
                 "description": "Edit map image with specified map id.",
                 "produces": [
@@ -332,7 +332,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Map ID",
-                        "name": "id",
+                        "name": "mapid",
                         "in": "path",
                         "required": true
                     },
@@ -374,7 +374,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/maps/{id}/leaderboards": {
+        "/maps/{mapid}/leaderboards": {
             "get": {
                 "description": "Get map leaderboards with specified id.",
                 "produces": [
@@ -387,7 +387,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Map ID",
-                        "name": "id",
+                        "name": "mapid",
                         "in": "path",
                         "required": true
                     },
@@ -432,7 +432,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/maps/{id}/record": {
+        "/maps/{mapid}/record": {
             "post": {
                 "description": "Post record with demo of a specific map.",
                 "consumes": [
@@ -448,7 +448,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Map ID",
-                        "name": "id",
+                        "name": "mapid",
                         "in": "path",
                         "required": true
                     },
@@ -519,7 +519,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/maps/{id}/summary": {
+        "/maps/{mapid}/summary": {
             "get": {
                 "description": "Get map summary with specified id.",
                 "produces": [
@@ -532,7 +532,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Map ID",
-                        "name": "id",
+                        "name": "mapid",
                         "in": "path",
                         "required": true
                     }
@@ -583,7 +583,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Map ID",
-                        "name": "id",
+                        "name": "mapid",
                         "in": "path",
                         "required": true
                     },
@@ -643,7 +643,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Map ID",
-                        "name": "id",
+                        "name": "mapid",
                         "in": "path",
                         "required": true
                     },
@@ -703,7 +703,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Map ID",
-                        "name": "id",
+                        "name": "mapid",
                         "in": "path",
                         "required": true
                     },
@@ -1055,7 +1055,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/{id}": {
+        "/users/{userid}": {
             "get": {
                 "description": "Get profile page of another user.",
                 "consumes": [
@@ -1071,7 +1071,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "User ID",
-                        "name": "id",
+                        "name": "userid",
                         "in": "path",
                         "required": true
                     }

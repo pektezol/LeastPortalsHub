@@ -37,7 +37,7 @@ type RecordResponse struct {
 //	@Tags			maps
 //	@Accept			mpfd
 //	@Produce		json
-//	@Param			id					path		int		true	"Map ID"
+//	@Param			mapid				path		int		true	"Map ID"
 //	@Param			Authorization		header		string	true	"JWT Token"
 //	@Param			host_demo			formData	file	true	"Host Demo"
 //	@Param			partner_demo		formData	file	false	"Partner Demo"
@@ -46,9 +46,9 @@ type RecordResponse struct {
 //	@Success		200					{object}	models.Response{data=RecordResponse}
 //	@Failure		400					{object}	models.Response
 //	@Failure		401					{object}	models.Response
-//	@Router			/maps/{id}/record [post]
+//	@Router			/maps/{mapid}/record [post]
 func CreateRecordWithDemo(c *gin.Context) {
-	mapId := c.Param("id")
+	mapId := c.Param("mapid")
 	// Check if user exists
 	user, exists := c.Get("user")
 	if !exists {

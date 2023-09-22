@@ -377,13 +377,13 @@ info:
   title: Least Portals Database API
   version: "1.0"
 paths:
-  /chapters/{id}:
+  /chapters/{chapterid}:
     get:
       description: Get maps from the specified chapter id.
       parameters:
       - description: Chapter ID
         in: path
-        name: id
+        name: chapterid
         required: true
         type: integer
       produces:
@@ -451,13 +451,13 @@ paths:
             $ref: '#/definitions/models.Response'
       tags:
       - games & chapters
-  /games/{id}:
+  /games/{gameid}:
     get:
       description: Get chapters from the specified game id.
       parameters:
       - description: Game ID
         in: path
-        name: id
+        name: gameid
         required: true
         type: integer
       produces:
@@ -549,7 +549,7 @@ paths:
             $ref: '#/definitions/models.Response'
       tags:
       - logs
-  /maps/{id}/image:
+  /maps/{mapid}/image:
     put:
       description: Edit map image with specified map id.
       parameters:
@@ -560,7 +560,7 @@ paths:
         type: string
       - description: Map ID
         in: path
-        name: id
+        name: mapid
         required: true
         type: integer
       - description: Body
@@ -587,13 +587,13 @@ paths:
             $ref: '#/definitions/models.Response'
       tags:
       - maps
-  /maps/{id}/leaderboards:
+  /maps/{mapid}/leaderboards:
     get:
       description: Get map leaderboards with specified id.
       parameters:
       - description: Map ID
         in: path
-        name: id
+        name: mapid
         required: true
         type: integer
       - description: 'Page Number (default: 1)'
@@ -622,7 +622,7 @@ paths:
             $ref: '#/definitions/models.Response'
       tags:
       - maps
-  /maps/{id}/record:
+  /maps/{mapid}/record:
     post:
       consumes:
       - multipart/form-data
@@ -630,7 +630,7 @@ paths:
       parameters:
       - description: Map ID
         in: path
-        name: id
+        name: mapid
         required: true
         type: integer
       - description: JWT Token
@@ -677,7 +677,7 @@ paths:
             $ref: '#/definitions/models.Response'
       tags:
       - maps
-  /maps/{id}/summary:
+  /maps/{mapid}/summary:
     delete:
       description: Delete map summary with specified map id.
       parameters:
@@ -688,7 +688,7 @@ paths:
         type: string
       - description: Map ID
         in: path
-        name: id
+        name: mapid
         required: true
         type: integer
       - description: Body
@@ -720,7 +720,7 @@ paths:
       parameters:
       - description: Map ID
         in: path
-        name: id
+        name: mapid
         required: true
         type: integer
       produces:
@@ -751,7 +751,7 @@ paths:
         type: string
       - description: Map ID
         in: path
-        name: id
+        name: mapid
         required: true
         type: integer
       - description: Body
@@ -788,7 +788,7 @@ paths:
         type: string
       - description: Map ID
         in: path
-        name: id
+        name: mapid
         required: true
         type: integer
       - description: Body
@@ -1000,7 +1000,7 @@ paths:
             $ref: '#/definitions/models.Response'
       tags:
       - auth
-  /users/{id}:
+  /users/{userid}:
     get:
       consumes:
       - application/json
@@ -1008,7 +1008,7 @@ paths:
       parameters:
       - description: User ID
         in: path
-        name: id
+        name: userid
         required: true
         type: integer
       produces:
