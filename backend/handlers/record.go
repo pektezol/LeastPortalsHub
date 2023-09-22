@@ -52,7 +52,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 	// Check if user exists
 	user, exists := c.Get("user")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, models.ErrorResponse("User not logged in."))
+		c.JSON(http.StatusOK, models.ErrorResponse("User not logged in."))
 		return
 	}
 	// Check if map is sp or mp
@@ -62,12 +62,12 @@ func CreateRecordWithDemo(c *gin.Context) {
 	sql := `SELECT g.name, m.is_disabled FROM maps m INNER JOIN games g ON m.game_id=g.id WHERE m.id = $1`
 	err := database.DB.QueryRow(sql, mapId).Scan(&gameName, &isDisabled)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	if isDisabled {
 		CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailInvalidRequest)
-		c.JSON(http.StatusBadRequest, models.ErrorResponse("Map is not available for competitive boards."))
+		c.JSON(http.StatusOK, models.ErrorResponse("Map is not available for competitive boards."))
 		return
 	}
 	if gameName == "Portal 2 - Cooperative" {
@@ -77,12 +77,12 @@ func CreateRecordWithDemo(c *gin.Context) {
 	var record RecordRequest
 	if err := c.ShouldBind(&record); err != nil {
 		CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailInvalidRequest)
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	if isCoop && (record.PartnerDemo == nil || record.PartnerID == "") {
 		CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailInvalidRequest)
-		c.JSON(http.StatusBadRequest, models.ErrorResponse("Invalid entry for coop record submission."))
+		c.JSON(http.StatusOK, models.ErrorResponse("Invalid entry for coop record submission."))
 		return
 	}
 	// Demo files
@@ -95,13 +95,13 @@ func CreateRecordWithDemo(c *gin.Context) {
 	client := serviceAccount()
 	srv, err := drive.New(client)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	// Create database transaction for inserts
 	tx, err := database.DB.Begin()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	// Defer to a rollback in case anything fails
@@ -112,27 +112,27 @@ func CreateRecordWithDemo(c *gin.Context) {
 		err = c.SaveUploadedFile(header, "backend/parser/"+uuid+".dem")
 		if err != nil {
 			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailSaveDemo)
-			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 		defer os.Remove("backend/parser/" + uuid + ".dem")
 		f, err := os.Open("backend/parser/" + uuid + ".dem")
 		if err != nil {
 			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailOpenDemo)
-			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 		defer f.Close()
 		file, err := createFile(srv, uuid+".dem", "application/octet-stream", f, os.Getenv("GOOGLE_FOLDER_ID"))
 		if err != nil {
 			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailCreateDemo)
-			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 		hostDemoScoreCount, hostDemoScoreTime, err = parser.ProcessDemo("backend/parser/" + uuid + ".dem")
 		if err != nil {
 			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailProcessDemo)
-			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 		if i == 0 {
@@ -146,7 +146,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 		if err != nil {
 			deleteFile(srv, file.Id)
 			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailInsertDemo)
-			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 	}
@@ -168,14 +168,14 @@ func CreateRecordWithDemo(c *gin.Context) {
 			deleteFile(srv, hostDemoFileID)
 			deleteFile(srv, partnerDemoFileID)
 			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailInsertRecord)
-			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 		// If a new world record based on portal count
 		// if record.ScoreCount < wrScore {
 		// 	_, err := tx.Exec(`UPDATE maps SET wr_score = $1, wr_time = $2 WHERE id = $3`, record.ScoreCount, record.ScoreTime, mapId)
 		// 	if err != nil {
-		// 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		// 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		// 		return
 		// 	}
 		// }
@@ -186,20 +186,20 @@ func CreateRecordWithDemo(c *gin.Context) {
 		if err != nil {
 			deleteFile(srv, hostDemoFileID)
 			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailInsertRecord)
-			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 		// If a new world record based on portal count
 		// if record.ScoreCount < wrScore {
 		// 	_, err := tx.Exec(`UPDATE maps SET wr_score = $1, wr_time = $2 WHERE id = $3`, record.ScoreCount, record.ScoreTime, mapId)
 		// 	if err != nil {
-		// 		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		// 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		// 		return
 		// 	}
 		// }
 	}
 	if err = tx.Commit(); err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordSuccess)
@@ -224,36 +224,36 @@ func DownloadDemoWithID(c *gin.Context) {
 	uuid := c.Query("uuid")
 	var locationID string
 	if uuid == "" {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse("Invalid id given."))
+		c.JSON(http.StatusOK, models.ErrorResponse("Invalid id given."))
 		return
 	}
 	err := database.DB.QueryRow(`SELECT location_id FROM demos WHERE id = $1`, uuid).Scan(&locationID)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	if locationID == "" {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse("Invalid id given."))
+		c.JSON(http.StatusOK, models.ErrorResponse("Invalid id given."))
 		return
 	}
 	url := "https://drive.google.com/uc?export=download&id=" + locationID
 	fileName := uuid + ".dem"
 	output, err := os.Create(fileName)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	defer os.Remove(fileName)
 	defer output.Close()
 	response, err := http.Get(url)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	defer response.Body.Close()
 	_, err = io.Copy(output, response.Body)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	// Downloaded file

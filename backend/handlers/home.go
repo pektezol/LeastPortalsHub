@@ -50,7 +50,7 @@ func Rankings(c *gin.Context) {
 	FROM records_sp sp JOIN users u ON u.steam_id = sp.user_id GROUP BY u.steam_id, u.user_name`
 	rows, err := database.DB.Query(sql)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	for rows.Next() {
@@ -59,7 +59,7 @@ func Rankings(c *gin.Context) {
 		var totalCount int
 		err = rows.Scan(&ranking.User.SteamID, &ranking.User.UserName, &currentCount, &totalCount, &ranking.TotalScore)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 		if currentCount != totalCount {
@@ -82,7 +82,7 @@ func Rankings(c *gin.Context) {
 	FROM records_mp mp JOIN users u ON u.steam_id = mp.host_id OR u.steam_id = mp.partner_id GROUP BY u.steam_id, u.user_name`
 	rows, err = database.DB.Query(sql)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	for rows.Next() {
@@ -91,7 +91,7 @@ func Rankings(c *gin.Context) {
 		var totalCount int
 		err = rows.Scan(&ranking.User.SteamID, &ranking.User.UserName, &currentCount, &totalCount, &ranking.TotalScore)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 		if currentCount != totalCount {
@@ -273,7 +273,7 @@ func SearchWithQuery(c *gin.Context) {
 	for rows.Next() {
 		var user models.UserShort
 		if err := rows.Scan(&user.SteamID, &user.UserName); err != nil {
-			c.JSON(http.StatusBadRequest, models.ErrorResponse(err.Error()))
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 		response.Players = append(response.Players, user)
