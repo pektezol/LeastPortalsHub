@@ -7,6 +7,8 @@ import "./summary.css";
 import img4 from "../../imgs/4.png"
 import img5 from "../../imgs/5.png"
 import img6 from "../../imgs/6.png"
+import img12 from "../../imgs/12.png"
+import img13 from "../../imgs/13.png"
 import Modview from "./summary_modview.js"
 
 export default function Summary(prop) {
@@ -28,7 +30,15 @@ const fakedata={} //for debug
         // eslint-disable-next-line
     }, []);
 
-
+    const [pageNumber, setPageNumber] = React.useState(1);
+    const [lbData, setLbData] = React.useState(null);
+    React.useEffect(() => {
+        fetch(`https://lp.ardapektezol.com/api/v1/maps/${location.pathname.split('/')[2]}/leaderboards?page=${pageNumber}`)
+        .then(r => r.json())
+        .then(d => setLbData(d))
+        console.log(lbData)
+        // eslint-disable-next-line
+    }, [pageNumber]);
 
 
 
@@ -40,6 +50,11 @@ function NavClick() {
     const btn = document.querySelectorAll("#section2 button.nav-button");
     btn.forEach((e) => {e.style.backgroundColor = "#2b2e46"});
     btn[navState].style.backgroundColor = "#202232";
+
+    document.querySelectorAll("section").forEach((e,i)=>i>=2?e.style.display="none":"")
+    if(navState === 0){document.querySelectorAll(".summary1").forEach((e) => {e.style.display = "grid"});}
+    if(navState === 1){document.querySelectorAll(".summary2").forEach((e) => {e.style.display = "block"});}
+    if(navState === 2){document.querySelectorAll(".summary3").forEach((e) => {e.style.display = "block"});}
 }}
 
 
@@ -108,7 +123,6 @@ function graph(state) {
                 <span><br/></span>
                 ))
         case 2: // graph
-        let i = 1
         let g = 0
         let h = 0
         return  graph_numbers.map((e,j)=>(
@@ -123,11 +137,11 @@ function graph(state) {
                         <td className='graph_ver'
                         data-graph={ h++ }
                         style={{outline: 
-                             g==h-1 ? 
+                             g===h-1 ? 
                              "1px solid #2b2e46" : g>=h ? "1px dashed white" : "0" }}
                         ></td>
                         
-                        {g==h && graph_score.includes(graph_max-j) ? 
+                        {g===h && graph_score.includes(graph_max-j) ? 
                         <button className='graph-button'
                         onClick={()=>{
                             selectRun(graph_dates.length-(i-1),catState);
@@ -189,6 +203,29 @@ function YouTubeGetID(url){
     return (url[2] !== undefined) ? url[2].split(/[^0-9a-z_]/i)[0] : url[0];
  }
 
+function TimeAgo(date) {
+    const seconds = Math.floor((new Date() - date) / 1000);
+  
+    let interval = Math.floor(seconds / 31536000);
+    if (interval > 1) {return interval + ' years ago';}
+  
+    interval = Math.floor(seconds / 2592000);
+    if (interval > 1) {return interval + ' months ago';}
+  
+    interval = Math.floor(seconds / 86400);
+    if (interval > 1) {return interval + ' days ago';}
+  
+    interval = Math.floor(seconds / 3600);
+    if (interval > 1) {return interval + ' hours ago';}
+  
+    interval = Math.floor(seconds / 60);
+    if (interval > 1) {return interval + ' minutes ago';}
+  
+    if(seconds < 10) return 'just now';
+  
+    return Math.floor(seconds) + ' seconds ago';
+  };
+
 if(data!==null){
 return (
     <>
@@ -213,8 +250,7 @@ return (
                 <button className='nav-button' onClick={()=>setNavState(1)}><img src={img5} alt="" /><span>Leaderboards</span></button>
                 <button className='nav-button' onClick={()=>setNavState(2)}><img src={img6} alt="" /><span>Discussions</span></button>
         </section>
-
-        <section id='section3'>
+        <section id='section3' className='summary1'>
             <div id='category'
             style={data.map.image===""?{backgroundColor:"#202232"}:{}}>
                 <img src={data.map.image} alt="" id='category-image'></img>
@@ -279,7 +315,7 @@ return (
                 
                 
         </section>
-        <section id='section4'>
+        <section id='section4' className='summary1'>
         <div id='difficulty'>
                 <span>Difficulty</span>
                 {data.summary.routes.sort((a,b)=>a.category.id - b.category.id)[selectedRun].rating === 0 ? (<span style={{color:"lime"}}>Very easy</span>):null}
@@ -301,7 +337,7 @@ return (
             </div>
         </section>
 
-        <section id='section5'>
+        <section id='section5' className='summary1'>
             <div id='description'>
                 {data.summary.routes.sort((a,b)=>a.category.id - b.category.id)[selectedRun].showcase!=="" ?
                 <iframe title='Showcase video' src={vid}> </iframe>
@@ -312,9 +348,59 @@ return (
                         {data.summary.routes.sort((a,b)=>a.category.id - b.category.id)[selectedRun].description}
                     </ReactMarkdown>
                 </span>
-            </div>
-            
+            </div>    
         </section>
+
+        {lbData===null?(
+            <section id='section6' className='summary2'>
+                <h1 style={{textAlign:"center"}}>Map is not available for competitive boards.</h1>
+            </section>
+        ):lbData.data.records.length===0?(
+            <section id='section6' className='summary2'>
+            <h1 style={{textAlign:"center"}}>No records found.</h1>
+        </section>
+        ):(
+        <section id='section6' className='summary2'>
+            
+            <div id='leaderboard-top'>
+                <span>Place</span>
+                <span>Runner</span>
+                <span>Portals</span>
+                <span>Time</span>
+                <span>Date</span>
+                <div id='page-number'>
+                    <div>
+
+                    <button onClick={() => pageNumber === 1 ? null : setPageNumber(prevPageNumber => prevPageNumber - 1)}
+                    ><i className='triangle' style={{position:'relative',left:'-5px',}}></i> </button>
+                    <span>{lbData.data.pagination.current_page}/{lbData.data.pagination.total_pages}</span>
+                    <button onClick={() => pageNumber === lbData.data.pagination.total_pages ? null : setPageNumber(prevPageNumber => prevPageNumber + 1)}
+                    ><i className='triangle' style={{position:'relative',left:'5px',transform:'rotate(180deg)'}}></i> </button>
+                    </div>
+                </div>
+            </div>
+            <hr/>
+            <div id='leaderboard-records'>
+            {lbData.data.records.map((r, index) => (
+                    <span className='leaderboard-record' key={index} >
+                        <span>{r.placement}</span>
+                        <span> </span>
+                        <span><img src={r.user.avatar_link} alt='' /> &nbsp; {r.user.user_name}</span>
+                        <span>{r.score_count}</span>
+                        <span> </span>
+                        <span>{r.score_time}</span>
+                        <span className='hover-popup' popup-text={r.record_date.replace("T",' ').split(".")[0]}>{ TimeAgo(new Date(r.record_date.replace("T"," ").replace("Z",""))) }</span>
+                        <span>
+                            <button onClick={()=>{window.alert(r.demo_id)}}><img src={img13} alt="demo_id" /></button>
+                            <button onClick={()=>window.location.href=`https://lp.ardapektezol.com/api/v1/demos?uuid=${r.demo_id}`}><img src={img12} alt="download" /></button>
+                        </span>
+                    </span>
+                    ))}
+                    {console.log(lbData.data.records.length)}
+            </div>
+        </section>
+        )}
+
     </main>
     </>
     )
