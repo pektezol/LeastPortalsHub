@@ -20,7 +20,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/chapters/{id}": {
+        "/chapters/{chapterid}": {
             "get": {
                 "description": "Get maps from the specified chapter id.",
                 "produces": [
@@ -33,7 +33,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Chapter ID",
-                        "name": "id",
+                        "name": "chapterid",
                         "in": "path",
                         "required": true
                     }
@@ -93,12 +93,6 @@ const docTemplate = `{
                         "schema": {
                             "type": "file"
                         }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.Response"
-                        }
                     }
                 }
             }
@@ -143,7 +137,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/games/{id}": {
+        "/games/{gameid}": {
             "get": {
                 "description": "Get chapters from the specified game id.",
                 "produces": [
@@ -156,7 +150,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Game ID",
-                        "name": "id",
+                        "name": "gameid",
                         "in": "path",
                         "required": true
                     }
@@ -178,12 +172,6 @@ const docTemplate = `{
                                     }
                                 }
                             ]
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.Response"
                         }
                     }
                 }
@@ -218,12 +206,6 @@ const docTemplate = `{
                                     }
                                 }
                             ]
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.Response"
                         }
                     }
                 }
@@ -265,12 +247,6 @@ const docTemplate = `{
                                 }
                             ]
                         }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.Response"
-                        }
                     }
                 }
             }
@@ -302,9 +278,252 @@ const docTemplate = `{
                                 }
                             ]
                         }
+                    }
+                }
+            }
+        },
+        "/maps/{mapid}/discussions": {
+            "get": {
+                "description": "Get map discussions with specified map id.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "maps"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Map ID",
+                        "name": "mapid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/handlers.MapDiscussionsResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create map discussion with specified map id.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "maps"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "JWT Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    {
+                        "type": "integer",
+                        "description": "Map ID",
+                        "name": "mapid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Discussion ID",
+                        "name": "discussionid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.CreateMapDiscussionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/handlers.CreateMapDiscussionRequest"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/maps/{mapid}/discussions/{discussionid}": {
+            "get": {
+                "description": "Get map discussion with specified map and discussion id.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "maps"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Map ID",
+                        "name": "mapid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Discussion ID",
+                        "name": "discussionid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/handlers.MapDiscussionResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Edit map discussion with specified map id.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "maps"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "JWT Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Map ID",
+                        "name": "mapid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Discussion ID",
+                        "name": "discussionid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.EditMapDiscussionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/handlers.EditMapDiscussionRequest"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete map summary with specified map id.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "maps"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "JWT Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Map ID",
+                        "name": "mapid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Discussion ID",
+                        "name": "discussionid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.Response"
                         }
@@ -312,7 +531,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/maps/{id}/image": {
+        "/maps/{mapid}/image": {
             "put": {
                 "description": "Edit map image with specified map id.",
                 "produces": [
@@ -332,7 +551,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Map ID",
-                        "name": "id",
+                        "name": "mapid",
                         "in": "path",
                         "required": true
                     },
@@ -364,17 +583,11 @@ const docTemplate = `{
                                 }
                             ]
                         }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.Response"
-                        }
                     }
                 }
             }
         },
-        "/maps/{id}/leaderboards": {
+        "/maps/{mapid}/leaderboards": {
             "get": {
                 "description": "Get map leaderboards with specified id.",
                 "produces": [
@@ -387,7 +600,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Map ID",
-                        "name": "id",
+                        "name": "mapid",
                         "in": "path",
                         "required": true
                     },
@@ -422,17 +635,11 @@ const docTemplate = `{
                                 }
                             ]
                         }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.Response"
-                        }
                     }
                 }
             }
         },
-        "/maps/{id}/record": {
+        "/maps/{mapid}/record": {
             "post": {
                 "description": "Post record with demo of a specific map.",
                 "consumes": [
@@ -448,7 +655,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Map ID",
-                        "name": "id",
+                        "name": "mapid",
                         "in": "path",
                         "required": true
                     },
@@ -503,23 +710,11 @@ const docTemplate = `{
                                 }
                             ]
                         }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.Response"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/models.Response"
-                        }
                     }
                 }
             }
         },
-        "/maps/{id}/summary": {
+        "/maps/{mapid}/summary": {
             "get": {
                 "description": "Get map summary with specified id.",
                 "produces": [
@@ -532,7 +727,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Map ID",
-                        "name": "id",
+                        "name": "mapid",
                         "in": "path",
                         "required": true
                     }
@@ -554,12 +749,6 @@ const docTemplate = `{
                                     }
                                 }
                             ]
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.Response"
                         }
                     }
                 }
@@ -583,7 +772,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Map ID",
-                        "name": "id",
+                        "name": "mapid",
                         "in": "path",
                         "required": true
                     },
@@ -615,12 +804,6 @@ const docTemplate = `{
                                 }
                             ]
                         }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.Response"
-                        }
                     }
                 }
             },
@@ -643,7 +826,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Map ID",
-                        "name": "id",
+                        "name": "mapid",
                         "in": "path",
                         "required": true
                     },
@@ -675,12 +858,6 @@ const docTemplate = `{
                                 }
                             ]
                         }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.Response"
-                        }
                     }
                 }
             },
@@ -703,7 +880,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "Map ID",
-                        "name": "id",
+                        "name": "mapid",
                         "in": "path",
                         "required": true
                     },
@@ -734,12 +911,6 @@ const docTemplate = `{
                                     }
                                 }
                             ]
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.Response"
                         }
                     }
                 }
@@ -784,18 +955,6 @@ const docTemplate = `{
                                 }
                             ]
                         }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.Response"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/models.Response"
-                        }
                     }
                 }
             },
@@ -829,18 +988,6 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.Response"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/models.Response"
                         }
@@ -885,18 +1032,6 @@ const docTemplate = `{
                                 }
                             ]
                         }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.Response"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/models.Response"
-                        }
                     }
                 }
             }
@@ -927,12 +1062,6 @@ const docTemplate = `{
                                     }
                                 }
                             ]
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.Response"
                         }
                     }
                 }
@@ -972,12 +1101,6 @@ const docTemplate = `{
                                     }
                                 }
                             ]
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.Response"
                         }
                     }
                 }
@@ -1055,7 +1178,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/users/{id}": {
+        "/users/{userid}": {
             "get": {
                 "description": "Get profile page of another user.",
                 "consumes": [
@@ -1071,7 +1194,7 @@ const docTemplate = `{
                     {
                         "type": "integer",
                         "description": "User ID",
-                        "name": "id",
+                        "name": "userid",
                         "in": "path",
                         "required": true
                     }
@@ -1093,18 +1216,6 @@ const docTemplate = `{
                                     }
                                 }
                             ]
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.Response"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/models.Response"
                         }
                     }
                 }
@@ -1137,6 +1248,21 @@ const docTemplate = `{
                 },
                 "game": {
                     "$ref": "#/definitions/models.Game"
+                }
+            }
+        },
+        "handlers.CreateMapDiscussionRequest": {
+            "type": "object",
+            "required": [
+                "content",
+                "title"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
                 }
             }
         },
@@ -1178,6 +1304,21 @@ const docTemplate = `{
             "properties": {
                 "route_id": {
                     "type": "integer"
+                }
+            }
+        },
+        "handlers.EditMapDiscussionRequest": {
+            "type": "object",
+            "required": [
+                "content",
+                "title"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
                 }
             }
         },
@@ -1252,6 +1393,90 @@ const docTemplate = `{
                 },
                 "user": {
                     "$ref": "#/definitions/models.UserShort"
+                }
+            }
+        },
+        "handlers.MapDiscussion": {
+            "type": "object",
+            "properties": {
+                "comments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handlers.MapDiscussionComment"
+                    }
+                },
+                "content": {
+                    "type": "string"
+                },
+                "creator": {
+                    "$ref": "#/definitions/models.UserShortWithAvatar"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "description": "Upvotes   int                        ` + "`" + `json:\"upvotes\"` + "`" + `",
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.MapDiscussionComment": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/models.UserShortWithAvatar"
+                }
+            }
+        },
+        "handlers.MapDiscussionOnlyTitle": {
+            "type": "object",
+            "properties": {
+                "comments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handlers.MapDiscussionComment"
+                    }
+                },
+                "creator": {
+                    "$ref": "#/definitions/models.UserShortWithAvatar"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "description": "Upvotes   int                        ` + "`" + `json:\"upvotes\"` + "`" + `",
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.MapDiscussionResponse": {
+            "type": "object",
+            "properties": {
+                "discussion": {
+                    "$ref": "#/definitions/handlers.MapDiscussion"
+                }
+            }
+        },
+        "handlers.MapDiscussionsResponse": {
+            "type": "object",
+            "properties": {
+                "discussions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handlers.MapDiscussionOnlyTitle"
+                    }
                 }
             }
         },
