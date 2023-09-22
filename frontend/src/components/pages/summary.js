@@ -28,7 +28,7 @@ const fakedata={} //for debug
             if(d.data.summary.routes.length===0){d.data.summary.routes[0]={"category": "","history": {"score_count": 0,},"rating": 0,"description": "","showcase": ""}} 
         })
         // eslint-disable-next-line
-    }, []);
+    }, [location.pathname]);
 
     const [pageNumber, setPageNumber] = React.useState(1);
     const [lbData, setLbData] = React.useState(null);
@@ -438,7 +438,6 @@ return (
                             <button onClick={()=>window.location.href=`https://lp.ardapektezol.com/api/v1/demos?uuid=${r.demo_id}`}><img src={img12} alt="download" /></button>
                         </span>
                             )}
-                    {console.log(lbData)}
                     </span>
                     ))}
             </div>

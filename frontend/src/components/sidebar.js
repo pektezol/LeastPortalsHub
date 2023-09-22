@@ -91,9 +91,17 @@ React.useEffect(()=>{
     if(location.pathname.includes("rules")){SidebarClick(9)}
     if(location.pathname.includes("about")){SidebarClick(10)}
 
-    // console.log(location.pathname)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-},  [location])
+},  [location.pathname])
+
+const [search,setSearch] = React.useState(null)
+const [searchData,setSearchData] = React.useState(null)
+React.useEffect(()=>{
+    fetch(`https://lp.ardapektezol.com/api/v1/search?q=${search}`)
+        .then(r=>r.json())
+        .then(d=>setSearchData(d.data))
+
+}, [search])
 
 
 return (
@@ -151,7 +159,27 @@ return (
             </div>
         </div>
         <div> 
-            <input type="text" id='searchbar' placeholder='Search for map or a player...'/>
+            <input type="text" id='searchbar' placeholder='Search for map or a player...' onChange={()=>setSearch(document.querySelector("#searchbar").value)}/>
+
+            <div id='search-data'>
+
+            {searchData!==null?searchData.maps.map((q,index)=>(
+                <Link to={`/maps/${q.id}`} className='search-map' key={index}>
+                    <span>{q.game}</span>
+                    <span>{q.chapter}</span>
+                    <span>{q.map}</span>
+                </Link>
+            )):""}
+            {searchData!==null?searchData.players.map((q,index)=>
+                (
+                <Link className='search-player' key={index}>
+                    <img src={q.avatar_link} alt='pfp'></img>
+                    <span style={{fontSize:`${36 - q.user_name.length * 0.8}px`}}>{q.user_name}</span>
+                </Link>
+                
+            )):""}
+
+            </div>            
         </div>
     </div>
         )
