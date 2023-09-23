@@ -12,7 +12,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/pektezol/leastportalshub/backend/database"
 	"github.com/pektezol/leastportalshub/backend/models"
-	"github.com/solovev/steam_go"
+	"github.com/pektezol/steam_go"
 )
 
 type LoginResponse struct {
@@ -28,14 +28,14 @@ type LoginResponse struct {
 //	@Success		200	{object}	models.Response{data=LoginResponse}
 //	@Router			/login [get]
 func Login(c *gin.Context) {
-	openID := steam_go.NewOpenId(c.Request)
+	openID := steam_go.NewOpenID(c.Request)
 	switch openID.Mode() {
 	case "":
 		c.Redirect(http.StatusMovedPermanently, openID.AuthUrl())
 	case "cancel":
 		c.Redirect(http.StatusMovedPermanently, "/")
 	default:
-		steamID, err := openID.ValidateAndGetId()
+		steamID, err := openID.ValidateAndGetID()
 		if err != nil {
 			CreateLog(steamID, LogTypeUser, LogDescriptionUserLoginFailValidate)
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
