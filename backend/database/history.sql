@@ -11,6 +11,7 @@ INSERT INTO map_history(map_id,category_id,user_name,score_count,record_date) VA
 (6,1,'Stimich',4,'2011-10-08'),
 (6,1,'aepaePolakrn',3,'2011-10-19'),
 (6,1,'Krzyhau',2,'2020-10-10'),
+(7,1,'Tyronis',0,'2013-01-11'),
 (9,1,'slmid1995',4,'2011-10-05'),
 (9,1,'Jokie',3,'2011-10-05'),
 (9,1,'Tyronis',2,'2011-10-05'),
@@ -163,6 +164,7 @@ INSERT INTO map_history(map_id,category_id,user_name,score_count,record_date) VA
 (64,1,'Chubfish & Exhale',2,'2011-11-01'),
 (65,1,'Mathias123961 & Sir Spawn Alot',4,'2011-08-01'),
 (65,1,'Nidboj132 & Oryn',3,'2022-02-03'),
+(65,1,'Nidboj132 & Oryn',2,'2022-07-11'),
 (66,1,'Mathias123961 & Sir Spawn Alot',3,'2011-08-01'),
 (66,1,'Schlepian & Chubfish',2,'2011-10-01'),
 (67,1,'Mathias123961 & Sir Spawn Alot',0,'2011-08-01'),
@@ -200,6 +202,7 @@ INSERT INTO map_history(map_id,category_id,user_name,score_count,record_date) VA
 (79,1,'ganonscrub & ?',5,'2011-04-01'),
 (79,1,'Mathias123961 & Sir Spawn Alot',4,'2011-08-01'),
 (79,1,'Chubfish & Exhale',2,'2012-08-04'),
+(79,1,'BiSaXa & Oryn',0,'2023-07-18')
 (80,1,'Mathias123961 & Sir Spawn Alot',5,'2011-08-01'),
 (80,1,'Chubfish & Exhale',4,'2011-12-01'),
 (81,1,'Mathias123961 & Sir Spawn Alot',7,'2011-08-01'),
