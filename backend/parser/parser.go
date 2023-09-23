@@ -35,8 +35,6 @@ func ProcessDemo(demoPath string) (int, int, error) {
 			}
 		}
 	}
-	if err := cmd.Wait(); err != nil {
-		return 0, 0, err
-	}
+	cmd.Wait()
 	return portalCount, cmTicks, nil
 }
