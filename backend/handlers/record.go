@@ -8,6 +8,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -206,6 +207,84 @@ func CreateRecordWithDemo(c *gin.Context) {
 		Success: true,
 		Message: "Successfully created record.",
 		Data:    RecordResponse{ScoreCount: hostDemoScoreCount, ScoreTime: hostDemoScoreTime},
+	})
+}
+
+func DeleteRecord(c *gin.Context) {
+	mapID, err := strconv.Atoi(c.Param("mapid"))
+	if err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+		return
+	}
+	recordID, err := strconv.Atoi(c.Param("recordid"))
+	if err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+		return
+	}
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusOK, models.ErrorResponse("User not logged in."))
+		return
+	}
+	// Validate map
+	var validateMapID int
+	var isCoop bool
+	sql := `SELECT m.id, g.is_coop FROM maps m INNER JOIN games g ON m.game_id = g.id
+	INNER JOIN chapters c ON m.chapter_id = c.id WHERE m.id = $1`
+	err = database.DB.QueryRow(sql, mapID).Scan(&validateMapID, &isCoop)
+	if err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+		return
+	}
+	if mapID != validateMapID {
+		c.JSON(http.StatusOK, models.ErrorResponse("Selected map does not exist."))
+		return
+	}
+	if isCoop {
+		// Validate if cooperative record does exist
+		var validateRecordID int
+		sql = `SELECT mp.id FROM records_mp mp WHERE mp.id = $1 AND mp.map_id = $2 AND (mp.host_id = $3 OR mp.partner_id = $3) AND is_deleted = false`
+		err = database.DB.QueryRow(sql, recordID, mapID, user.(models.User).SteamID).Scan(&validateRecordID)
+		if err != nil {
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+			return
+		}
+		if recordID != validateRecordID {
+			c.JSON(http.StatusOK, models.ErrorResponse("Selected record does not exist."))
+			return
+		}
+		// Remove record
+		sql = `UPDATE records_mp SET is_deleted = true WHERE id = $1`
+		_, err = database.DB.Exec(sql, recordID)
+		if err != nil {
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+			return
+		}
+	} else {
+		// Validate if singleplayer record does exist
+		var validateRecordID int
+		sql = `SELECT sp.id FROM records_sp sp WHERE sp.id = $1 AND sp.map_id = $2 AND sp.user_id = $3 AND is_deleted = false`
+		err = database.DB.QueryRow(sql, recordID, mapID, user.(models.User).SteamID).Scan(&validateRecordID)
+		if err != nil {
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+			return
+		}
+		if recordID != validateRecordID {
+			c.JSON(http.StatusOK, models.ErrorResponse("Selected record does not exist."))
+			return
+		}
+		// Remove record
+		sql = `UPDATE records_sp SET is_deleted = true WHERE id = $1`
+		_, err = database.DB.Exec(sql, recordID)
+		if err != nil {
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+			return
+		}
+	}
+	c.JSON(http.StatusOK, models.Response{
+		Success: true,
+		Message: "Successfully deleted record.",
+		Data:    nil,
 	})
 }
 

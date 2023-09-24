@@ -104,7 +104,7 @@ func FetchMapSummary(c *gin.Context) {
 		if response.Map.IsCoop {
 			sql = `SELECT count(*) FROM ( SELECT host_id, partner_id, score_count, score_time,
 				ROW_NUMBER() OVER (PARTITION BY host_id, partner_id ORDER BY score_count, score_time) AS rn
-				FROM records_mp WHERE map_id = $1
+				FROM records_mp WHERE map_id = $1 AND is_deleted = false
 				) sub WHERE sub.rn = 1 AND score_count = $2`
 			err = database.DB.QueryRow(sql, response.Map.ID, route.History.ScoreCount).Scan(&route.CompletionCount)
 			if err != nil {
@@ -114,7 +114,7 @@ func FetchMapSummary(c *gin.Context) {
 		} else {
 			sql = `SELECT count(*) FROM ( SELECT user_id, score_count, score_time, 
 				ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY score_count, score_time) AS rn
-				FROM records_sp WHERE map_id = $1
+				FROM records_sp WHERE map_id = $1 AND is_deleted = false
 				) sub WHERE rn = 1 AND score_count = $2`
 			err = database.DB.QueryRow(sql, response.Map.ID, route.History.ScoreCount).Scan(&route.CompletionCount)
 			if err != nil {
@@ -204,7 +204,7 @@ func FetchMapLeaderboards(c *gin.Context) {
 			record_date,
 			ROW_NUMBER() OVER (PARTITION BY host_id, partner_id ORDER BY score_count, score_time) AS rn
 		FROM records_mp
-		WHERE map_id = $1
+		WHERE map_id = $1 AND is_deleted = false
 	) sub
 	JOIN users AS host ON sub.host_id = host.steam_id 
 	JOIN users AS partner ON sub.partner_id = partner.steam_id 
@@ -255,7 +255,7 @@ func FetchMapLeaderboards(c *gin.Context) {
 		  SELECT id, user_id, score_count, score_time, demo_id, record_date,
 				 ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY score_count, score_time) AS rn
 		  FROM records_sp
-		  WHERE map_id = $1
+		  WHERE map_id = $1 AND is_deleted = false
 		) sub
 		INNER JOIN users ON user_id = users.steam_id
 		WHERE rn = 1
