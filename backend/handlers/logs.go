@@ -140,17 +140,17 @@ func ScoreLogs(c *gin.Context) {
 		rs.record_date
 	FROM (
 		SELECT id, map_id, user_id, score_count, score_time, demo_id, record_date
-		FROM records_sp
+		FROM records_sp WHERE is_deleted = false
 
 		UNION ALL
 
 		SELECT id, map_id, host_id AS user_id, score_count, score_time, host_demo_id AS demo_id, record_date
-		FROM records_mp
+		FROM records_mp WHERE is_deleted = false
 
 		UNION ALL
 
 		SELECT id, map_id, partner_id AS user_id, score_count, score_time, partner_demo_id AS demo_id, record_date
-		FROM records_mp
+		FROM records_mp WHERE is_deleted = false
 	) AS rs
 	JOIN users u ON rs.user_id = u.steam_id
 	JOIN maps m ON rs.map_id = m.id
