@@ -1,4 +1,4 @@
-basePath: /v1
+basePath: /api/v1
 definitions:
   handlers.ChapterMapsResponse:
     properties:
@@ -462,7 +462,7 @@ definitions:
       user_name:
         type: string
     type: object
-host: lp.ardapektezol.com/api
+host: lp.ardapektezol.com
 info:
   contact: {}
   description: Backend API endpoints for the Least Portals Database.
@@ -658,11 +658,6 @@ paths:
       - description: Map ID
         in: path
         name: mapid
-        required: true
-        type: integer
-      - description: Discussion ID
-        in: path
-        name: discussionid
         required: true
         type: integer
       - description: Body
@@ -888,6 +883,34 @@ paths:
                 data:
                   $ref: '#/definitions/handlers.RecordResponse'
               type: object
+      tags:
+      - maps
+  /maps/{mapid}/record/{recordid}:
+    delete:
+      description: Delete record with specified map and record id.
+      parameters:
+      - description: Map ID
+        in: path
+        name: mapid
+        required: true
+        type: integer
+      - description: Record ID
+        in: path
+        name: recordid
+        required: true
+        type: integer
+      - description: JWT Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Response'
       tags:
       - maps
   /maps/{mapid}/summary:
