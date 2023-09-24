@@ -345,13 +345,6 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "type": "integer",
-                        "description": "Discussion ID",
-                        "name": "discussionid",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
                         "description": "Body",
                         "name": "request",
                         "in": "body",
@@ -709,6 +702,48 @@ const docTemplate = `{
                                     }
                                 }
                             ]
+                        }
+                    }
+                }
+            }
+        },
+        "/maps/{mapid}/record/{recordid}": {
+            "delete": {
+                "description": "Delete record with specified map and record id.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "maps"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Map ID",
+                        "name": "mapid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Record ID",
+                        "name": "recordid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "JWT Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
                         }
                     }
                 }
@@ -1937,8 +1972,8 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "lp.ardapektezol.com/api",
-	BasePath:         "/v1",
+	Host:             "lp.ardapektezol.com",
+	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "Least Portals Database API",
 	Description:      "Backend API endpoints for the Least Portals Database.",

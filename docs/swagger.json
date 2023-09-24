@@ -10,8 +10,8 @@
         },
         "version": "1.0"
     },
-    "host": "lp.ardapektezol.com/api",
-    "basePath": "/v1",
+    "host": "lp.ardapektezol.com",
+    "basePath": "/api/v1",
     "paths": {
         "/chapters/{chapterid}": {
             "get": {
@@ -334,13 +334,6 @@
                         "type": "integer",
                         "description": "Map ID",
                         "name": "mapid",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Discussion ID",
-                        "name": "discussionid",
                         "in": "path",
                         "required": true
                     },
@@ -702,6 +695,48 @@
                                     }
                                 }
                             ]
+                        }
+                    }
+                }
+            }
+        },
+        "/maps/{mapid}/record/{recordid}": {
+            "delete": {
+                "description": "Delete record with specified map and record id.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "maps"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Map ID",
+                        "name": "mapid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Record ID",
+                        "name": "recordid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "JWT Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Response"
                         }
                     }
                 }
