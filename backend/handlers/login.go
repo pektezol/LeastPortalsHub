@@ -28,7 +28,7 @@ type LoginResponse struct {
 //	@Success		200	{object}	models.Response{data=LoginResponse}
 //	@Router			/login [get]
 func Login(c *gin.Context) {
-	openID := steam_go.NewOpenID(c.Request)
+	openID := steam_go.NewOpenID(c.Request, true)
 	switch openID.Mode() {
 	case "":
 		c.Redirect(http.StatusMovedPermanently, openID.AuthUrl())
