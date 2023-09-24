@@ -49,11 +49,11 @@ func Rankings(c *gin.Context) {
 			SELECT
 			user_id,
 			MIN(score_count) AS min_score_count
-			FROM records_sp
+			FROM records_sp WHERE is_deleted = false
 			GROUP BY user_id, map_id
 			) AS subquery
 		WHERE user_id = u.steam_id) 
-	FROM records_sp sp JOIN users u ON u.steam_id = sp.user_id GROUP BY u.steam_id, u.user_name`
+	FROM records_sp sp JOIN users u ON u.steam_id = sp.user_id WHERE is_deleted = false GROUP BY u.steam_id, u.user_name`
 	rows, err := database.DB.Query(sql)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
@@ -81,11 +81,11 @@ func Rankings(c *gin.Context) {
 			host_id,
 			partner_id,
 			MIN(score_count) AS min_score_count
-			FROM records_mp
+			FROM records_mp WHERE is_deleted = false
 			GROUP BY host_id, partner_id, map_id
 			) AS subquery
 		WHERE host_id = u.steam_id OR partner_id = u.steam_id) 
-	FROM records_mp mp JOIN users u ON u.steam_id = mp.host_id OR u.steam_id = mp.partner_id GROUP BY u.steam_id, u.user_name`
+	FROM records_mp mp JOIN users u ON u.steam_id = mp.host_id OR u.steam_id = mp.partner_id WHERE is_deleted = false GROUP BY u.steam_id, u.user_name`
 	rows, err = database.DB.Query(sql)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))

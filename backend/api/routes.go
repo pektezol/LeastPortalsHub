@@ -21,6 +21,7 @@ const (
 	mapImagePath        string = "/maps/:mapid/image"
 	mapLeaderboardsPath string = "/maps/:mapid/leaderboards"
 	mapRecordPath       string = "/maps/:mapid/record"
+	mapRecordIDPath     string = "/maps/:mapid/record/:recordid"
 	mapDiscussionsPath  string = "/maps/:mapid/discussions"
 	mapDiscussionIDPath string = "/maps/:mapid/discussions/:discussionid"
 	rankingsPath        string = "/rankings"
@@ -51,14 +52,18 @@ func InitRoutes(router *gin.Engine) {
 		v1.POST(profilePath, CheckAuth, handlers.UpdateUser)
 		v1.GET(usersPath, CheckAuth, handlers.FetchUser)
 		// Maps
+		// - Summary
 		v1.GET(mapSummaryPath, handlers.FetchMapSummary)
 		v1.POST(mapSummaryPath, CheckAuth, handlers.CreateMapSummary)
 		v1.PUT(mapSummaryPath, CheckAuth, handlers.EditMapSummary)
 		v1.DELETE(mapSummaryPath, CheckAuth, handlers.DeleteMapSummary)
 		v1.PUT(mapImagePath, CheckAuth, handlers.EditMapImage)
+		// - Leaderboards
 		v1.GET(mapLeaderboardsPath, handlers.FetchMapLeaderboards)
 		v1.POST(mapRecordPath, CheckAuth, handlers.CreateRecordWithDemo)
+		v1.DELETE(mapRecordIDPath, CheckAuth, handlers.DeleteRecord)
 		v1.GET(demosPath, handlers.DownloadDemoWithID)
+		// - Discussions
 		v1.GET(mapDiscussionsPath, handlers.FetchMapDiscussions)
 		v1.GET(mapDiscussionIDPath, handlers.FetchMapDiscussion)
 		v1.POST(mapDiscussionsPath, CheckAuth, handlers.CreateMapDiscussion)
