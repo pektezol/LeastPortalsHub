@@ -129,6 +129,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 		}
 		hostDemoScoreCount, hostDemoScoreTime, err = parser.ProcessDemo("backend/parser/" + uuid + ".dem")
 		if err != nil {
+			deleteFile(srv, file.Id)
 			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailProcessDemo)
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
