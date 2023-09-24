@@ -210,6 +210,16 @@ func CreateRecordWithDemo(c *gin.Context) {
 	})
 }
 
+// DELETE Record
+//
+//	@Description	Delete record with specified map and record id.
+//	@Tags			maps
+//	@Produce		json
+//	@Param			mapid			path		int		true	"Map ID"
+//	@Param			recordid		path		int		true	"Record ID"
+//	@Param			Authorization	header		string	true	"JWT Token"
+//	@Success		200				{object}	models.Response
+//	@Router			/maps/{mapid}/record/{recordid} [delete]
 func DeleteRecord(c *gin.Context) {
 	mapID, err := strconv.Atoi(c.Param("mapid"))
 	if err != nil {
