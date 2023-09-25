@@ -228,6 +228,7 @@ func FetchMapLeaderboards(c *gin.Context) {
 				ties++
 				record.Placement = placement - ties
 			} else {
+				ties = 0
 				record.Placement = placement
 			}
 			records = append(records, record)
@@ -278,6 +279,7 @@ func FetchMapLeaderboards(c *gin.Context) {
 				ties++
 				record.Placement = placement - ties
 			} else {
+				ties = 0
 				record.Placement = placement
 			}
 			records = append(records, record)
