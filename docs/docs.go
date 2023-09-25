@@ -1794,7 +1794,7 @@ const docTemplate = `{
                 "p2sr": {
                     "type": "string"
                 },
-                "stream": {
+                "steam": {
                     "type": "string"
                 },
                 "twitch": {
@@ -1933,11 +1933,14 @@ const docTemplate = `{
         "models.UserRanking": {
             "type": "object",
             "properties": {
+                "placement": {
+                    "type": "integer"
+                },
                 "total_score": {
                     "type": "integer"
                 },
                 "user": {
-                    "$ref": "#/definitions/models.UserShort"
+                    "$ref": "#/definitions/models.UserShortWithAvatar"
                 }
             }
         },

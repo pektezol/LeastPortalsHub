@@ -351,7 +351,7 @@ definitions:
     properties:
       p2sr:
         type: string
-      stream:
+      steam:
         type: string
       twitch:
         type: string
@@ -441,10 +441,12 @@ definitions:
     type: object
   models.UserRanking:
     properties:
+      placement:
+        type: integer
       total_score:
         type: integer
       user:
-        $ref: '#/definitions/models.UserShort'
+        $ref: '#/definitions/models.UserShortWithAvatar'
     type: object
   models.UserShort:
     properties:
