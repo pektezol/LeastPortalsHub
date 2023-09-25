@@ -43,8 +43,8 @@ func Rankings(c *gin.Context) {
 		Multiplayer:  []models.UserRanking{},
 	}
 	// Singleplayer rankings
-	sql := `SELECT u.steam_id, u.user_name, COUNT(DISTINCT map_id), 
-	(SELECT COUNT(maps.name) FROM maps INNER JOIN games g ON maps.game_id = g.id WHERE g.is_coop = FALSE AND is_disabled = false), 
+	sql := `SELECT u.steam_id, u.user_name, u.avatar_link, COUNT(DISTINCT map_id), 
+	(SELECT COUNT(maps.name) FROM maps INNER JOIN games g ON maps.game_id = g.id WHERE g."name" = 'Portal 2 - Singleplayer' AND is_disabled = false), 
 	(SELECT SUM(min_score_count) AS total_min_score_count FROM (
 			SELECT
 			user_id,
@@ -63,7 +63,7 @@ func Rankings(c *gin.Context) {
 		ranking := models.UserRanking{}
 		var currentCount int
 		var totalCount int
-		err = rows.Scan(&ranking.User.SteamID, &ranking.User.UserName, &currentCount, &totalCount, &ranking.TotalScore)
+		err = rows.Scan(&ranking.User.SteamID, &ranking.User.UserName, &ranking.User.AvatarLink, &currentCount, &totalCount, &ranking.TotalScore)
 		if err != nil {
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
@@ -74,8 +74,8 @@ func Rankings(c *gin.Context) {
 		response.Singleplayer = append(response.Singleplayer, ranking)
 	}
 	// Multiplayer rankings
-	sql = `SELECT u.steam_id, u.user_name, COUNT(DISTINCT map_id), 
-	(SELECT COUNT(maps.name) FROM maps INNER JOIN games g ON maps.game_id = g.id WHERE g.is_coop = FALSE AND is_disabled = false),
+	sql = `SELECT u.steam_id, u.user_name, u.avatar_link, COUNT(DISTINCT map_id), 
+	(SELECT COUNT(maps.name) FROM maps INNER JOIN games g ON maps.game_id = g.id WHERE g."name" = 'Portal 2 - Cooperative' AND is_disabled = false),
 	(SELECT SUM(min_score_count) AS total_min_score_count FROM (
 			SELECT
 			host_id,
@@ -95,7 +95,7 @@ func Rankings(c *gin.Context) {
 		ranking := models.UserRanking{}
 		var currentCount int
 		var totalCount int
-		err = rows.Scan(&ranking.User.SteamID, &ranking.User.UserName, &currentCount, &totalCount, &ranking.TotalScore)
+		err = rows.Scan(&ranking.User.SteamID, &ranking.User.UserName, &ranking.User.AvatarLink, &currentCount, &totalCount, &ranking.TotalScore)
 		if err != nil {
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
@@ -121,12 +121,48 @@ func Rankings(c *gin.Context) {
 	sort.Slice(response.Singleplayer, func(i, j int) bool {
 		return response.Singleplayer[i].TotalScore < response.Singleplayer[j].TotalScore
 	})
+	placement := 1
+	ties := 0
+	for index := 0; index < len(response.Singleplayer); index++ {
+		if index != 0 && response.Singleplayer[index-1].TotalScore == response.Singleplayer[index].TotalScore {
+			ties++
+			response.Singleplayer[index].Placement = placement - ties
+		} else {
+			ties = 0
+			response.Singleplayer[index].Placement = placement
+		}
+		placement++
+	}
 	sort.Slice(response.Multiplayer, func(i, j int) bool {
 		return response.Multiplayer[i].TotalScore < response.Multiplayer[j].TotalScore
 	})
+	placement = 1
+	ties = 0
+	for index := 0; index < len(response.Multiplayer); index++ {
+		if index != 0 && response.Multiplayer[index-1].TotalScore == response.Multiplayer[index].TotalScore {
+			ties++
+			response.Multiplayer[index].Placement = placement - ties
+		} else {
+			ties = 0
+			response.Multiplayer[index].Placement = placement
+		}
+		placement++
+	}
 	sort.Slice(response.Overall, func(i, j int) bool {
 		return response.Overall[i].TotalScore < response.Overall[j].TotalScore
 	})
+	placement = 1
+	ties = 0
+	for index := 0; index < len(response.Overall); index++ {
+		if index != 0 && response.Overall[index-1].TotalScore == response.Overall[index].TotalScore {
+			ties++
+			response.Overall[index].Placement = placement - ties
+		} else {
+			ties = 0
+			response.Overall[index].Placement = placement
+		}
+		placement++
+	}
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully retrieved rankings.",
