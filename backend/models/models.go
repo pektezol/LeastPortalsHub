@@ -78,8 +78,9 @@ type MapRecords struct {
 }
 
 type UserRanking struct {
-	User       UserShort `json:"user"`
-	TotalScore int       `json:"total_score"`
+	Placement  int                 `json:"placement"`
+	User       UserShortWithAvatar `json:"user"`
+	TotalScore int                 `json:"total_score"`
 }
 
 type Game struct {
@@ -105,7 +106,7 @@ type Title struct {
 
 type Links struct {
 	P2SR    string `json:"p2sr"`
-	Steam   string `json:"stream"`
+	Steam   string `json:"steam"`
 	YouTube string `json:"youtube"`
 	Twitch  string `json:"twitch"`
 }
