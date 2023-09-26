@@ -88,7 +88,7 @@ func Profile(c *gin.Context) {
 		Cooperative:  ProfileRankingsDetails{},
 	}
 	// Get total map count
-	sql = `SELECT count(id), (SELECT count(id) FROM maps m WHERE m.game_id = 2 AND m.is_disabled = false) FROM maps m WHERE m.game_id = 1  AND m.is_disabled = false;`
+	sql = `SELECT count(id), (SELECT count(id) FROM maps m WHERE m.game_id = 2 AND m.is_disabled = false) FROM maps m WHERE m.game_id = 1 AND m.is_disabled = false`
 	err = database.DB.QueryRow(sql).Scan(&rankings.Singleplayer.CompletionTotal, &rankings.Cooperative.CompletionTotal)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
@@ -96,19 +96,19 @@ func Profile(c *gin.Context) {
 	}
 	rankings.Overall.CompletionTotal = rankings.Singleplayer.CompletionTotal + rankings.Cooperative.CompletionTotal
 	// Get user completion count
-	sql = `SELECT 'records_sp' AS table_name, COUNT(rs.id) AS total_user_scores
-	FROM public.records_sp rs JOIN (
+	sql = `SELECT 'records_sp' AS table_name, COUNT(sp.id)
+	FROM records_sp sp JOIN (
     	SELECT mr.map_id, MIN(mr.score_count) AS min_score_count
     	FROM public.map_routes mr WHERE mr.category_id = 1 GROUP BY mr.map_id
-	) AS subquery_sp ON rs.map_id = subquery_sp.map_id AND rs.score_count = subquery_sp.min_score_count
-	WHERE rs.user_id = $1
+	) AS subquery_sp ON sp.map_id = subquery_sp.map_id AND sp.score_count = subquery_sp.min_score_count
+	WHERE sp.user_id = $1 AND sp.is_deleted = false
 	UNION ALL
-	SELECT 'records_mp' AS table_name, COUNT(rm.id) AS total_user_scores
-	FROM public.records_mp rm JOIN (
+	SELECT 'records_mp' AS table_name, COUNT(mp.id)
+	FROM public.records_mp mp JOIN (
     	SELECT mr.map_id, MIN(mr.score_count) AS min_score_count
-    FROM public.map_routes mr WHERE mr.category_id = 1 GROUP BY mr.map_id
-	) AS subquery_mp ON rm.map_id = subquery_mp.map_id AND rm.score_count = subquery_mp.min_score_count
-	WHERE rm.host_id = $1 OR rm.partner_id = $1;`
+    	FROM public.map_routes mr WHERE mr.category_id = 1 GROUP BY mr.map_id
+	) AS subquery_mp ON mp.map_id = subquery_mp.map_id AND mp.score_count = subquery_mp.min_score_count
+	WHERE (mp.host_id = $1 OR mp.partner_id = $1) AND mp.is_deleted = false`
 	rows, err := database.DB.Query(sql, user.(models.User).SteamID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
@@ -136,10 +136,10 @@ func Profile(c *gin.Context) {
 	sql = `SELECT u.steam_id, COUNT(DISTINCT map_id), 
 	(SELECT COUNT(maps.name) FROM maps INNER JOIN games g ON maps.game_id = g.id WHERE g."name" = 'Portal 2 - Singleplayer' AND maps.is_disabled = false), 
 	(SELECT SUM(min_score_count) AS total_min_score_count FROM (
-		SELECT user_id, MIN(score_count) AS min_score_count FROM records_sp GROUP BY user_id, map_id) AS subquery WHERE user_id = u.steam_id)
-	FROM records_sp sp JOIN users u ON u.steam_id = sp.user_id GROUP BY u.steam_id, u.user_name
+		SELECT user_id, MIN(score_count) AS min_score_count FROM records_sp WHERE is_deleted = false GROUP BY user_id, map_id) AS subquery WHERE user_id = u.steam_id)
+	FROM records_sp sp JOIN users u ON u.steam_id = sp.user_id WHERE is_deleted = false GROUP BY u.steam_id, u.user_name
 	HAVING COUNT(DISTINCT map_id) = (SELECT COUNT(maps.name) FROM maps INNER JOIN games g ON maps.game_id = g.id WHERE g.is_coop = FALSE AND is_disabled = false)
-	ORDER BY total_min_score_count ASC;`
+	ORDER BY total_min_score_count ASC`
 	rows, err = database.DB.Query(sql)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
@@ -170,10 +170,10 @@ func Profile(c *gin.Context) {
 	sql = `SELECT u.steam_id, COUNT(DISTINCT map_id), 
 	(SELECT COUNT(maps.name) FROM maps INNER JOIN games g ON maps.game_id = g.id WHERE g."name" = 'Portal 2 - Cooperative' AND is_disabled = false), 
 	(SELECT SUM(min_score_count) AS total_min_score_count FROM (
-		SELECT host_id, partner_id, MIN(score_count) AS min_score_count FROM records_mp GROUP BY host_id, partner_id, map_id) AS subquery WHERE host_id = u.steam_id OR partner_id = u.steam_id)
-	FROM records_mp mp JOIN users u ON u.steam_id = mp.host_id OR u.steam_id = mp.partner_id GROUP BY u.steam_id, u.user_name
+		SELECT host_id, partner_id, MIN(score_count) AS min_score_count FROM records_mp WHERE is_deleted = false GROUP BY host_id, partner_id, map_id) AS subquery WHERE host_id = u.steam_id OR partner_id = u.steam_id)
+	FROM records_mp mp JOIN users u ON u.steam_id = mp.host_id OR u.steam_id = mp.partner_id WHERE mp.is_deleted = false GROUP BY u.steam_id, u.user_name
 	HAVING  COUNT(DISTINCT map_id) = (SELECT COUNT(maps.name) FROM maps INNER JOIN games g ON maps.game_id = g.id WHERE g.is_coop = true AND is_disabled = false)
-	ORDER BY total_min_score_count ASC;`
+	ORDER BY total_min_score_count ASC`
 	rows, err = database.DB.Query(sql)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
@@ -208,7 +208,7 @@ func Profile(c *gin.Context) {
 			FROM users u
 			LEFT JOIN (
 				SELECT user_id, map_id, MIN(score_count) AS min_score_count
-				FROM records_sp
+				FROM records_sp WHERE is_deleted = false
 				GROUP BY user_id, map_id
 			) AS subquery ON subquery.user_id = u.steam_id
 			WHERE u.steam_id IN (
@@ -216,7 +216,7 @@ func Profile(c *gin.Context) {
 				FROM records_sp sp
 				JOIN maps m ON sp.map_id = m.id
 				JOIN games g ON m.game_id = g.id
-				WHERE g.is_coop = FALSE AND m.is_disabled = FALSE
+				WHERE g.is_coop = FALSE AND m.is_disabled = FALSE AND sp.is_deleted = false
 				GROUP BY user_id
 				HAVING COUNT(DISTINCT sp.map_id) = (
 					SELECT COUNT(maps.name)
@@ -232,7 +232,7 @@ func Profile(c *gin.Context) {
 			FROM users u
 			LEFT JOIN (
 				SELECT host_id, partner_id, map_id, MIN(score_count) AS min_score_count
-				FROM records_mp
+				FROM records_mp WHERE is_deleted = false
 				GROUP BY host_id, partner_id, map_id
 			) AS subquery ON subquery.host_id = u.steam_id OR subquery.partner_id = u.steam_id
 			WHERE u.steam_id IN (
@@ -240,7 +240,7 @@ func Profile(c *gin.Context) {
 				FROM records_mp mp
 				JOIN maps m ON mp.map_id = m.id
 				JOIN games g ON m.game_id = g.id
-				WHERE g.is_coop = TRUE AND m.is_disabled = FALSE
+				WHERE g.is_coop = TRUE AND m.is_disabled = FALSE AND mp.is_deleted = false
 				GROUP BY host_id
 				HAVING COUNT(DISTINCT mp.map_id) = (
 					SELECT COUNT(maps.name)
@@ -253,7 +253,7 @@ func Profile(c *gin.Context) {
 				FROM records_mp mp
 				JOIN maps m ON mp.map_id = m.id
 				JOIN games g ON m.game_id = g.id
-				WHERE g.is_coop = TRUE AND m.is_disabled = FALSE
+				WHERE g.is_coop = TRUE AND m.is_disabled = FALSE AND mp.is_deleted = false
 				GROUP BY partner_id
 				HAVING COUNT(DISTINCT mp.map_id) = (
 					SELECT COUNT(maps.name)
@@ -265,10 +265,10 @@ func Profile(c *gin.Context) {
 			GROUP BY u.steam_id
 		)
 		SELECT COALESCE(sp.steam_id, mp.steam_id) AS steam_id,
-			   COALESCE(sp.total_min_score_count, 0) + COALESCE(mp.total_min_score_count, 0) AS overall_total_min_score_count
+			   sp.total_min_score_count + mp.total_min_score_count AS overall_total_min_score_count
 		FROM user_sp sp
 		INNER JOIN user_mp mp ON sp.steam_id = mp.steam_id
-		ORDER BY overall_total_min_score_count ASC;`
+		ORDER BY overall_total_min_score_count ASC`
 		rows, err = database.DB.Query(sql)
 		if err != nil {
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
@@ -293,7 +293,7 @@ func Profile(c *gin.Context) {
 	records := []ProfileRecords{}
 	// Get singleplayer records
 	sql = `SELECT sp.id, m.game_id, m.chapter_id, sp.map_id, m."name", (SELECT mr.score_count FROM map_routes mr WHERE mr.map_id = sp.map_id ORDER BY mr.score_count ASC LIMIT 1) AS wr_count, sp.score_count, sp.score_time, sp.demo_id, sp.record_date
-	FROM records_sp sp INNER JOIN maps m ON sp.map_id = m.id WHERE sp.user_id = $1 ORDER BY sp.map_id, sp.score_count, sp.score_time`
+	FROM records_sp sp INNER JOIN maps m ON sp.map_id = m.id WHERE sp.user_id = $1 AND sp.is_deleted = false ORDER BY sp.map_id, sp.score_count, sp.score_time`
 	rows, err = database.DB.Query(sql, user.(models.User).SteamID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
@@ -301,7 +301,7 @@ func Profile(c *gin.Context) {
 	}
 	sql = `WITH map_records AS (SELECT sp.user_id, sp.map_id, 
 	RANK() OVER (PARTITION BY sp.map_id ORDER BY sp.score_count, sp.score_time) AS placement
-	FROM records_sp sp) SELECT DISTINCT ON (map_id) placement FROM map_records WHERE user_id = $1`
+	FROM records_sp sp WHERE sp.is_deleted = false) SELECT DISTINCT ON (map_id) placement FROM map_records WHERE user_id = $1`
 	placementsRows, err := database.DB.Query(sql, user.(models.User).SteamID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
@@ -346,7 +346,7 @@ func Profile(c *gin.Context) {
 	}
 	// Get multiplayer records
 	sql = `SELECT mp.id, m.game_id, m.chapter_id, mp.map_id, m."name", (SELECT mr.score_count FROM map_routes mr WHERE mr.map_id = mp.map_id ORDER BY mr.score_count ASC LIMIT 1) AS wr_count,  mp.score_count, mp.score_time, CASE WHEN host_id = $1 THEN mp.host_demo_id WHEN partner_id = $1 THEN mp.partner_demo_id END demo_id, mp.record_date
-	FROM records_mp mp INNER JOIN maps m ON mp.map_id = m.id WHERE mp.host_id = $1 OR mp.partner_id = $1 ORDER BY mp.map_id, mp.score_count, mp.score_time`
+	FROM records_mp mp INNER JOIN maps m ON mp.map_id = m.id WHERE (mp.host_id = $1 OR mp.partner_id = $1) AND mp.is_deleted = false ORDER BY mp.map_id, mp.score_count, mp.score_time`
 	rows, err = database.DB.Query(sql, user.(models.User).SteamID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
@@ -354,7 +354,7 @@ func Profile(c *gin.Context) {
 	}
 	sql = `WITH map_records AS (SELECT mp.host_id, mp.partner_id, mp.map_id, 
 	RANK() OVER (PARTITION BY mp.map_id ORDER BY mp.score_count, mp.score_time) AS placement
-	FROM records_mp mp) SELECT DISTINCT ON (map_id) placement FROM map_records WHERE host_id = $1 OR partner_id = $1`
+	FROM records_mp mp WHERE mp.is_deleted = false) SELECT DISTINCT ON (map_id) placement FROM map_records WHERE host_id = $1 OR partner_id = $1`
 	placementsRows, err = database.DB.Query(sql, user.(models.User).SteamID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
@@ -460,7 +460,7 @@ func FetchUser(c *gin.Context) {
 		Cooperative:  ProfileRankingsDetails{},
 	}
 	// Get total map count
-	sql = `SELECT count(id), (SELECT count(id) FROM maps m WHERE m.game_id = 2 AND m.is_disabled = false) FROM maps m WHERE m.game_id = 1  AND m.is_disabled = false;`
+	sql = `SELECT count(id), (SELECT count(id) FROM maps m WHERE m.game_id = 2 AND m.is_disabled = false) FROM maps m WHERE m.game_id = 1 AND m.is_disabled = false`
 	err = database.DB.QueryRow(sql).Scan(&rankings.Singleplayer.CompletionTotal, &rankings.Cooperative.CompletionTotal)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
@@ -468,19 +468,19 @@ func FetchUser(c *gin.Context) {
 	}
 	rankings.Overall.CompletionTotal = rankings.Singleplayer.CompletionTotal + rankings.Cooperative.CompletionTotal
 	// Get user completion count
-	sql = `SELECT 'records_sp' AS table_name, COUNT(rs.id) AS total_user_scores
-	FROM public.records_sp rs JOIN (
+	sql = `SELECT 'records_sp' AS table_name, COUNT(sp.id)
+	FROM records_sp sp JOIN (
     	SELECT mr.map_id, MIN(mr.score_count) AS min_score_count
     	FROM public.map_routes mr WHERE mr.category_id = 1 GROUP BY mr.map_id
-	) AS subquery_sp ON rs.map_id = subquery_sp.map_id AND rs.score_count = subquery_sp.min_score_count
-	WHERE rs.user_id = $1
+	) AS subquery_sp ON sp.map_id = subquery_sp.map_id AND sp.score_count = subquery_sp.min_score_count
+	WHERE sp.user_id = $1 AND sp.is_deleted = false
 	UNION ALL
-	SELECT 'records_mp' AS table_name, COUNT(rm.id) AS total_user_scores
-	FROM public.records_mp rm JOIN (
+	SELECT 'records_mp' AS table_name, COUNT(mp.id)
+	FROM public.records_mp mp JOIN (
     	SELECT mr.map_id, MIN(mr.score_count) AS min_score_count
-    FROM public.map_routes mr WHERE mr.category_id = 1 GROUP BY mr.map_id
-	) AS subquery_mp ON rm.map_id = subquery_mp.map_id AND rm.score_count = subquery_mp.min_score_count
-	WHERE rm.host_id = $1 OR rm.partner_id = $1;`
+    	FROM public.map_routes mr WHERE mr.category_id = 1 GROUP BY mr.map_id
+	) AS subquery_mp ON mp.map_id = subquery_mp.map_id AND mp.score_count = subquery_mp.min_score_count
+	WHERE (mp.host_id = $1 OR mp.partner_id = $1) AND mp.is_deleted = false`
 	rows, err = database.DB.Query(sql, user.SteamID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
@@ -508,10 +508,10 @@ func FetchUser(c *gin.Context) {
 	sql = `SELECT u.steam_id, COUNT(DISTINCT map_id), 
 	(SELECT COUNT(maps.name) FROM maps INNER JOIN games g ON maps.game_id = g.id WHERE g."name" = 'Portal 2 - Singleplayer' AND maps.is_disabled = false), 
 	(SELECT SUM(min_score_count) AS total_min_score_count FROM (
-		SELECT user_id, MIN(score_count) AS min_score_count FROM records_sp GROUP BY user_id, map_id) AS subquery WHERE user_id = u.steam_id)
-	FROM records_sp sp JOIN users u ON u.steam_id = sp.user_id GROUP BY u.steam_id, u.user_name
+		SELECT user_id, MIN(score_count) AS min_score_count FROM records_sp WHERE is_deleted = false GROUP BY user_id, map_id) AS subquery WHERE user_id = u.steam_id)
+	FROM records_sp sp JOIN users u ON u.steam_id = sp.user_id WHERE is_deleted = false GROUP BY u.steam_id, u.user_name
 	HAVING COUNT(DISTINCT map_id) = (SELECT COUNT(maps.name) FROM maps INNER JOIN games g ON maps.game_id = g.id WHERE g.is_coop = FALSE AND is_disabled = false)
-	ORDER BY total_min_score_count ASC;`
+	ORDER BY total_min_score_count ASC`
 	rows, err = database.DB.Query(sql)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
@@ -542,10 +542,10 @@ func FetchUser(c *gin.Context) {
 	sql = `SELECT u.steam_id, COUNT(DISTINCT map_id), 
 	(SELECT COUNT(maps.name) FROM maps INNER JOIN games g ON maps.game_id = g.id WHERE g."name" = 'Portal 2 - Cooperative' AND is_disabled = false), 
 	(SELECT SUM(min_score_count) AS total_min_score_count FROM (
-		SELECT host_id, partner_id, MIN(score_count) AS min_score_count FROM records_mp GROUP BY host_id, partner_id, map_id) AS subquery WHERE host_id = u.steam_id OR partner_id = u.steam_id)
-	FROM records_mp mp JOIN users u ON u.steam_id = mp.host_id OR u.steam_id = mp.partner_id GROUP BY u.steam_id, u.user_name
+		SELECT host_id, partner_id, MIN(score_count) AS min_score_count FROM records_mp WHERE is_deleted = false GROUP BY host_id, partner_id, map_id) AS subquery WHERE host_id = u.steam_id OR partner_id = u.steam_id)
+	FROM records_mp mp JOIN users u ON u.steam_id = mp.host_id OR u.steam_id = mp.partner_id WHERE mp.is_deleted = false GROUP BY u.steam_id, u.user_name
 	HAVING  COUNT(DISTINCT map_id) = (SELECT COUNT(maps.name) FROM maps INNER JOIN games g ON maps.game_id = g.id WHERE g.is_coop = true AND is_disabled = false)
-	ORDER BY total_min_score_count ASC;`
+	ORDER BY total_min_score_count ASC`
 	rows, err = database.DB.Query(sql)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
@@ -580,7 +580,7 @@ func FetchUser(c *gin.Context) {
 			FROM users u
 			LEFT JOIN (
 				SELECT user_id, map_id, MIN(score_count) AS min_score_count
-				FROM records_sp
+				FROM records_sp WHERE is_deleted = false
 				GROUP BY user_id, map_id
 			) AS subquery ON subquery.user_id = u.steam_id
 			WHERE u.steam_id IN (
@@ -588,7 +588,7 @@ func FetchUser(c *gin.Context) {
 				FROM records_sp sp
 				JOIN maps m ON sp.map_id = m.id
 				JOIN games g ON m.game_id = g.id
-				WHERE g.is_coop = FALSE AND m.is_disabled = FALSE
+				WHERE g.is_coop = FALSE AND m.is_disabled = FALSE AND sp.is_deleted = false
 				GROUP BY user_id
 				HAVING COUNT(DISTINCT sp.map_id) = (
 					SELECT COUNT(maps.name)
@@ -604,7 +604,7 @@ func FetchUser(c *gin.Context) {
 			FROM users u
 			LEFT JOIN (
 				SELECT host_id, partner_id, map_id, MIN(score_count) AS min_score_count
-				FROM records_mp
+				FROM records_mp WHERE is_deleted = false
 				GROUP BY host_id, partner_id, map_id
 			) AS subquery ON subquery.host_id = u.steam_id OR subquery.partner_id = u.steam_id
 			WHERE u.steam_id IN (
@@ -612,7 +612,7 @@ func FetchUser(c *gin.Context) {
 				FROM records_mp mp
 				JOIN maps m ON mp.map_id = m.id
 				JOIN games g ON m.game_id = g.id
-				WHERE g.is_coop = TRUE AND m.is_disabled = FALSE
+				WHERE g.is_coop = TRUE AND m.is_disabled = FALSE AND mp.is_deleted = false
 				GROUP BY host_id
 				HAVING COUNT(DISTINCT mp.map_id) = (
 					SELECT COUNT(maps.name)
@@ -625,7 +625,7 @@ func FetchUser(c *gin.Context) {
 				FROM records_mp mp
 				JOIN maps m ON mp.map_id = m.id
 				JOIN games g ON m.game_id = g.id
-				WHERE g.is_coop = TRUE AND m.is_disabled = FALSE
+				WHERE g.is_coop = TRUE AND m.is_disabled = FALSE AND mp.is_deleted = false
 				GROUP BY partner_id
 				HAVING COUNT(DISTINCT mp.map_id) = (
 					SELECT COUNT(maps.name)
@@ -637,10 +637,10 @@ func FetchUser(c *gin.Context) {
 			GROUP BY u.steam_id
 		)
 		SELECT COALESCE(sp.steam_id, mp.steam_id) AS steam_id,
-			   COALESCE(sp.total_min_score_count, 0) + COALESCE(mp.total_min_score_count, 0) AS overall_total_min_score_count
+			   sp.total_min_score_count + mp.total_min_score_count AS overall_total_min_score_count
 		FROM user_sp sp
 		INNER JOIN user_mp mp ON sp.steam_id = mp.steam_id
-		ORDER BY overall_total_min_score_count ASC;`
+		ORDER BY overall_total_min_score_count ASC`
 		rows, err = database.DB.Query(sql)
 		if err != nil {
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
@@ -665,7 +665,7 @@ func FetchUser(c *gin.Context) {
 	records := []ProfileRecords{}
 	// Get singleplayer records
 	sql = `SELECT sp.id, m.game_id, m.chapter_id, sp.map_id, m."name", (SELECT mr.score_count FROM map_routes mr WHERE mr.map_id = sp.map_id ORDER BY mr.score_count ASC LIMIT 1) AS wr_count, sp.score_count, sp.score_time, sp.demo_id, sp.record_date
-	FROM records_sp sp INNER JOIN maps m ON sp.map_id = m.id WHERE sp.user_id = $1 ORDER BY sp.map_id, sp.score_count, sp.score_time`
+	FROM records_sp sp INNER JOIN maps m ON sp.map_id = m.id WHERE sp.user_id = $1 AND sp.is_deleted = false ORDER BY sp.map_id, sp.score_count, sp.score_time`
 	rows, err = database.DB.Query(sql, user.SteamID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
@@ -673,7 +673,7 @@ func FetchUser(c *gin.Context) {
 	}
 	sql = `WITH map_records AS (SELECT sp.user_id, sp.map_id, 
 	RANK() OVER (PARTITION BY sp.map_id ORDER BY sp.score_count, sp.score_time) AS placement
-	FROM records_sp sp) SELECT DISTINCT ON (map_id) placement FROM map_records WHERE user_id = $1`
+	FROM records_sp sp WHERE sp.is_deleted = false) SELECT DISTINCT ON (map_id) placement FROM map_records WHERE user_id = $1`
 	placementsRows, err := database.DB.Query(sql, user.SteamID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
@@ -718,7 +718,7 @@ func FetchUser(c *gin.Context) {
 	}
 	// Get multiplayer records
 	sql = `SELECT mp.id, m.game_id, m.chapter_id, mp.map_id, m."name", (SELECT mr.score_count FROM map_routes mr WHERE mr.map_id = mp.map_id ORDER BY mr.score_count ASC LIMIT 1) AS wr_count,  mp.score_count, mp.score_time, CASE WHEN host_id = $1 THEN mp.host_demo_id WHEN partner_id = $1 THEN mp.partner_demo_id END demo_id, mp.record_date
-	FROM records_mp mp INNER JOIN maps m ON mp.map_id = m.id WHERE mp.host_id = $1 OR mp.partner_id = $1 ORDER BY mp.map_id, mp.score_count, mp.score_time`
+	FROM records_mp mp INNER JOIN maps m ON mp.map_id = m.id WHERE (mp.host_id = $1 OR mp.partner_id = $1) AND mp.is_deleted = false ORDER BY mp.map_id, mp.score_count, mp.score_time`
 	rows, err = database.DB.Query(sql, user.SteamID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
@@ -726,7 +726,7 @@ func FetchUser(c *gin.Context) {
 	}
 	sql = `WITH map_records AS (SELECT mp.host_id, mp.partner_id, mp.map_id, 
 	RANK() OVER (PARTITION BY mp.map_id ORDER BY mp.score_count, mp.score_time) AS placement
-	FROM records_mp mp) SELECT DISTINCT ON (map_id) placement FROM map_records WHERE host_id = $1 OR partner_id = $1`
+	FROM records_mp mp WHERE mp.is_deleted = false) SELECT DISTINCT ON (map_id) placement FROM map_records WHERE host_id = $1 OR partner_id = $1`
 	placementsRows, err = database.DB.Query(sql, user.SteamID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))

@@ -226,6 +226,8 @@ definitions:
         type: string
       map_wr_count:
         type: integer
+      placement:
+        type: integer
       scores:
         items:
           $ref: '#/definitions/handlers.ProfileScores'
@@ -262,6 +264,8 @@ definitions:
         type: string
       demo_id:
         type: string
+      record_id:
+        type: integer
       score_count:
         type: integer
       score_time:
