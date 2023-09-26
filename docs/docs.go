@@ -1601,6 +1601,9 @@ const docTemplate = `{
                 "map_wr_count": {
                     "type": "integer"
                 },
+                "placement": {
+                    "type": "integer"
+                },
                 "scores": {
                     "type": "array",
                     "items": {
@@ -1655,6 +1658,9 @@ const docTemplate = `{
                 },
                 "demo_id": {
                     "type": "string"
+                },
+                "record_id": {
+                    "type": "integer"
                 },
                 "score_count": {
                     "type": "integer"
