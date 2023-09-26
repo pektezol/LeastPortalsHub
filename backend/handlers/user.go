@@ -441,6 +441,18 @@ func FetchUser(c *gin.Context) {
 		c.JSON(http.StatusOK, models.ErrorResponse("User not found."))
 		return
 	}
+	// Get titles
+	titles := []models.Title{}
+	rows, err := database.DB.Query(`SELECT t.title_name, t.title_color FROM titles t INNER JOIN user_titles ut ON t.id=ut.title_id WHERE ut.user_id = $1`, user.SteamID)
+	if err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+		return
+	}
+	for rows.Next() {
+		var title models.Title
+		rows.Scan(&title.Name, &title.Color)
+		titles = append(titles, title)
+	}
 	// Get rankings (all maps done in one game)
 	rankings := ProfileRankings{
 		Overall:      ProfileRankingsDetails{},
@@ -469,7 +481,7 @@ func FetchUser(c *gin.Context) {
     FROM public.map_routes mr WHERE mr.category_id = 1 GROUP BY mr.map_id
 	) AS subquery_mp ON rm.map_id = subquery_mp.map_id AND rm.score_count = subquery_mp.min_score_count
 	WHERE rm.host_id = $1 OR rm.partner_id = $1;`
-	rows, err := database.DB.Query(sql, user.SteamID)
+	rows, err = database.DB.Query(sql, user.SteamID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
@@ -762,7 +774,7 @@ func FetchUser(c *gin.Context) {
 			UserName:    user.UserName,
 			AvatarLink:  user.AvatarLink,
 			CountryCode: user.CountryCode,
-			Titles:      user.Titles,
+			Titles:      titles,
 			Links:       links,
 			Rankings:    rankings,
 			Records:     records,
