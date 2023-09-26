@@ -40,10 +40,12 @@ type ProfileRecords struct {
 	MapID      int             `json:"map_id"`
 	MapName    string          `json:"map_name"`
 	MapWRCount int             `json:"map_wr_count"`
+	Placement  int             `json:"placement"`
 	Scores     []ProfileScores `json:"scores"`
 }
 
 type ProfileScores struct {
+	RecordID   int       `json:"record_id"`
 	DemoID     string    `json:"demo_id"`
 	ScoreCount int       `json:"score_count"`
 	ScoreTime  int       `json:"score_time"`
@@ -290,12 +292,27 @@ func Profile(c *gin.Context) {
 	}
 	records := []ProfileRecords{}
 	// Get singleplayer records
-	sql = `SELECT m.game_id, m.chapter_id, sp.map_id, m."name", (SELECT mr.score_count FROM map_routes mr WHERE mr.map_id = sp.map_id ORDER BY mr.score_count ASC LIMIT 1) AS wr_count, sp.score_count, sp.score_time, sp.demo_id, sp.record_date
-	FROM records_sp sp INNER JOIN maps m ON sp.map_id = m.id WHERE sp.user_id = $1 ORDER BY sp.map_id, sp.score_count, sp.score_time;`
+	sql = `SELECT sp.id, m.game_id, m.chapter_id, sp.map_id, m."name", (SELECT mr.score_count FROM map_routes mr WHERE mr.map_id = sp.map_id ORDER BY mr.score_count ASC LIMIT 1) AS wr_count, sp.score_count, sp.score_time, sp.demo_id, sp.record_date
+	FROM records_sp sp INNER JOIN maps m ON sp.map_id = m.id WHERE sp.user_id = $1 ORDER BY sp.map_id, sp.score_count, sp.score_time`
 	rows, err = database.DB.Query(sql, user.(models.User).SteamID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
+	}
+	sql = `WITH map_records AS (SELECT sp.user_id, sp.map_id, 
+	RANK() OVER (PARTITION BY sp.map_id ORDER BY sp.score_count, sp.score_time) AS placement
+	FROM records_sp sp) SELECT DISTINCT ON (map_id) placement FROM map_records WHERE user_id = $1`
+	placementsRows, err := database.DB.Query(sql, user.(models.User).SteamID)
+	if err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+		return
+	}
+	placements := []int{}
+	placementIndex := 0
+	for placementsRows.Next() {
+		var placement int
+		placementsRows.Scan(&placement)
+		placements = append(placements, placement)
 	}
 	for rows.Next() {
 		var gameID int
@@ -304,7 +321,11 @@ func Profile(c *gin.Context) {
 		var mapName string
 		var mapWR int
 		score := ProfileScores{}
-		rows.Scan(&gameID, &categoryID, &mapID, &mapName, &mapWR, &score.ScoreCount, &score.ScoreTime, &score.DemoID, &score.Date)
+		err = rows.Scan(&score.RecordID, &gameID, &categoryID, &mapID, &mapName, &mapWR, &score.ScoreCount, &score.ScoreTime, &score.DemoID, &score.Date)
+		if err != nil {
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+			return
+		}
 		// More than one record in one map
 		if len(records) != 0 && mapID == records[len(records)-1].MapID {
 			records[len(records)-1].Scores = append(records[len(records)-1].Scores, score)
@@ -317,17 +338,34 @@ func Profile(c *gin.Context) {
 			MapID:      mapID,
 			MapName:    mapName,
 			MapWRCount: mapWR,
+			Placement:  placements[placementIndex],
 			Scores:     []ProfileScores{},
 		})
+		placementIndex++
 		records[len(records)-1].Scores = append(records[len(records)-1].Scores, score)
 	}
 	// Get multiplayer records
-	sql = `SELECT m.game_id, m.chapter_id, mp.map_id, m."name", (SELECT mr.score_count FROM map_routes mr WHERE mr.map_id = mp.map_id ORDER BY mr.score_count ASC LIMIT 1) AS wr_count,  mp.score_count, mp.score_time, CASE WHEN host_id = $1 THEN mp.host_demo_id WHEN partner_id = $1 THEN mp.partner_demo_id END demo_id, mp.record_date
-	FROM records_mp mp INNER JOIN maps m ON mp.map_id = m.id WHERE mp.host_id = $1 OR mp.partner_id = $1 ORDER BY mp.map_id, mp.score_count, mp.score_time;`
+	sql = `SELECT mp.id, m.game_id, m.chapter_id, mp.map_id, m."name", (SELECT mr.score_count FROM map_routes mr WHERE mr.map_id = mp.map_id ORDER BY mr.score_count ASC LIMIT 1) AS wr_count,  mp.score_count, mp.score_time, CASE WHEN host_id = $1 THEN mp.host_demo_id WHEN partner_id = $1 THEN mp.partner_demo_id END demo_id, mp.record_date
+	FROM records_mp mp INNER JOIN maps m ON mp.map_id = m.id WHERE mp.host_id = $1 OR mp.partner_id = $1 ORDER BY mp.map_id, mp.score_count, mp.score_time`
 	rows, err = database.DB.Query(sql, user.(models.User).SteamID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
+	}
+	sql = `WITH map_records AS (SELECT mp.host_id, mp.partner_id, mp.map_id, 
+	RANK() OVER (PARTITION BY mp.map_id ORDER BY mp.score_count, mp.score_time) AS placement
+	FROM records_mp mp) SELECT DISTINCT ON (map_id) placement FROM map_records WHERE host_id = $1 OR partner_id = $1`
+	placementsRows, err = database.DB.Query(sql, user.(models.User).SteamID)
+	if err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+		return
+	}
+	placements = []int{}
+	placementIndex = 0
+	for placementsRows.Next() {
+		var placement int
+		placementsRows.Scan(&placement)
+		placements = append(placements, placement)
 	}
 	for rows.Next() {
 		var gameID int
@@ -336,7 +374,7 @@ func Profile(c *gin.Context) {
 		var mapName string
 		var mapWR int
 		score := ProfileScores{}
-		rows.Scan(&gameID, &categoryID, &mapID, &mapName, &mapWR, &score.ScoreCount, &score.ScoreTime, &score.DemoID, &score.Date)
+		rows.Scan(&score.RecordID, &gameID, &categoryID, &mapID, &mapName, &mapWR, &score.ScoreCount, &score.ScoreTime, &score.DemoID, &score.Date)
 		// More than one record in one map
 		if len(records) != 0 && mapID == records[len(records)-1].MapID {
 			records[len(records)-1].Scores = append(records[len(records)-1].Scores, score)
@@ -349,8 +387,10 @@ func Profile(c *gin.Context) {
 			MapID:      mapID,
 			MapName:    mapName,
 			MapWRCount: mapWR,
+			Placement:  placements[placementIndex],
 			Scores:     []ProfileScores{},
 		})
+		placementIndex++
 		records[len(records)-1].Scores = append(records[len(records)-1].Scores, score)
 	}
 	c.JSON(http.StatusOK, models.Response{
@@ -612,12 +652,27 @@ func FetchUser(c *gin.Context) {
 	}
 	records := []ProfileRecords{}
 	// Get singleplayer records
-	sql = `SELECT m.game_id, m.chapter_id, sp.map_id, m."name", (SELECT mr.score_count FROM map_routes mr WHERE mr.map_id = sp.map_id ORDER BY mr.score_count ASC LIMIT 1) AS wr_count, sp.score_count, sp.score_time, sp.demo_id, sp.record_date
-	FROM records_sp sp INNER JOIN maps m ON sp.map_id = m.id WHERE sp.user_id = $1 ORDER BY sp.map_id, sp.score_count, sp.score_time;`
+	sql = `SELECT sp.id, m.game_id, m.chapter_id, sp.map_id, m."name", (SELECT mr.score_count FROM map_routes mr WHERE mr.map_id = sp.map_id ORDER BY mr.score_count ASC LIMIT 1) AS wr_count, sp.score_count, sp.score_time, sp.demo_id, sp.record_date
+	FROM records_sp sp INNER JOIN maps m ON sp.map_id = m.id WHERE sp.user_id = $1 ORDER BY sp.map_id, sp.score_count, sp.score_time`
 	rows, err = database.DB.Query(sql, user.SteamID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
+	}
+	sql = `WITH map_records AS (SELECT sp.user_id, sp.map_id, 
+	RANK() OVER (PARTITION BY sp.map_id ORDER BY sp.score_count, sp.score_time) AS placement
+	FROM records_sp sp) SELECT DISTINCT ON (map_id) placement FROM map_records WHERE user_id = $1`
+	placementsRows, err := database.DB.Query(sql, user.SteamID)
+	if err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+		return
+	}
+	placements := []int{}
+	placementIndex := 0
+	for placementsRows.Next() {
+		var placement int
+		placementsRows.Scan(&placement)
+		placements = append(placements, placement)
 	}
 	for rows.Next() {
 		var gameID int
@@ -626,7 +681,11 @@ func FetchUser(c *gin.Context) {
 		var mapName string
 		var mapWR int
 		score := ProfileScores{}
-		rows.Scan(&gameID, &categoryID, &mapID, &mapName, &mapWR, &score.ScoreCount, &score.ScoreTime, &score.DemoID, &score.Date)
+		err = rows.Scan(&score.RecordID, &gameID, &categoryID, &mapID, &mapName, &mapWR, &score.ScoreCount, &score.ScoreTime, &score.DemoID, &score.Date)
+		if err != nil {
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+			return
+		}
 		// More than one record in one map
 		if len(records) != 0 && mapID == records[len(records)-1].MapID {
 			records[len(records)-1].Scores = append(records[len(records)-1].Scores, score)
@@ -639,17 +698,34 @@ func FetchUser(c *gin.Context) {
 			MapID:      mapID,
 			MapName:    mapName,
 			MapWRCount: mapWR,
+			Placement:  placements[placementIndex],
 			Scores:     []ProfileScores{},
 		})
+		placementIndex++
 		records[len(records)-1].Scores = append(records[len(records)-1].Scores, score)
 	}
 	// Get multiplayer records
-	sql = `SELECT m.game_id, m.chapter_id, mp.map_id, m."name", (SELECT mr.score_count FROM map_routes mr WHERE mr.map_id = mp.map_id ORDER BY mr.score_count ASC LIMIT 1) AS wr_count,  mp.score_count, mp.score_time, CASE WHEN host_id = $1 THEN mp.host_demo_id WHEN partner_id = $1 THEN mp.partner_demo_id END demo_id, mp.record_date
-	FROM records_mp mp INNER JOIN maps m ON mp.map_id = m.id WHERE mp.host_id = $1 OR mp.partner_id = $1 ORDER BY mp.map_id, mp.score_count, mp.score_time;`
+	sql = `SELECT mp.id, m.game_id, m.chapter_id, mp.map_id, m."name", (SELECT mr.score_count FROM map_routes mr WHERE mr.map_id = mp.map_id ORDER BY mr.score_count ASC LIMIT 1) AS wr_count,  mp.score_count, mp.score_time, CASE WHEN host_id = $1 THEN mp.host_demo_id WHEN partner_id = $1 THEN mp.partner_demo_id END demo_id, mp.record_date
+	FROM records_mp mp INNER JOIN maps m ON mp.map_id = m.id WHERE mp.host_id = $1 OR mp.partner_id = $1 ORDER BY mp.map_id, mp.score_count, mp.score_time`
 	rows, err = database.DB.Query(sql, user.SteamID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
+	}
+	sql = `WITH map_records AS (SELECT mp.host_id, mp.partner_id, mp.map_id, 
+	RANK() OVER (PARTITION BY mp.map_id ORDER BY mp.score_count, mp.score_time) AS placement
+	FROM records_mp mp) SELECT DISTINCT ON (map_id) placement FROM map_records WHERE host_id = $1 OR partner_id = $1`
+	placementsRows, err = database.DB.Query(sql, user.SteamID)
+	if err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+		return
+	}
+	placements = []int{}
+	placementIndex = 0
+	for placementsRows.Next() {
+		var placement int
+		placementsRows.Scan(&placement)
+		placements = append(placements, placement)
 	}
 	for rows.Next() {
 		var gameID int
@@ -658,7 +734,7 @@ func FetchUser(c *gin.Context) {
 		var mapName string
 		var mapWR int
 		score := ProfileScores{}
-		rows.Scan(&gameID, &categoryID, &mapID, &mapName, &mapWR, &score.ScoreCount, &score.ScoreTime, &score.DemoID, &score.Date)
+		rows.Scan(&score.RecordID, &gameID, &categoryID, &mapID, &mapName, &mapWR, &score.ScoreCount, &score.ScoreTime, &score.DemoID, &score.Date)
 		// More than one record in one map
 		if len(records) != 0 && mapID == records[len(records)-1].MapID {
 			records[len(records)-1].Scores = append(records[len(records)-1].Scores, score)
@@ -671,8 +747,10 @@ func FetchUser(c *gin.Context) {
 			MapID:      mapID,
 			MapName:    mapName,
 			MapWRCount: mapWR,
+			Placement:  placements[placementIndex],
 			Scores:     []ProfileScores{},
 		})
+		placementIndex++
 		records[len(records)-1].Scores = append(records[len(records)-1].Scores, score)
 	}
 	c.JSON(http.StatusOK, models.Response{
