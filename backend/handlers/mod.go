@@ -248,9 +248,9 @@ func DeleteMapSummary(c *gin.Context) {
 	}
 	defer tx.Rollback()
 	// Fetch route category and score count
-	var checkMapID, scoreCount, mapHistoryID int
-	sql := `SELECT m.id, mr.score_count FROM maps m INNER JOIN map_routes mr ON m.id=mr.map_id WHERE m.id = $1 AND mr.id = $2`
-	err = database.DB.QueryRow(sql, mapID, request.RouteID).Scan(&checkMapID, &scoreCount)
+	var checkMapID, scoreCount, categoryID, mapHistoryID int
+	sql := `SELECT m.id, mr.score_count, mr.category_id FROM maps m INNER JOIN map_routes mr ON m.id=mr.map_id WHERE m.id = $1 AND mr.id = $2`
+	err = database.DB.QueryRow(sql, mapID, request.RouteID).Scan(&checkMapID, &scoreCount, &categoryID)
 	if err != nil {
 		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryDeleteFail, "S#map_routes: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
@@ -260,8 +260,8 @@ func DeleteMapSummary(c *gin.Context) {
 		c.JSON(http.StatusOK, models.ErrorResponse("Map ID does not exist."))
 		return
 	}
-	sql = `SELECT mh.id FROM maps m INNER JOIN map_routes mr ON m.id=mr.map_id INNER JOIN map_history mh ON m.id=mh.map_id WHERE m.id = $1 AND mr.id = $2 AND mh.score_count = $3`
-	err = database.DB.QueryRow(sql, mapID, request.RouteID, scoreCount).Scan(&mapHistoryID)
+	sql = `SELECT mh.id FROM maps m INNER JOIN map_routes mr ON m.id=mr.map_id INNER JOIN map_history mh ON m.id=mh.map_id WHERE m.id = $1 AND mh.category_id = $2 AND mh.score_count = $3`
+	err = database.DB.QueryRow(sql, mapID, categoryID, scoreCount).Scan(&mapHistoryID)
 	if err != nil {
 		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryDeleteFail, "S#map_history: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
