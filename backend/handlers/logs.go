@@ -25,10 +25,13 @@ const (
 	LogDescriptionUserUpdateCountrySuccess string = "UpdateCountrySuccess"
 	LogDescriptionUserUpdateCountryFail    string = "UpdateCountryFail"
 
-	LogDescriptionMapSummaryCreate    string = "MapSummaryCreate"
-	LogDescriptionMapSummaryEdit      string = "MapSummaryEdit"
-	LogDescriptionMapSummaryEditImage string = "MapSummaryEditImage"
-	LogDescriptionMapSummaryDelete    string = "MapSummaryDelete"
+	LogDescriptionMapSummaryCreateSuccess string = "MapSummaryCreateSuccess"
+	LogDescriptionMapSummaryCreateFail    string = "MapSummaryCreateFail"
+	LogDescriptionMapSummaryEditSuccess   string = "MapSummaryEditSuccess"
+	LogDescriptionMapSummaryEditFail      string = "MapSummaryEditFail"
+	LogDescriptionMapSummaryEditImage     string = "MapSummaryEditImage"
+	LogDescriptionMapSummaryDeleteSuccess string = "MapSummaryDeleteSuccess"
+	LogDescriptionMapSummaryDeleteFail    string = "MapSummaryDeleteFail"
 
 	LogDescriptionRecordSuccess            string = "Success"
 	LogDescriptionRecordFailInsertRecord   string = "InsertRecordFail"
@@ -177,9 +180,13 @@ func ScoreLogs(c *gin.Context) {
 	})
 }
 
-func CreateLog(user_id string, log_type string, log_description string) (err error) {
-	sql := `INSERT INTO logs (user_id, "type", description) VALUES($1, $2, $3)`
-	_, err = database.DB.Exec(sql, user_id, log_type, log_description)
+func CreateLog(userID string, logType string, logDescription string, logMessage ...string) (err error) {
+	message := "-"
+	if len(logMessage) == 1 {
+		message = logMessage[0]
+	}
+	sql := `INSERT INTO logs (user_id, "type", description, message) VALUES($1, $2, $3, $4)`
+	_, err = database.DB.Exec(sql, userID, logType, logDescription, message)
 	if err != nil {
 		return err
 	}
