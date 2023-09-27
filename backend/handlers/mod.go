@@ -62,7 +62,6 @@ func CreateMapSummary(c *gin.Context) {
 	id := c.Param("mapid")
 	mapID, err := strconv.Atoi(id)
 	if err != nil {
-		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryCreateFail, "ATOI: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
@@ -75,7 +74,6 @@ func CreateMapSummary(c *gin.Context) {
 	// Start database transaction
 	tx, err := database.DB.Begin()
 	if err != nil {
-		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryCreateFail, "TX#B: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
@@ -111,7 +109,6 @@ func CreateMapSummary(c *gin.Context) {
 		return
 	}
 	if err = tx.Commit(); err != nil {
-		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryCreateFail, "TX#C: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
@@ -149,7 +146,6 @@ func EditMapSummary(c *gin.Context) {
 	id := c.Param("mapid")
 	mapID, err := strconv.Atoi(id)
 	if err != nil {
-		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryEditFail, "ATOI: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
@@ -162,7 +158,6 @@ func EditMapSummary(c *gin.Context) {
 	// Start database transaction
 	tx, err := database.DB.Begin()
 	if err != nil {
-		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryEditFail, "TX#B: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
@@ -199,7 +194,6 @@ func EditMapSummary(c *gin.Context) {
 		return
 	}
 	if err = tx.Commit(); err != nil {
-		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryEditFail, "TX#C: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
@@ -237,7 +231,6 @@ func DeleteMapSummary(c *gin.Context) {
 	id := c.Param("mapid")
 	mapID, err := strconv.Atoi(id)
 	if err != nil {
-		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryEditFail, "ATOI: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
@@ -250,7 +243,6 @@ func DeleteMapSummary(c *gin.Context) {
 	// Start database transaction
 	tx, err := database.DB.Begin()
 	if err != nil {
-		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryDeleteFail, "TX#B: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
@@ -291,7 +283,6 @@ func DeleteMapSummary(c *gin.Context) {
 		return
 	}
 	if err = tx.Commit(); err != nil {
-		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryDeleteFail, "TX#C: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}

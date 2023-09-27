@@ -800,7 +800,7 @@ func UpdateUser(c *gin.Context) {
 	}
 	profile, err := GetPlayerSummaries(user.(models.User).SteamID, os.Getenv("API_KEY"))
 	if err != nil {
-		CreateLog(user.(models.User).SteamID, LogTypeUser, LogDescriptionUserUpdateSummaryFail)
+		CreateLog(user.(models.User).SteamID, LogTypeUser, LogDescriptionUserUpdateSummaryFail, err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
@@ -808,7 +808,7 @@ func UpdateUser(c *gin.Context) {
 	_, err = database.DB.Exec(`UPDATE users SET username = $1, avatar_link = $2, country_code = $3, updated_at = $4
 	WHERE steam_id = $5`, profile.PersonaName, profile.AvatarFull, profile.LocCountryCode, time.Now().UTC(), user.(models.User).SteamID)
 	if err != nil {
-		CreateLog(user.(models.User).SteamID, LogTypeUser, LogDescriptionUserUpdateFail)
+		CreateLog(user.(models.User).SteamID, LogTypeUser, LogDescriptionUserUpdateFail, "U#users: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}

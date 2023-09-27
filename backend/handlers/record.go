@@ -65,7 +65,6 @@ func CreateRecordWithDemo(c *gin.Context) {
 		return
 	}
 	if isDisabled {
-		CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailInvalidRequest)
 		c.JSON(http.StatusOK, models.ErrorResponse("Map is not available for competitive boards."))
 		return
 	}
@@ -75,12 +74,12 @@ func CreateRecordWithDemo(c *gin.Context) {
 	// Get record request
 	var record RecordRequest
 	if err := c.ShouldBind(&record); err != nil {
-		CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailInvalidRequest)
+		CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionCreateRecordInvalidRequestFail, "BIND: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	if isCoop && (record.PartnerDemo == nil || record.PartnerID == "") {
-		CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailInvalidRequest)
+		CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionCreateRecordInvalidRequestFail)
 		c.JSON(http.StatusOK, models.ErrorResponse("Invalid entry for coop record submission."))
 		return
 	}
@@ -110,28 +109,28 @@ func CreateRecordWithDemo(c *gin.Context) {
 		// Upload & insert into demos
 		err = c.SaveUploadedFile(header, "backend/parser/"+uuid+".dem")
 		if err != nil {
-			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailSaveDemo)
+			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionCreateRecordSaveDemoFail, err.Error())
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 		defer os.Remove("backend/parser/" + uuid + ".dem")
 		f, err := os.Open("backend/parser/" + uuid + ".dem")
 		if err != nil {
-			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailOpenDemo)
+			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionCreateRecordOpenDemoFail, err.Error())
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 		defer f.Close()
 		file, err := createFile(srv, uuid+".dem", "application/octet-stream", f, os.Getenv("GOOGLE_FOLDER_ID"))
 		if err != nil {
-			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailCreateDemo)
+			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionCreateRecordCreateDemoFail, err.Error())
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 		hostDemoScoreCount, hostDemoScoreTime, err = parser.ProcessDemo("backend/parser/" + uuid + ".dem")
 		if err != nil {
 			deleteFile(srv, file.Id)
-			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailProcessDemo)
+			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionCreateRecordProcessDemoFail, err.Error())
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
@@ -145,7 +144,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 		_, err = tx.Exec(`INSERT INTO demos (id,location_id) VALUES ($1,$2)`, uuid, file.Id)
 		if err != nil {
 			deleteFile(srv, file.Id)
-			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailInsertDemo)
+			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionCreateRecordInsertDemoFail, err.Error())
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
@@ -167,42 +166,26 @@ func CreateRecordWithDemo(c *gin.Context) {
 		if err != nil {
 			deleteFile(srv, hostDemoFileID)
 			deleteFile(srv, partnerDemoFileID)
-			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailInsertRecord)
+			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionCreateRecordInsertRecordFail, err.Error())
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
-		// If a new world record based on portal count
-		// if record.ScoreCount < wrScore {
-		// 	_, err := tx.Exec(`UPDATE maps SET wr_score = $1, wr_time = $2 WHERE id = $3`, record.ScoreCount, record.ScoreTime, mapId)
-		// 	if err != nil {
-		// 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
-		// 		return
-		// 	}
-		// }
 	} else {
 		sql := `INSERT INTO records_sp(map_id,score_count,score_time,user_id,demo_id) 
 		VALUES($1, $2, $3, $4, $5)`
 		_, err := tx.Exec(sql, mapId, hostDemoScoreCount, hostDemoScoreTime, user.(models.User).SteamID, hostDemoUUID)
 		if err != nil {
 			deleteFile(srv, hostDemoFileID)
-			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordFailInsertRecord)
+			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionCreateRecordInsertRecordFail, err.Error())
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
-		// If a new world record based on portal count
-		// if record.ScoreCount < wrScore {
-		// 	_, err := tx.Exec(`UPDATE maps SET wr_score = $1, wr_time = $2 WHERE id = $3`, record.ScoreCount, record.ScoreTime, mapId)
-		// 	if err != nil {
-		// 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
-		// 		return
-		// 	}
-		// }
 	}
 	if err = tx.Commit(); err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
-	CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionRecordSuccess)
+	CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionCreateRecordSuccess)
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully created record.",
@@ -256,10 +239,12 @@ func DeleteRecord(c *gin.Context) {
 		sql = `SELECT mp.id FROM records_mp mp WHERE mp.id = $1 AND mp.map_id = $2 AND (mp.host_id = $3 OR mp.partner_id = $3) AND is_deleted = false`
 		err = database.DB.QueryRow(sql, recordID, mapID, user.(models.User).SteamID).Scan(&validateRecordID)
 		if err != nil {
+			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionDeleteRecordFail, "S#records_mp: "+err.Error())
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 		if recordID != validateRecordID {
+			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionDeleteRecordFail, "recordID != validateRecordID")
 			c.JSON(http.StatusOK, models.ErrorResponse("Selected record does not exist."))
 			return
 		}
@@ -267,6 +252,7 @@ func DeleteRecord(c *gin.Context) {
 		sql = `UPDATE records_mp SET is_deleted = true WHERE id = $1`
 		_, err = database.DB.Exec(sql, recordID)
 		if err != nil {
+			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionDeleteRecordFail, "U#records_mp: "+err.Error())
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
@@ -276,10 +262,12 @@ func DeleteRecord(c *gin.Context) {
 		sql = `SELECT sp.id FROM records_sp sp WHERE sp.id = $1 AND sp.map_id = $2 AND sp.user_id = $3 AND is_deleted = false`
 		err = database.DB.QueryRow(sql, recordID, mapID, user.(models.User).SteamID).Scan(&validateRecordID)
 		if err != nil {
+			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionDeleteRecordFail, "S#records_sp: "+err.Error())
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 		if recordID != validateRecordID {
+			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionDeleteRecordFail, "recordID != validateRecordID")
 			c.JSON(http.StatusOK, models.ErrorResponse("Selected record does not exist."))
 			return
 		}
@@ -287,10 +275,12 @@ func DeleteRecord(c *gin.Context) {
 		sql = `UPDATE records_sp SET is_deleted = true WHERE id = $1`
 		_, err = database.DB.Exec(sql, recordID)
 		if err != nil {
+			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionDeleteRecordFail, "U#records_sp: "+err.Error())
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 	}
+	CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionDeleteRecordSuccess)
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully deleted record.",
