@@ -62,17 +62,20 @@ func CreateMapSummary(c *gin.Context) {
 	id := c.Param("mapid")
 	mapID, err := strconv.Atoi(id)
 	if err != nil {
+		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryCreateFail, "ATOI: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	var request CreateMapSummaryRequest
 	if err := c.BindJSON(&request); err != nil {
+		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryCreateFail, "BIND: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	// Start database transaction
 	tx, err := database.DB.Begin()
 	if err != nil {
+		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryCreateFail, "TX#B: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
@@ -82,6 +85,7 @@ func CreateMapSummary(c *gin.Context) {
 	sql := `SELECT m.id FROM maps m WHERE m.id = $1`
 	err = database.DB.QueryRow(sql, mapID).Scan(&checkMapID)
 	if err != nil {
+		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryCreateFail, "S#maps: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
@@ -94,6 +98,7 @@ func CreateMapSummary(c *gin.Context) {
 	VALUES ($1,$2,$3,$4,$5)`
 	_, err = tx.Exec(sql, mapID, request.CategoryID, request.ScoreCount, request.Description, request.Showcase)
 	if err != nil {
+		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryCreateFail, "I#map_routes: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
@@ -101,14 +106,16 @@ func CreateMapSummary(c *gin.Context) {
 	VALUES ($1,$2,$3,$4,$5)`
 	_, err = tx.Exec(sql, mapID, request.CategoryID, request.UserName, request.ScoreCount, request.RecordDate)
 	if err != nil {
+		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryCreateFail, "I#map_history: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	if err = tx.Commit(); err != nil {
+		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryCreateFail, "TX#C: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
-	CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryCreate)
+	CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryCreateSuccess)
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully created map summary.",
@@ -142,17 +149,20 @@ func EditMapSummary(c *gin.Context) {
 	id := c.Param("mapid")
 	mapID, err := strconv.Atoi(id)
 	if err != nil {
+		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryEditFail, "ATOI: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	var request EditMapSummaryRequest
 	if err := c.BindJSON(&request); err != nil {
+		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryEditFail, "BIND: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	// Start database transaction
 	tx, err := database.DB.Begin()
 	if err != nil {
+		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryEditFail, "TX#B: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
@@ -162,12 +172,14 @@ func EditMapSummary(c *gin.Context) {
 	sql := `SELECT mr.category_id, mr.score_count FROM map_routes mr INNER JOIN maps m ON m.id = mr.map_id WHERE m.id = $1 AND mr.id = $2`
 	err = database.DB.QueryRow(sql, mapID, request.RouteID).Scan(&categoryID, &scoreCount)
 	if err != nil {
+		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryEditFail, "S#map_routes: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	sql = `SELECT mh.id FROM map_history mh WHERE mh.score_count = $1 AND mh.category_id = $2 AND mh.map_id = $3`
 	err = database.DB.QueryRow(sql, scoreCount, categoryID, mapID).Scan(&historyID)
 	if err != nil {
+		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryEditFail, "S#map_history: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
@@ -175,20 +187,23 @@ func EditMapSummary(c *gin.Context) {
 	sql = `UPDATE map_routes SET score_count = $2, description = $3, showcase = $4 WHERE id = $1`
 	_, err = tx.Exec(sql, request.RouteID, request.ScoreCount, request.Description, request.Showcase)
 	if err != nil {
+		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryEditFail, "U#map_routes: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	sql = `UPDATE map_history SET user_name = $2, score_count = $3, record_date = $4 WHERE id = $1`
 	_, err = tx.Exec(sql, historyID, request.UserName, request.ScoreCount, request.RecordDate)
 	if err != nil {
+		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryEditFail, "U#map_history"+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	if err = tx.Commit(); err != nil {
+		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryEditFail, "TX#C: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
-	CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryEdit)
+	CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryEditSuccess)
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully updated map summary.",
@@ -222,17 +237,20 @@ func DeleteMapSummary(c *gin.Context) {
 	id := c.Param("mapid")
 	mapID, err := strconv.Atoi(id)
 	if err != nil {
+		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryEditFail, "ATOI: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	var request DeleteMapSummaryRequest
 	if err := c.BindJSON(&request); err != nil {
+		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryEditFail, "BIND: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	// Start database transaction
 	tx, err := database.DB.Begin()
 	if err != nil {
+		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryDeleteFail, "TX#B: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
@@ -242,6 +260,7 @@ func DeleteMapSummary(c *gin.Context) {
 	sql := `SELECT m.id, mr.score_count FROM maps m INNER JOIN map_routes mr ON m.id=mr.map_id WHERE m.id = $1 AND mr.id = $2`
 	err = database.DB.QueryRow(sql, mapID, request.RouteID).Scan(&checkMapID, &scoreCount)
 	if err != nil {
+		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryDeleteFail, "S#map_routes: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
@@ -252,6 +271,7 @@ func DeleteMapSummary(c *gin.Context) {
 	sql = `SELECT mh.id FROM maps m INNER JOIN map_routes mr ON m.id=mr.map_id INNER JOIN map_history mh ON m.id=mh.map_id WHERE m.id = $1 AND mr.id = $2 AND mh.score_count = $3`
 	err = database.DB.QueryRow(sql, mapID, request.RouteID, scoreCount).Scan(&mapHistoryID)
 	if err != nil {
+		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryDeleteFail, "S#map_history: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
@@ -259,20 +279,23 @@ func DeleteMapSummary(c *gin.Context) {
 	sql = `DELETE FROM map_routes mr WHERE mr.id = $1 `
 	_, err = tx.Exec(sql, request.RouteID)
 	if err != nil {
+		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryDeleteFail, "D#map_routes: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	sql = `DELETE FROM map_history mh WHERE mh.id = $1`
 	_, err = tx.Exec(sql, mapHistoryID)
 	if err != nil {
+		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryDeleteFail, "D#map_history: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	if err = tx.Commit(); err != nil {
+		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryDeleteFail, "TX#C: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
-	CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryDelete)
+	CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryDeleteSuccess)
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully delete map summary.",
