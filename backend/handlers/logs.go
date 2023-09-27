@@ -33,14 +33,16 @@ const (
 	LogDescriptionMapSummaryDeleteSuccess string = "MapSummaryDeleteSuccess"
 	LogDescriptionMapSummaryDeleteFail    string = "MapSummaryDeleteFail"
 
-	LogDescriptionRecordSuccess            string = "Success"
-	LogDescriptionRecordFailInsertRecord   string = "InsertRecordFail"
-	LogDescriptionRecordFailInsertDemo     string = "InsertDemoFail"
-	LogDescriptionRecordFailProcessDemo    string = "ProcessDemoFail"
-	LogDescriptionRecordFailCreateDemo     string = "CreateDemoFail"
-	LogDescriptionRecordFailOpenDemo       string = "OpenDemoFail"
-	LogDescriptionRecordFailSaveDemo       string = "SaveDemoFail"
-	LogDescriptionRecordFailInvalidRequest string = "InvalidRequestFail"
+	LogDescriptionCreateRecordSuccess            string = "CreateRecordSuccess"
+	LogDescriptionCreateRecordInsertRecordFail   string = "InsertRecordFail"
+	LogDescriptionCreateRecordInsertDemoFail     string = "InsertDemoFail"
+	LogDescriptionCreateRecordProcessDemoFail    string = "ProcessDemoFail"
+	LogDescriptionCreateRecordCreateDemoFail     string = "CreateDemoFail"
+	LogDescriptionCreateRecordOpenDemoFail       string = "OpenDemoFail"
+	LogDescriptionCreateRecordSaveDemoFail       string = "SaveDemoFail"
+	LogDescriptionCreateRecordInvalidRequestFail string = "InvalidRequestFail"
+	LogDescriptionDeleteRecordSuccess            string = "DeleteRecordSuccess"
+	LogDescriptionDeleteRecordFail               string = "DeleteRecordFail"
 )
 
 type Log struct {
