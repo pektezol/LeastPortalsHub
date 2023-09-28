@@ -25,13 +25,14 @@ const (
 	LogDescriptionUserUpdateCountrySuccess string = "UpdateCountrySuccess"
 	LogDescriptionUserUpdateCountryFail    string = "UpdateCountryFail"
 
-	LogDescriptionMapSummaryCreateSuccess string = "MapSummaryCreateSuccess"
-	LogDescriptionMapSummaryCreateFail    string = "MapSummaryCreateFail"
-	LogDescriptionMapSummaryEditSuccess   string = "MapSummaryEditSuccess"
-	LogDescriptionMapSummaryEditFail      string = "MapSummaryEditFail"
-	LogDescriptionMapSummaryEditImage     string = "MapSummaryEditImage"
-	LogDescriptionMapSummaryDeleteSuccess string = "MapSummaryDeleteSuccess"
-	LogDescriptionMapSummaryDeleteFail    string = "MapSummaryDeleteFail"
+	LogDescriptionMapSummaryCreateSuccess    string = "MapSummaryCreateSuccess"
+	LogDescriptionMapSummaryCreateFail       string = "MapSummaryCreateFail"
+	LogDescriptionMapSummaryEditSuccess      string = "MapSummaryEditSuccess"
+	LogDescriptionMapSummaryEditFail         string = "MapSummaryEditFail"
+	LogDescriptionMapSummaryEditImageSuccess string = "MapSummaryEditImageSuccess"
+	LogDescriptionMapSummaryEditImageFail    string = "MapSummaryEditImageFail"
+	LogDescriptionMapSummaryDeleteSuccess    string = "MapSummaryDeleteSuccess"
+	LogDescriptionMapSummaryDeleteFail       string = "MapSummaryDeleteFail"
 
 	LogDescriptionCreateRecordSuccess            string = "CreateRecordSuccess"
 	LogDescriptionCreateRecordInsertRecordFail   string = "InsertRecordFail"
@@ -49,6 +50,7 @@ type Log struct {
 	User        models.UserShort `json:"user"`
 	Type        string           `json:"type"`
 	Description string           `json:"description"`
+	Message     string           `json:"message"`
 	Date        time.Time        `json:"date"`
 }
 
@@ -57,9 +59,10 @@ type LogsResponse struct {
 }
 
 type LogsResponseDetails struct {
-	User models.UserShort `json:"user"`
-	Log  string           `json:"detail"`
-	Date time.Time        `json:"date"`
+	User    models.UserShort `json:"user"`
+	Log     string           `json:"detail"`
+	Message string           `json:"message"`
+	Date    time.Time        `json:"date"`
 }
 
 type ScoreLogsResponse struct {
@@ -112,8 +115,9 @@ func ModLogs(c *gin.Context) {
 				SteamID:  log.User.SteamID,
 				UserName: log.User.UserName,
 			},
-			Log:  detail,
-			Date: log.Date,
+			Log:     detail,
+			Message: log.Message,
+			Date:    log.Date,
 		})
 	}
 	c.JSON(http.StatusOK, models.Response{
