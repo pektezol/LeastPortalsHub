@@ -1307,7 +1307,6 @@ const docTemplate = `{
                 "category_id",
                 "description",
                 "record_date",
-                "score_count",
                 "user_name"
             ],
             "properties": {
@@ -1374,7 +1373,6 @@ const docTemplate = `{
                 "description",
                 "record_date",
                 "route_id",
-                "score_count",
                 "user_name"
             ],
             "properties": {
@@ -1424,6 +1422,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "detail": {
+                    "type": "string"
+                },
+                "message": {
                     "type": "string"
                 },
                 "user": {
@@ -1827,6 +1828,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "is_coop": {
+                    "type": "boolean"
+                },
+                "is_disabled": {
                     "type": "boolean"
                 },
                 "map_name": {

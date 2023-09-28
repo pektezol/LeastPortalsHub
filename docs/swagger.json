@@ -1300,7 +1300,6 @@
                 "category_id",
                 "description",
                 "record_date",
-                "score_count",
                 "user_name"
             ],
             "properties": {
@@ -1367,7 +1366,6 @@
                 "description",
                 "record_date",
                 "route_id",
-                "score_count",
                 "user_name"
             ],
             "properties": {
@@ -1417,6 +1415,9 @@
                     "type": "string"
                 },
                 "detail": {
+                    "type": "string"
+                },
+                "message": {
                     "type": "string"
                 },
                 "user": {
@@ -1820,6 +1821,9 @@
                     "type": "string"
                 },
                 "is_coop": {
+                    "type": "boolean"
+                },
+                "is_disabled": {
                     "type": "boolean"
                 },
                 "map_name": {
