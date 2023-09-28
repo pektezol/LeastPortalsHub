@@ -50,7 +50,7 @@ CREATE TABLE map_routes (
   category_id SMALLINT NOT NULL,
   score_count SMALLINT NOT NULL,
   description TEXT NOT NULL,
-  showcase TEXT NOT NULL DEFAULT '-',
+  showcase TEXT NOT NULL DEFAULT,
   PRIMARY KEY (id),
   FOREIGN KEY (map_id) REFERENCES maps(id),
   FOREIGN KEY (category_id) REFERENCES categories(id),
@@ -181,7 +181,7 @@ CREATE TABLE logs (
   user_id TEXT NOT NULL,
   type TEXT NOT NULL,
   description TEXT NOT NULL,
-  message TEXT NOT NULL DEFAULT '-',
+  message TEXT NOT NULL DEFAULT,
   date TIMESTAMP NOT NULL DEFAULT now(),
   PRIMARY KEY (id),
   FOREIGN KEY (user_id) REFERENCES users(steam_id)
