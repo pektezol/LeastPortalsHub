@@ -239,7 +239,7 @@ func DeleteRecord(c *gin.Context) {
 		sql = `SELECT mp.id FROM records_mp mp WHERE mp.id = $1 AND mp.map_id = $2 AND (mp.host_id = $3 OR mp.partner_id = $3) AND is_deleted = false`
 		err = database.DB.QueryRow(sql, recordID, mapID, user.(models.User).SteamID).Scan(&validateRecordID)
 		if err != nil {
-			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionDeleteRecordFail, "S#records_mp: "+err.Error())
+			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionDeleteRecordFail, "SELECT#records_mp: "+err.Error())
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
@@ -252,7 +252,7 @@ func DeleteRecord(c *gin.Context) {
 		sql = `UPDATE records_mp SET is_deleted = true WHERE id = $1`
 		_, err = database.DB.Exec(sql, recordID)
 		if err != nil {
-			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionDeleteRecordFail, "U#records_mp: "+err.Error())
+			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionDeleteRecordFail, "UPDATE#records_mp: "+err.Error())
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
@@ -262,7 +262,7 @@ func DeleteRecord(c *gin.Context) {
 		sql = `SELECT sp.id FROM records_sp sp WHERE sp.id = $1 AND sp.map_id = $2 AND sp.user_id = $3 AND is_deleted = false`
 		err = database.DB.QueryRow(sql, recordID, mapID, user.(models.User).SteamID).Scan(&validateRecordID)
 		if err != nil {
-			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionDeleteRecordFail, "S#records_sp: "+err.Error())
+			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionDeleteRecordFail, "SELECT#records_sp: "+err.Error())
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
@@ -275,7 +275,7 @@ func DeleteRecord(c *gin.Context) {
 		sql = `UPDATE records_sp SET is_deleted = true WHERE id = $1`
 		_, err = database.DB.Exec(sql, recordID)
 		if err != nil {
-			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionDeleteRecordFail, "U#records_sp: "+err.Error())
+			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionDeleteRecordFail, "UPDATE#records_sp: "+err.Error())
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
