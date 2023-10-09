@@ -31,6 +31,11 @@ type ChapterMapsResponse struct {
 	Maps    []models.MapShort `json:"maps"`
 }
 
+type GameMapsResponse struct {
+	Game models.Game       `json:"game"`
+	Maps []models.MapShort `json:"maps"`
+}
+
 type RecordSingleplayer struct {
 	Placement  int                        `json:"placement"`
 	RecordID   int                        `json:"record_id"`
@@ -381,6 +386,41 @@ func FetchChapters(c *gin.Context) {
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully retrieved chapters.",
+		Data:    response,
+	})
+}
+
+// GET Maps of a Game
+//
+//	@Description	Get maps from the specified game id.
+//	@Tags			games & chapters
+//	@Produce		json
+//	@Param			gameid	path		int	true	"Game ID"
+//	@Success		200		{object}	models.Response{data=ChaptersResponse}
+//	@Router			/games/{gameid}/maps [get]
+func FetchMaps(c *gin.Context) {
+	gameID, err := strconv.Atoi(c.Param("gameid"))
+	if err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+		return
+	}
+	var response GameMapsResponse
+	rows, err := database.DB.Query(`SELECT g.id, g.name, g.is_coop, m.id, m."name", m.is_disabled FROM games g INNER JOIN maps m ON g.id = m.game_id WHERE g.id = $1 ORDER BY m.id `, gameID)
+	if err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+		return
+	}
+	for rows.Next() {
+		var mapShort models.MapShort
+		if err := rows.Scan(&response.Game.ID, &response.Game.Name, &response.Game.IsCoop, &mapShort.ID, &mapShort.Name, &mapShort.IsDisabled); err != nil {
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+			return
+		}
+		response.Maps = append(response.Maps, mapShort)
+	}
+	c.JSON(http.StatusOK, models.Response{
+		Success: true,
+		Message: "Successfully retrieved maps.",
 		Data:    response,
 	})
 }
