@@ -402,7 +402,7 @@ func FetchChapterMaps(c *gin.Context) {
 		return
 	}
 	var response ChapterMapsResponse
-	rows, err := database.DB.Query(`SELECT m.id, m.name, c.name FROM maps m INNER JOIN chapters c ON m.chapter_id = c.id WHERE chapter_id = $1`, chapterID)
+	rows, err := database.DB.Query(`SELECT m.id, m.name, c.name, m.is_disabled FROM maps m INNER JOIN chapters c ON m.chapter_id = c.id WHERE chapter_id = $1`, chapterID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
@@ -411,7 +411,7 @@ func FetchChapterMaps(c *gin.Context) {
 	var chapterName string
 	for rows.Next() {
 		var mapShort models.MapShort
-		if err := rows.Scan(&mapShort.ID, &mapShort.Name, &chapterName); err != nil {
+		if err := rows.Scan(&mapShort.ID, &mapShort.Name, &chapterName, &mapShort.IsDisabled); err != nil {
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
