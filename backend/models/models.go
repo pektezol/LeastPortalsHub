@@ -50,8 +50,9 @@ type Map struct {
 }
 
 type MapShort struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	ID         int    `json:"id"`
+	Name       string `json:"name"`
+	IsDisabled bool   `json:"is_disabled"`
 }
 
 type MapSummary struct {
