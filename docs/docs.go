@@ -177,6 +177,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/games/{gameid}/maps": {
+            "get": {
+                "description": "Get maps from the specified game id.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "games \u0026 chapters"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Game ID",
+                        "name": "gameid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/handlers.ChaptersResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/login": {
             "get": {
                 "description": "Get (redirect) login page for Steam auth.",
@@ -1883,6 +1923,9 @@ const docTemplate = `{
             "properties": {
                 "id": {
                     "type": "integer"
+                },
+                "is_disabled": {
+                    "type": "boolean"
                 },
                 "name": {
                     "type": "string"

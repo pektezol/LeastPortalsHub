@@ -28,6 +28,7 @@ const (
 	searchPath          string = "/search"
 	gamesPath           string = "/games"
 	chaptersPath        string = "/games/:gameid"
+	gameMapsPath        string = "/games/:gameid/maps"
 	chapterMapsPath     string = "/chapters/:chapterid"
 	scoreLogsPath       string = "/logs/score"
 	modLogsPath         string = "/logs/mod"
@@ -76,6 +77,7 @@ func InitRoutes(router *gin.Engine) {
 		v1.GET(gamesPath, handlers.FetchGames)
 		v1.GET(chaptersPath, handlers.FetchChapters)
 		v1.GET(chapterMapsPath, handlers.FetchChapterMaps)
+		v1.GET(gameMapsPath, handlers.FetchMaps)
 		// Logs
 		v1.GET(scoreLogsPath, handlers.ScoreLogs)
 		v1.GET(modLogsPath, CheckAuth, handlers.ModLogs)

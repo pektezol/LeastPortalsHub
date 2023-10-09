@@ -409,6 +409,8 @@ definitions:
     properties:
       id:
         type: integer
+      is_disabled:
+        type: boolean
       name:
         type: string
     type: object
@@ -553,6 +555,29 @@ paths:
   /games/{gameid}:
     get:
       description: Get chapters from the specified game id.
+      parameters:
+      - description: Game ID
+        in: path
+        name: gameid
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.ChaptersResponse'
+              type: object
+      tags:
+      - games & chapters
+  /games/{gameid}/maps:
+    get:
+      description: Get maps from the specified game id.
       parameters:
       - description: Game ID
         in: path
