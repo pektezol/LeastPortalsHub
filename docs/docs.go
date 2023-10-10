@@ -1665,6 +1665,9 @@ const docTemplate = `{
                 "links": {
                     "$ref": "#/definitions/models.Links"
                 },
+                "pagination": {
+                    "$ref": "#/definitions/models.Pagination"
+                },
                 "profile": {
                     "type": "boolean"
                 },
@@ -1815,6 +1818,9 @@ const docTemplate = `{
             "properties": {
                 "id": {
                     "type": "integer"
+                },
+                "is_disabled": {
+                    "type": "boolean"
                 },
                 "name": {
                     "type": "string"
