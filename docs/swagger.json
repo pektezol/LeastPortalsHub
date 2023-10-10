@@ -1658,6 +1658,9 @@
                 "links": {
                     "$ref": "#/definitions/models.Links"
                 },
+                "pagination": {
+                    "$ref": "#/definitions/models.Pagination"
+                },
                 "profile": {
                     "type": "boolean"
                 },
@@ -1808,6 +1811,9 @@
             "properties": {
                 "id": {
                     "type": "integer"
+                },
+                "is_disabled": {
+                    "type": "boolean"
                 },
                 "name": {
                     "type": "string"
