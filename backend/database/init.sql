@@ -23,6 +23,7 @@ CREATE TABLE chapters (
   id SERIAL,
   game_id SMALLINT NOT NULL,
   name TEXT NOT NULL,
+  is_disabled BOOLEAN NOT NULL DEFAULT false,
   PRIMARY KEY (id),
   FOREIGN KEY (game_id) REFERENCES games(id)
 );
