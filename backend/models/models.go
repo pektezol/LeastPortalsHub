@@ -92,8 +92,9 @@ type Game struct {
 }
 
 type Chapter struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	ID         int    `json:"id"`
+	Name       string `json:"name"`
+	IsDisabled bool   `json:"is_disabled"`
 }
 
 type Category struct {
