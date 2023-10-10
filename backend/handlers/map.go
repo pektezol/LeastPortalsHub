@@ -365,7 +365,7 @@ func FetchChapters(c *gin.Context) {
 		return
 	}
 	var response ChaptersResponse
-	rows, err := database.DB.Query(`SELECT c.id, c.name, g.name FROM chapters c INNER JOIN games g ON c.game_id = g.id WHERE game_id = $1`, gameID)
+	rows, err := database.DB.Query(`SELECT c.id, c.name, g.name, c.is_disabled FROM chapters c INNER JOIN games g ON c.game_id = g.id WHERE game_id = $1`, gameID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
@@ -374,7 +374,7 @@ func FetchChapters(c *gin.Context) {
 	var gameName string
 	for rows.Next() {
 		var chapter models.Chapter
-		if err := rows.Scan(&chapter.ID, &chapter.Name, &gameName); err != nil {
+		if err := rows.Scan(&chapter.ID, &chapter.Name, &gameName, &chapter.IsDisabled); err != nil {
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
