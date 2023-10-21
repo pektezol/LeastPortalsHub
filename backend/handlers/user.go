@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"os"
 	"regexp"
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -75,18 +74,10 @@ func Profile(c *gin.Context) {
 		c.JSON(http.StatusOK, models.ErrorResponse("User not logged in."))
 		return
 	}
-	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
-	if err != nil || page < 1 {
-		page = 1
-	}
-	pageSize, err := strconv.Atoi(c.DefaultQuery("pageSize", "20"))
-	if err != nil || pageSize < 1 {
-		pageSize = 20
-	}
 	// Get user links
 	links := models.Links{}
 	sql := `SELECT u.p2sr, u.steam, u.youtube, u.twitch FROM users u WHERE u.steam_id = $1`
-	err = database.DB.QueryRow(sql, user.(models.User).SteamID).Scan(&links.P2SR, &links.Steam, &links.YouTube, &links.Twitch)
+	err := database.DB.QueryRow(sql, user.(models.User).SteamID).Scan(&links.P2SR, &links.Steam, &links.YouTube, &links.Twitch)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
@@ -301,8 +292,6 @@ func Profile(c *gin.Context) {
 		}
 	}
 	records := []ProfileRecords{}
-	totalRecords := 0
-	totalPages := 0
 	// Get singleplayer records
 	sql = `SELECT sp.id, m.game_id, m.chapter_id, sp.map_id, m."name", (SELECT mr.score_count FROM map_routes mr WHERE mr.map_id = sp.map_id ORDER BY mr.score_count ASC LIMIT 1) AS wr_count, sp.score_count, sp.score_time, sp.demo_id, sp.record_date
 	FROM records_sp sp INNER JOIN maps m ON sp.map_id = m.id WHERE sp.user_id = $1 AND sp.is_deleted = false ORDER BY sp.map_id, sp.score_count, sp.score_time`
@@ -405,20 +394,6 @@ func Profile(c *gin.Context) {
 		placementIndex++
 		records[len(records)-1].Scores = append(records[len(records)-1].Scores, score)
 	}
-	totalRecords = len(records)
-	if totalRecords != 0 {
-		totalPages = (totalRecords + pageSize - 1) / pageSize
-		if page > totalPages {
-			c.JSON(http.StatusOK, models.ErrorResponse("Invalid page number."))
-			return
-		}
-		startIndex := (page - 1) * pageSize
-		endIndex := startIndex + pageSize
-		if endIndex > totalRecords {
-			endIndex = totalRecords
-		}
-		records = records[startIndex:endIndex]
-	}
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully retrieved user scores.",
@@ -432,12 +407,6 @@ func Profile(c *gin.Context) {
 			Links:       links,
 			Rankings:    rankings,
 			Records:     records,
-			Pagination: models.Pagination{
-				TotalRecords: totalRecords,
-				TotalPages:   totalPages,
-				CurrentPage:  page,
-				PageSize:     pageSize,
-			},
 		},
 	})
 }
@@ -459,19 +428,11 @@ func FetchUser(c *gin.Context) {
 		c.JSON(http.StatusOK, models.ErrorResponse("User not found."))
 		return
 	}
-	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
-	if err != nil || page < 1 {
-		page = 1
-	}
-	pageSize, err := strconv.Atoi(c.DefaultQuery("pageSize", "20"))
-	if err != nil || pageSize < 1 {
-		pageSize = 20
-	}
 	// Check if user exists
 	var user models.User
 	links := models.Links{}
 	sql := `SELECT u.steam_id, u.user_name, u.avatar_link, u.country_code, u.created_at, u.updated_at, u.p2sr, u.steam, u.youtube, u.twitch FROM users u WHERE u.steam_id = $1`
-	err = database.DB.QueryRow(sql, id).Scan(&user.SteamID, &user.UserName, &user.AvatarLink, &user.CountryCode, &user.CreatedAt, &user.UpdatedAt, &links.P2SR, &links.Steam, &links.YouTube, &links.Twitch)
+	err := database.DB.QueryRow(sql, id).Scan(&user.SteamID, &user.UserName, &user.AvatarLink, &user.CountryCode, &user.CreatedAt, &user.UpdatedAt, &links.P2SR, &links.Steam, &links.YouTube, &links.Twitch)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
@@ -703,8 +664,6 @@ func FetchUser(c *gin.Context) {
 		}
 	}
 	records := []ProfileRecords{}
-	totalRecords := 0
-	totalPages := 0
 	// Get singleplayer records
 	sql = `SELECT sp.id, m.game_id, m.chapter_id, sp.map_id, m."name", (SELECT mr.score_count FROM map_routes mr WHERE mr.map_id = sp.map_id ORDER BY mr.score_count ASC LIMIT 1) AS wr_count, sp.score_count, sp.score_time, sp.demo_id, sp.record_date
 	FROM records_sp sp INNER JOIN maps m ON sp.map_id = m.id WHERE sp.user_id = $1 AND sp.is_deleted = false ORDER BY sp.map_id, sp.score_count, sp.score_time`
@@ -807,20 +766,6 @@ func FetchUser(c *gin.Context) {
 		placementIndex++
 		records[len(records)-1].Scores = append(records[len(records)-1].Scores, score)
 	}
-	totalRecords = len(records)
-	if totalRecords != 0 {
-		totalPages = (totalRecords + pageSize - 1) / pageSize
-		if page > totalPages {
-			c.JSON(http.StatusOK, models.ErrorResponse("Invalid page number."))
-			return
-		}
-		startIndex := (page - 1) * pageSize
-		endIndex := startIndex + pageSize
-		if endIndex > totalRecords {
-			endIndex = totalRecords
-		}
-		records = records[startIndex:endIndex]
-	}
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully retrieved user scores.",
@@ -834,12 +779,6 @@ func FetchUser(c *gin.Context) {
 			Links:       links,
 			Rankings:    rankings,
 			Records:     records,
-			Pagination: models.Pagination{
-				TotalRecords: totalRecords,
-				TotalPages:   totalPages,
-				CurrentPage:  page,
-				PageSize:     pageSize,
-			},
 		},
 	})
 }
