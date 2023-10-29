@@ -166,7 +166,7 @@ func FetchMapLeaderboards(c *gin.Context) {
 		return
 	}
 	response.Map.ID = intID
-	sql := `SELECT g.name, c.name, m.name, is_disabled, m.image, g.is_coop
+	sql := `SELECT g.name, c.name, m.name, m.is_disabled, m.image, g.is_coop
 	FROM maps m
 	INNER JOIN games g ON m.game_id = g.id
 	INNER JOIN chapters c ON m.chapter_id = c.id
