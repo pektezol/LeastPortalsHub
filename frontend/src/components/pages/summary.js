@@ -20,6 +20,7 @@ const fakedata={} //for debug
     //fetching data
     const [data, setData] = React.useState(null);
     React.useEffect(() => {
+    setData(null)
         fetch(`https://lp.ardapektezol.com/api/v1/maps/${location.pathname.split('/')[2]}/summary`)
         .then(r => r.json())
         .then(d => {
@@ -37,7 +38,7 @@ const fakedata={} //for debug
         .then(r => r.json())
         .then(d => setLbData(d))
         // eslint-disable-next-line
-    }, [pageNumber]);
+    }, [pageNumber,location.pathname]);
 
 
 
@@ -247,7 +248,7 @@ return (
             <img src={data.map.image} alt="" />
         </div>
     <main>
-        <section id='section1'>
+        <section id='section1' className='summary1'>
             <div>
                 <button className='nav-button'><i className='triangle'></i><span>{data.map.game_name}</span></button>
                 <button className='nav-button'><i className='triangle'></i><span>{data.map.chapter_name}</span></button>
@@ -257,7 +258,7 @@ return (
 
         </section>
 
-        <section id='section2'>
+        <section id='section2' className='summary1'>
                 <button className='nav-button' onClick={()=>setNavState(0)}><img src={img4} alt="" /><span>Summary</span></button>
                 <button className='nav-button' onClick={()=>setNavState(1)}><img src={img5} alt="" /><span>Leaderboards</span></button>
                 <button className='nav-button' onClick={()=>setNavState(2)}><img src={img6} alt="" /><span>Discussions</span></button>
