@@ -6,6 +6,7 @@ import Main from "./components/main.js"
 import "./App.css";
 
 import Summary from "./components/pages/summary.js"
+import Profile from "./components/pages/profile.js"
 import About from './components/pages/about.js';
 
 
@@ -30,7 +31,8 @@ export default function App() {
             <Route path="/leaderboards" element={<Main text="Leaderboards"/>}></Route>
             <Route path="/discussions" element={<Main text="Discussion"/>}></Route>
             <Route path="/scorelog" element={<Main text="Score logs"/>}></Route>
-            <Route path="/profile" element={<Main text="Profile"/>}></Route>
+            <Route path="/profile" element={<Profile token={token}/>}></Route>
+            <Route path="/users/*" element={<Profile/>}></Route>
             <Route path="/rules" element={<Main text="Rules"/>}></Route>
             <Route path="/about" element={<About/>}></Route>
             <Route path="/maps/*" element={<Summary token={token} mod={mod}/>}></Route>

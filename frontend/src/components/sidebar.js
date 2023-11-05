@@ -17,6 +17,17 @@ import Login from "./login.js"
 
 export default function Sidebar(prop) {
 const {token,setToken} = prop
+const [profile, setProfile] = React.useState(null);
+React.useEffect(() => {
+    fetch(`https://lp.ardapektezol.com/api/v1/profile`,{
+        headers: {
+			'Content-Type': 'application/json',
+            Authorization: token
+        }})
+    .then(r => r.json())
+    .then(d => setProfile(d.data))
+    }, [token]);
+
 
 // Locks search button for 300ms before it can be clicked again, prevents spam
 const [isLocked, setIsLocked] = React.useState(false);
@@ -147,7 +158,7 @@ return (
             <div id='sidebar-bottomlist'>
                 <span></span>
 
-                <Login token={token} setToken={setToken}/>
+                <Login setToken={setToken} profile={profile} setProfile={setProfile}/>
 
                 <Link to="/rules" tabIndex={-1}>
                     <button className='sidebar-button'><img src={img8} alt="" /><span>Leaderboard&nbsp;Rules</span></button>
@@ -172,11 +183,13 @@ return (
             )):""}
             {searchData!==null?searchData.players.map((q,index)=>
                 (
-                <Link className='search-player' key={index}>
+                <Link to={
+                    q.steam_id===profile.steam_id?`/profile`:
+                    `/users/${q.steam_id}`
+                    } className='search-player' key={index}>
                     <img src={q.avatar_link} alt='pfp'></img>
                     <span style={{fontSize:`${36 - q.user_name.length * 0.8}px`}}>{q.user_name}</span>
                 </Link>
-                
             )):""}
 
             </div>            

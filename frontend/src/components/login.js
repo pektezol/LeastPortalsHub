@@ -8,7 +8,7 @@ import img3 from "../imgs/11.png"
 
 
 export default function Login(prop) {
-const {token,setToken} = prop
+const {setToken,profile,setProfile} = prop
 function login() {
     window.location.href="https://lp.ardapektezol.com/api/v1/login"
 }
@@ -16,26 +16,16 @@ function logout() {
     setIsLoggedIn(false)
     setProfile(null)
     setToken(null)
-    fetch(`/api/v1/token`,{'method':'DELETE'})
+    fetch(`https://lp.ardapektezol.com/api/v1/token`,{'method':'DELETE'})
     .then(r=>window.location.href="/")
 }
 const [isLoggedIn, setIsLoggedIn] = React.useState(false);
 React.useEffect(() => {
-    fetch(`/api/v1/token`)
+    fetch(`https://lp.ardapektezol.com/api/v1/token`)
     .then(r => r.json())
     .then(d => setToken(d.data.token))
     }, []);
 
-const [profile, setProfile] = React.useState(null);
-React.useEffect(() => {
-    fetch(`/api/v1/profile`,{
-        headers: {
-			'Content-Type': 'application/json',
-            Authorization: token
-        }})
-    .then(r => r.json())
-    .then(d => setProfile(d.data))
-    }, [token]);
 
 React.useEffect(() => {
     if(profile!==null){setIsLoggedIn(true)}
