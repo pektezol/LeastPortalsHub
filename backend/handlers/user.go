@@ -806,8 +806,8 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 	// Update profile
-	_, err = database.DB.Exec(`UPDATE users SET username = $1, avatar_link = $2, country_code = $3, updated_at = $4
-	WHERE steam_id = $5`, profile.PersonaName, profile.AvatarFull, profile.LocCountryCode, time.Now().UTC(), user.(models.User).SteamID)
+	sql := `UPDATE users SET user_name = $1, avatar_link = $2, country_code = $3, updated_at = $4 WHERE steam_id = $5`
+	_, err = database.DB.Exec(sql, profile.PersonaName, profile.AvatarFull, profile.LocCountryCode, time.Now().UTC(), user.(models.User).SteamID)
 	if err != nil {
 		CreateLog(user.(models.User).SteamID, LogTypeUser, LogDescriptionUserUpdateFail, "UPDATE#users: "+err.Error())
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
