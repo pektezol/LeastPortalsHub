@@ -134,6 +134,12 @@ func CreateRecordWithDemo(c *gin.Context) {
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
+		if hostDemoScoreCount == 0 && hostDemoScoreTime == 0 {
+			deleteFile(srv, file.Id)
+			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionCreateRecordProcessDemoFail, err.Error())
+			c.JSON(http.StatusOK, models.ErrorResponse("Processing demo went wrong. Please contact a web admin and provide the demo in question."))
+			return
+		}
 		if i == 0 {
 			hostDemoFileID = file.Id
 			hostDemoUUID = uuid
