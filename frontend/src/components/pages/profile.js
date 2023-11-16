@@ -125,10 +125,11 @@ function NavClick() {
 }
 }
 function UpdateProfile(){
-    fetch(`/api/v1/profile`,{
+    fetch(`https://lp.ardapektezol.com/api/v1/profile`,{
       method: 'POST',
       headers: {Authorization: token}
-    }).then(r=>window.location.reload())
+    }).then(r=>r.json())
+    .then(d=>d.success?window.location.reload():window.alert(`Error: ${d.message}`))
 }
 
 function TimeAgo(date) {
@@ -221,7 +222,7 @@ return (
                 </div>                
                 <div>
                     <span>Cooperative</span>
-                    <span>{profileData.rankings.cooperative.rank===0?"N/A":"#"+profileData.rankings.cooperative.rank+" "} 
+                    <span>{profileData.rankings.cooperative.rank===0?"N/A ":"#"+profileData.rankings.cooperative.rank+" "} 
                         <span>({profileData.rankings.cooperative.completion_count}/{profileData.rankings.cooperative.completion_total})</span>
                     </span>
                 </div>
@@ -285,7 +286,6 @@ return (
             <hr/>
             <div id='profileboard-records'>
 
-            {console.log(profileData)}
             {game == 0 && profileData !== null
   ?   (
     

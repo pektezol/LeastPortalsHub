@@ -184,7 +184,7 @@ return (
             {searchData!==null?searchData.players.map((q,index)=>
                 (
                 <Link to={
-                    q.steam_id===profile.steam_id?`/profile`:
+                    profile!==null&&q.steam_id===profile.steam_id?`/profile`:
                     `/users/${q.steam_id}`
                     } className='search-player' key={index}>
                     <img src={q.avatar_link} alt='pfp'></img>
