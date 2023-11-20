@@ -15,7 +15,7 @@ type MapDiscussionResponse struct {
 }
 
 type MapDiscussionsResponse struct {
-	Discussions []MapDiscussionOnlyTitle `json:"discussions"`
+	Discussions []MapDiscussion `json:"discussions"`
 }
 
 type MapDiscussion struct {
@@ -23,15 +23,6 @@ type MapDiscussion struct {
 	Creator models.UserShortWithAvatar `json:"creator"`
 	Title   string                     `json:"title"`
 	Content string                     `json:"content"`
-	// Upvotes   int                        `json:"upvotes"`
-	UpdatedAt time.Time              `json:"updated_at"`
-	Comments  []MapDiscussionComment `json:"comments"`
-}
-
-type MapDiscussionOnlyTitle struct {
-	ID      int                        `json:"id"`
-	Creator models.UserShortWithAvatar `json:"creator"`
-	Title   string                     `json:"title"`
 	// Upvotes   int                        `json:"upvotes"`
 	UpdatedAt time.Time              `json:"updated_at"`
 	Comments  []MapDiscussionComment `json:"comments"`
@@ -69,7 +60,7 @@ func FetchMapDiscussions(c *gin.Context) {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
-	sql := `SELECT md.id, u.steam_id, u.user_name, u.avatar_link, md.title, md.updated_at FROM map_discussions md
+	sql := `SELECT md.id, u.steam_id, u.user_name, u.avatar_link, md.title, md.content, md.updated_at FROM map_discussions md
 	INNER JOIN users u ON md.user_id = u.steam_id WHERE md.map_id = $1
 	ORDER BY md.updated_at DESC`
 	rows, err := database.DB.Query(sql, mapID)
@@ -79,8 +70,8 @@ func FetchMapDiscussions(c *gin.Context) {
 	}
 	// Get discussion data
 	for rows.Next() {
-		discussion := MapDiscussionOnlyTitle{}
-		err := rows.Scan(&discussion.ID, &discussion.Creator.SteamID, &discussion.Creator.UserName, &discussion.Creator.AvatarLink, &discussion.Title, &discussion.UpdatedAt)
+		discussion := MapDiscussion{}
+		err := rows.Scan(&discussion.ID, &discussion.Creator.SteamID, &discussion.Creator.UserName, &discussion.Creator.AvatarLink, &discussion.Title, &discussion.Content, &discussion.UpdatedAt)
 		if err != nil {
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
