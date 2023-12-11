@@ -18,6 +18,13 @@ definitions:
       game:
         $ref: '#/definitions/models.Game'
     type: object
+  handlers.CreateMapDiscussionCommentRequest:
+    properties:
+      comment:
+        type: string
+    required:
+    - comment
+    type: object
   handlers.CreateMapDiscussionRequest:
     properties:
       content:
@@ -769,6 +776,39 @@ paths:
             - properties:
                 data:
                   $ref: '#/definitions/handlers.MapDiscussionResponse'
+              type: object
+      tags:
+      - maps
+    post:
+      description: Create map discussion comment with specified map id.
+      parameters:
+      - description: JWT Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Map ID
+        in: path
+        name: mapid
+        required: true
+        type: integer
+      - description: Body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CreateMapDiscussionCommentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.CreateMapDiscussionCommentRequest'
               type: object
       tags:
       - maps

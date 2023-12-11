@@ -48,6 +48,10 @@ type CreateMapDiscussionRequest struct {
 	Content string `json:"content" binding:"required"`
 }
 
+type CreateMapDiscussionCommentRequest struct {
+	Comment string `json:"comment" binding:"required"`
+}
+
 type EditMapDiscussionRequest struct {
 	Title   string `json:"title" binding:"required"`
 	Content string `json:"content" binding:"required"`
@@ -183,6 +187,51 @@ func CreateMapDiscussion(c *gin.Context) {
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully created map discussion.",
+		Data:    request,
+	})
+}
+
+// POST Map Discussion Comment
+//
+//	@Description	Create map discussion comment with specified map id.
+//	@Tags			maps
+//	@Produce		json
+//	@Param			Authorization	header		string								true	"JWT Token"
+//	@Param			mapid			path		int									true	"Map ID"
+//	@Param			request			body		CreateMapDiscussionCommentRequest	true	"Body"
+//	@Success		200				{object}	models.Response{data=CreateMapDiscussionCommentRequest}
+//	@Router			/maps/{mapid}/discussions/{discussionid} [post]
+func CreateMapDiscussionComment(c *gin.Context) {
+	_, err := strconv.Atoi(c.Param("mapid"))
+	if err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+		return
+	}
+	discussionID, err := strconv.Atoi(c.Param("discussionid"))
+	if err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+		return
+	}
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusOK, models.ErrorResponse("User not logged in."))
+		return
+	}
+	var request CreateMapDiscussionCommentRequest
+	if err := c.BindJSON(&request); err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+		return
+	}
+	sql := `INSERT INTO map_discussions_comments (discussion_id,user_id,comment)
+	VALUES($1,$2,$3);`
+	_, err = database.DB.Exec(sql, discussionID, user.(models.User).SteamID, request.Comment)
+	if err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, models.Response{
+		Success: true,
+		Message: "Successfully created map discussion comment.",
 		Data:    request,
 	})
 }

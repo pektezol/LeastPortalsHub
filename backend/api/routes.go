@@ -68,6 +68,7 @@ func InitRoutes(router *gin.Engine) {
 		v1.GET(mapDiscussionsPath, handlers.FetchMapDiscussions)
 		v1.GET(mapDiscussionIDPath, handlers.FetchMapDiscussion)
 		v1.POST(mapDiscussionsPath, CheckAuth, handlers.CreateMapDiscussion)
+		v1.POST(mapDiscussionIDPath, CheckAuth, handlers.CreateMapDiscussionComment)
 		v1.PUT(mapDiscussionIDPath, CheckAuth, handlers.EditMapDiscussion)
 		v1.DELETE(mapDiscussionIDPath, CheckAuth, handlers.DeleteMapDiscussion)
 		// Rankings, search
