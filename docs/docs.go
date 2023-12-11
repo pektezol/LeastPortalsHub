@@ -546,6 +546,13 @@ const docTemplate = `{
                         "required": true
                     },
                     {
+                        "type": "integer",
+                        "description": "Discussion ID",
+                        "name": "discussionid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
                         "description": "Body",
                         "name": "request",
                         "in": "body",
@@ -1577,30 +1584,6 @@ const docTemplate = `{
                 }
             }
         },
-        "handlers.MapDiscussionOnlyTitle": {
-            "type": "object",
-            "properties": {
-                "comments": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/handlers.MapDiscussionComment"
-                    }
-                },
-                "creator": {
-                    "$ref": "#/definitions/models.UserShortWithAvatar"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "description": "Upvotes   int                        ` + "`" + `json:\"upvotes\"` + "`" + `",
-                    "type": "string"
-                }
-            }
-        },
         "handlers.MapDiscussionResponse": {
             "type": "object",
             "properties": {
@@ -1615,7 +1598,7 @@ const docTemplate = `{
                 "discussions": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/handlers.MapDiscussionOnlyTitle"
+                        "$ref": "#/definitions/handlers.MapDiscussion"
                     }
                 }
             }

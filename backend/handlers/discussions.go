@@ -189,6 +189,7 @@ func CreateMapDiscussion(c *gin.Context) {
 //	@Produce		json
 //	@Param			Authorization	header		string								true	"JWT Token"
 //	@Param			mapid			path		int									true	"Map ID"
+//	@Param			discussionid	path		int							true	"Discussion ID"
 //	@Param			request			body		CreateMapDiscussionCommentRequest	true	"Body"
 //	@Success		200				{object}	models.Response{data=CreateMapDiscussionCommentRequest}
 //	@Router			/maps/{mapid}/discussions/{discussionid} [post]

@@ -149,22 +149,6 @@ definitions:
       user:
         $ref: '#/definitions/models.UserShortWithAvatar'
     type: object
-  handlers.MapDiscussionOnlyTitle:
-    properties:
-      comments:
-        items:
-          $ref: '#/definitions/handlers.MapDiscussionComment'
-        type: array
-      creator:
-        $ref: '#/definitions/models.UserShortWithAvatar'
-      id:
-        type: integer
-      title:
-        type: string
-      updated_at:
-        description: Upvotes   int                        `json:"upvotes"`
-        type: string
-    type: object
   handlers.MapDiscussionResponse:
     properties:
       discussion:
@@ -174,7 +158,7 @@ definitions:
     properties:
       discussions:
         items:
-          $ref: '#/definitions/handlers.MapDiscussionOnlyTitle'
+          $ref: '#/definitions/handlers.MapDiscussion'
         type: array
     type: object
   handlers.MapLeaderboardsResponse:
@@ -790,6 +774,11 @@ paths:
       - description: Map ID
         in: path
         name: mapid
+        required: true
+        type: integer
+      - description: Discussion ID
+        in: path
+        name: discussionid
         required: true
         type: integer
       - description: Body
