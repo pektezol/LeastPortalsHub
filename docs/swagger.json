@@ -322,7 +322,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / discussions"
                 ],
                 "parameters": [
                     {
@@ -360,7 +360,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / discussions"
                 ],
                 "parameters": [
                     {
@@ -416,7 +416,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / discussions"
                 ],
                 "parameters": [
                     {
@@ -461,7 +461,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / discussions"
                 ],
                 "parameters": [
                     {
@@ -522,7 +522,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / discussions"
                 ],
                 "parameters": [
                     {
@@ -578,12 +578,12 @@
                 }
             },
             "delete": {
-                "description": "Delete map summary with specified map id.",
+                "description": "Delete map discussion with specified map id.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / discussions"
                 ],
                 "parameters": [
                     {
@@ -625,7 +625,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / summary"
                 ],
                 "parameters": [
                     {
@@ -681,7 +681,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / leaderboards"
                 ],
                 "parameters": [
                     {
@@ -736,7 +736,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / leaderboards"
                 ],
                 "parameters": [
                     {
@@ -808,7 +808,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / leaderboards"
                 ],
                 "parameters": [
                     {
@@ -850,7 +850,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / summary"
                 ],
                 "parameters": [
                     {
@@ -888,7 +888,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / summary"
                 ],
                 "parameters": [
                     {
@@ -942,7 +942,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / summary"
                 ],
                 "parameters": [
                     {
@@ -996,7 +996,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / summary"
                 ],
                 "parameters": [
                     {
@@ -1549,6 +1549,10 @@
                 "content": {
                     "type": "string"
                 },
+                "created_at": {
+                    "description": "Upvotes   int                        `json:\"upvotes\"`",
+                    "type": "string"
+                },
                 "creator": {
                     "$ref": "#/definitions/models.UserShortWithAvatar"
                 },
@@ -1559,7 +1563,6 @@
                     "type": "string"
                 },
                 "updated_at": {
-                    "description": "Upvotes   int                        `json:\"upvotes\"`",
                     "type": "string"
                 }
             }

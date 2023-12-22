@@ -328,7 +328,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / discussions"
                 ],
                 "parameters": [
                     {
@@ -366,7 +366,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / discussions"
                 ],
                 "parameters": [
                     {
@@ -422,7 +422,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / discussions"
                 ],
                 "parameters": [
                     {
@@ -467,7 +467,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / discussions"
                 ],
                 "parameters": [
                     {
@@ -528,7 +528,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / discussions"
                 ],
                 "parameters": [
                     {
@@ -584,12 +584,12 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "Delete map summary with specified map id.",
+                "description": "Delete map discussion with specified map id.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / discussions"
                 ],
                 "parameters": [
                     {
@@ -631,7 +631,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / summary"
                 ],
                 "parameters": [
                     {
@@ -687,7 +687,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / leaderboards"
                 ],
                 "parameters": [
                     {
@@ -742,7 +742,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / leaderboards"
                 ],
                 "parameters": [
                     {
@@ -814,7 +814,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / leaderboards"
                 ],
                 "parameters": [
                     {
@@ -856,7 +856,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / summary"
                 ],
                 "parameters": [
                     {
@@ -894,7 +894,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / summary"
                 ],
                 "parameters": [
                     {
@@ -948,7 +948,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / summary"
                 ],
                 "parameters": [
                     {
@@ -1002,7 +1002,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / summary"
                 ],
                 "parameters": [
                     {
@@ -1555,6 +1555,10 @@ const docTemplate = `{
                 "content": {
                     "type": "string"
                 },
+                "created_at": {
+                    "description": "Upvotes   int                        ` + "`" + `json:\"upvotes\"` + "`" + `",
+                    "type": "string"
+                },
                 "creator": {
                     "$ref": "#/definitions/models.UserShortWithAvatar"
                 },
@@ -1565,7 +1569,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updated_at": {
-                    "description": "Upvotes   int                        ` + "`" + `json:\"upvotes\"` + "`" + `",
                     "type": "string"
                 }
             }

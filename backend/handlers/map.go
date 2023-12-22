@@ -61,7 +61,7 @@ type RecordMultiplayer struct {
 // GET Map Summary
 //
 //	@Description	Get map summary with specified id.
-//	@Tags			maps
+//	@Tags			maps / summary
 //	@Produce		json
 //	@Param			mapid	path		int	true	"Map ID"
 //	@Success		200		{object}	models.Response{data=MapSummaryResponse}
@@ -140,7 +140,7 @@ func FetchMapSummary(c *gin.Context) {
 // GET Map Leaderboards
 //
 //	@Description	Get map leaderboards with specified id.
-//	@Tags			maps
+//	@Tags			maps / leaderboards
 //	@Produce		json
 //	@Param			mapid		path		int	true	"Map ID"
 //	@Param			page		query		int	false	"Page Number (default: 1)"
