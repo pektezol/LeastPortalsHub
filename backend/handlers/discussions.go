@@ -309,7 +309,7 @@ func DeleteMapDiscussion(c *gin.Context) {
 		c.JSON(http.StatusOK, models.ErrorResponse("User not logged in."))
 		return
 	}
-	sql := `UPDATE map_discussions SET is_disabled = true WHERE id = $1 AND map_id = $2 AND user_id = $3`
+	sql := `UPDATE map_discussions SET is_deleted = true WHERE id = $1 AND map_id = $2 AND user_id = $3`
 	result, err := database.DB.Exec(sql, discussionID, mapID, user.(models.User).SteamID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
