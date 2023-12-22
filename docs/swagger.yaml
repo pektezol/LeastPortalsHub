@@ -130,6 +130,9 @@ definitions:
         type: array
       content:
         type: string
+      created_at:
+        description: Upvotes   int                        `json:"upvotes"`
+        type: string
       creator:
         $ref: '#/definitions/models.UserShortWithAvatar'
       id:
@@ -137,7 +140,6 @@ definitions:
       title:
         type: string
       updated_at:
-        description: Upvotes   int                        `json:"upvotes"`
         type: string
     type: object
   handlers.MapDiscussionComment:
@@ -674,7 +676,7 @@ paths:
                   $ref: '#/definitions/handlers.MapDiscussionsResponse'
               type: object
       tags:
-      - maps
+      - maps / discussions
     post:
       description: Create map discussion with specified map id.
       parameters:
@@ -707,10 +709,10 @@ paths:
                   $ref: '#/definitions/handlers.CreateMapDiscussionRequest'
               type: object
       tags:
-      - maps
+      - maps / discussions
   /maps/{mapid}/discussions/{discussionid}:
     delete:
-      description: Delete map summary with specified map id.
+      description: Delete map discussion with specified map id.
       parameters:
       - description: JWT Token
         in: header
@@ -735,7 +737,7 @@ paths:
           schema:
             $ref: '#/definitions/models.Response'
       tags:
-      - maps
+      - maps / discussions
     get:
       description: Get map discussion with specified map and discussion id.
       parameters:
@@ -762,7 +764,7 @@ paths:
                   $ref: '#/definitions/handlers.MapDiscussionResponse'
               type: object
       tags:
-      - maps
+      - maps / discussions
     post:
       description: Create map discussion comment with specified map id.
       parameters:
@@ -800,7 +802,7 @@ paths:
                   $ref: '#/definitions/handlers.CreateMapDiscussionCommentRequest'
               type: object
       tags:
-      - maps
+      - maps / discussions
     put:
       description: Edit map discussion with specified map id.
       parameters:
@@ -838,7 +840,7 @@ paths:
                   $ref: '#/definitions/handlers.EditMapDiscussionRequest'
               type: object
       tags:
-      - maps
+      - maps / discussions
   /maps/{mapid}/image:
     put:
       description: Edit map image with specified map id.
@@ -872,7 +874,7 @@ paths:
                   $ref: '#/definitions/handlers.EditMapImageRequest'
               type: object
       tags:
-      - maps
+      - maps / summary
   /maps/{mapid}/leaderboards:
     get:
       description: Get map leaderboards with specified id.
@@ -903,7 +905,7 @@ paths:
                   $ref: '#/definitions/handlers.MapLeaderboardsResponse'
               type: object
       tags:
-      - maps
+      - maps / leaderboards
   /maps/{mapid}/record:
     post:
       consumes:
@@ -950,7 +952,7 @@ paths:
                   $ref: '#/definitions/handlers.RecordResponse'
               type: object
       tags:
-      - maps
+      - maps / leaderboards
   /maps/{mapid}/record/{recordid}:
     delete:
       description: Delete record with specified map and record id.
@@ -978,7 +980,7 @@ paths:
           schema:
             $ref: '#/definitions/models.Response'
       tags:
-      - maps
+      - maps / leaderboards
   /maps/{mapid}/summary:
     delete:
       description: Delete map summary with specified map id.
@@ -1012,7 +1014,7 @@ paths:
                   $ref: '#/definitions/handlers.DeleteMapSummaryRequest'
               type: object
       tags:
-      - maps
+      - maps / summary
     get:
       description: Get map summary with specified id.
       parameters:
@@ -1034,7 +1036,7 @@ paths:
                   $ref: '#/definitions/handlers.MapSummaryResponse'
               type: object
       tags:
-      - maps
+      - maps / summary
     post:
       description: Create map summary with specified map id.
       parameters:
@@ -1067,7 +1069,7 @@ paths:
                   $ref: '#/definitions/handlers.CreateMapSummaryRequest'
               type: object
       tags:
-      - maps
+      - maps / summary
     put:
       description: Edit map summary with specified map id.
       parameters:
@@ -1100,7 +1102,7 @@ paths:
                   $ref: '#/definitions/handlers.EditMapSummaryRequest'
               type: object
       tags:
-      - maps
+      - maps / summary
   /profile:
     get:
       consumes:

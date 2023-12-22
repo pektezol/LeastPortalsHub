@@ -91,6 +91,7 @@ CREATE TABLE map_discussions (
   content TEXT NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT now(),
   updated_at TIMESTAMP NOT NULL DEFAULT now(),
+  is_deleted BOOLEAN NOT NULL DEFAULT false,
   PRIMARY KEY (id),
   FOREIGN KEY (map_id) REFERENCES maps(id),
   FOREIGN KEY (user_id) REFERENCES users(steam_id)

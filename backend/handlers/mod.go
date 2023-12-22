@@ -40,7 +40,7 @@ type EditMapImageRequest struct {
 // POST Map Summary
 //
 //	@Description	Create map summary with specified map id.
-//	@Tags			maps
+//	@Tags			maps / summary
 //	@Produce		json
 //	@Param			Authorization	header		string					true	"JWT Token"
 //	@Param			mapid			path		int						true	"Map ID"
@@ -124,7 +124,7 @@ func CreateMapSummary(c *gin.Context) {
 // PUT Map Summary
 //
 //	@Description	Edit map summary with specified map id.
-//	@Tags			maps
+//	@Tags			maps / summary
 //	@Produce		json
 //	@Param			Authorization	header		string					true	"JWT Token"
 //	@Param			mapid			path		int						true	"Map ID"
@@ -209,7 +209,7 @@ func EditMapSummary(c *gin.Context) {
 // DELETE Map Summary
 //
 //	@Description	Delete map summary with specified map id.
-//	@Tags			maps
+//	@Tags			maps / summary
 //	@Produce		json
 //	@Param			Authorization	header		string					true	"JWT Token"
 //	@Param			mapid			path		int						true	"Map ID"
@@ -298,7 +298,7 @@ func DeleteMapSummary(c *gin.Context) {
 // PUT Map Image
 //
 //	@Description	Edit map image with specified map id.
-//	@Tags			maps
+//	@Tags			maps / summary
 //	@Produce		json
 //	@Param			Authorization	header		string				true	"JWT Token"
 //	@Param			mapid			path		int					true	"Map ID"
