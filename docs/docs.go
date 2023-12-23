@@ -328,7 +328,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / discussions"
                 ],
                 "parameters": [
                     {
@@ -366,7 +366,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / discussions"
                 ],
                 "parameters": [
                     {
@@ -422,7 +422,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / discussions"
                 ],
                 "parameters": [
                     {
@@ -467,7 +467,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / discussions"
                 ],
                 "parameters": [
                     {
@@ -522,13 +522,74 @@ const docTemplate = `{
                     }
                 }
             },
-            "delete": {
-                "description": "Delete map summary with specified map id.",
+            "post": {
+                "description": "Create map discussion comment with specified map id.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / discussions"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "JWT Token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Map ID",
+                        "name": "mapid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Discussion ID",
+                        "name": "discussionid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.CreateMapDiscussionCommentRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/handlers.CreateMapDiscussionCommentRequest"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete map discussion with specified map id.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "maps / discussions"
                 ],
                 "parameters": [
                     {
@@ -570,7 +631,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / summary"
                 ],
                 "parameters": [
                     {
@@ -626,7 +687,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / leaderboards"
                 ],
                 "parameters": [
                     {
@@ -681,7 +742,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / leaderboards"
                 ],
                 "parameters": [
                     {
@@ -753,7 +814,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / leaderboards"
                 ],
                 "parameters": [
                     {
@@ -795,7 +856,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / summary"
                 ],
                 "parameters": [
                     {
@@ -833,7 +894,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / summary"
                 ],
                 "parameters": [
                     {
@@ -887,7 +948,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / summary"
                 ],
                 "parameters": [
                     {
@@ -941,7 +1002,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "maps"
+                    "maps / summary"
                 ],
                 "parameters": [
                     {
@@ -1325,6 +1386,17 @@ const docTemplate = `{
                 }
             }
         },
+        "handlers.CreateMapDiscussionCommentRequest": {
+            "type": "object",
+            "required": [
+                "comment"
+            ],
+            "properties": {
+                "comment": {
+                    "type": "string"
+                }
+            }
+        },
         "handlers.CreateMapDiscussionRequest": {
             "type": "object",
             "required": [
@@ -1483,6 +1555,10 @@ const docTemplate = `{
                 "content": {
                     "type": "string"
                 },
+                "created_at": {
+                    "description": "Upvotes   int                        ` + "`" + `json:\"upvotes\"` + "`" + `",
+                    "type": "string"
+                },
                 "creator": {
                     "$ref": "#/definitions/models.UserShortWithAvatar"
                 },
@@ -1493,7 +1569,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updated_at": {
-                    "description": "Upvotes   int                        ` + "`" + `json:\"upvotes\"` + "`" + `",
                     "type": "string"
                 }
             }
@@ -1512,30 +1587,6 @@ const docTemplate = `{
                 }
             }
         },
-        "handlers.MapDiscussionOnlyTitle": {
-            "type": "object",
-            "properties": {
-                "comments": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/handlers.MapDiscussionComment"
-                    }
-                },
-                "creator": {
-                    "$ref": "#/definitions/models.UserShortWithAvatar"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "description": "Upvotes   int                        ` + "`" + `json:\"upvotes\"` + "`" + `",
-                    "type": "string"
-                }
-            }
-        },
         "handlers.MapDiscussionResponse": {
             "type": "object",
             "properties": {
@@ -1550,7 +1601,7 @@ const docTemplate = `{
                 "discussions": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/handlers.MapDiscussionOnlyTitle"
+                        "$ref": "#/definitions/handlers.MapDiscussion"
                     }
                 }
             }

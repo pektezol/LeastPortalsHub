@@ -35,7 +35,7 @@ type RecordResponse struct {
 // POST Record
 //
 //	@Description	Post record with demo of a specific map.
-//	@Tags			maps
+//	@Tags			maps / leaderboards
 //	@Accept			mpfd
 //	@Produce		json
 //	@Param			mapid				path		int		true	"Map ID"
@@ -202,7 +202,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 // DELETE Record
 //
 //	@Description	Delete record with specified map and record id.
-//	@Tags			maps
+//	@Tags			maps / leaderboards
 //	@Produce		json
 //	@Param			mapid			path		int		true	"Map ID"
 //	@Param			recordid		path		int		true	"Record ID"

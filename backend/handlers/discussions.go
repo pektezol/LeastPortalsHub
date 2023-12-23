@@ -15,7 +15,7 @@ type MapDiscussionResponse struct {
 }
 
 type MapDiscussionsResponse struct {
-	Discussions []MapDiscussionOnlyTitle `json:"discussions"`
+	Discussions []MapDiscussion `json:"discussions"`
 }
 
 type MapDiscussion struct {
@@ -24,15 +24,7 @@ type MapDiscussion struct {
 	Title   string                     `json:"title"`
 	Content string                     `json:"content"`
 	// Upvotes   int                        `json:"upvotes"`
-	UpdatedAt time.Time              `json:"updated_at"`
-	Comments  []MapDiscussionComment `json:"comments"`
-}
-
-type MapDiscussionOnlyTitle struct {
-	ID      int                        `json:"id"`
-	Creator models.UserShortWithAvatar `json:"creator"`
-	Title   string                     `json:"title"`
-	// Upvotes   int                        `json:"upvotes"`
+	CreatedAt time.Time              `json:"created_at"`
 	UpdatedAt time.Time              `json:"updated_at"`
 	Comments  []MapDiscussionComment `json:"comments"`
 }
@@ -48,6 +40,10 @@ type CreateMapDiscussionRequest struct {
 	Content string `json:"content" binding:"required"`
 }
 
+type CreateMapDiscussionCommentRequest struct {
+	Comment string `json:"comment" binding:"required"`
+}
+
 type EditMapDiscussionRequest struct {
 	Title   string `json:"title" binding:"required"`
 	Content string `json:"content" binding:"required"`
@@ -56,7 +52,7 @@ type EditMapDiscussionRequest struct {
 // GET Map Discussions
 //
 //	@Description	Get map discussions with specified map id.
-//	@Tags			maps
+//	@Tags			maps / discussions
 //	@Produce		json
 //	@Param			mapid	path		int	true	"Map ID"
 //	@Success		200		{object}	models.Response{data=MapDiscussionsResponse}
@@ -69,8 +65,8 @@ func FetchMapDiscussions(c *gin.Context) {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
-	sql := `SELECT md.id, u.steam_id, u.user_name, u.avatar_link, md.title, md.updated_at FROM map_discussions md
-	INNER JOIN users u ON md.user_id = u.steam_id WHERE md.map_id = $1
+	sql := `SELECT md.id, u.steam_id, u.user_name, u.avatar_link, md.title, md.content, md.created_at, md.updated_at FROM map_discussions md
+	INNER JOIN users u ON md.user_id = u.steam_id WHERE md.map_id = $1 AND is_deleted = false
 	ORDER BY md.updated_at DESC`
 	rows, err := database.DB.Query(sql, mapID)
 	if err != nil {
@@ -79,8 +75,8 @@ func FetchMapDiscussions(c *gin.Context) {
 	}
 	// Get discussion data
 	for rows.Next() {
-		discussion := MapDiscussionOnlyTitle{}
-		err := rows.Scan(&discussion.ID, &discussion.Creator.SteamID, &discussion.Creator.UserName, &discussion.Creator.AvatarLink, &discussion.Title, &discussion.UpdatedAt)
+		discussion := MapDiscussion{}
+		err := rows.Scan(&discussion.ID, &discussion.Creator.SteamID, &discussion.Creator.UserName, &discussion.Creator.AvatarLink, &discussion.Title, &discussion.Content, &discussion.CreatedAt, &discussion.UpdatedAt)
 		if err != nil {
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
@@ -97,7 +93,7 @@ func FetchMapDiscussions(c *gin.Context) {
 // GET Map Discussion
 //
 //	@Description	Get map discussion with specified map and discussion id.
-//	@Tags			maps
+//	@Tags			maps / discussions
 //	@Produce		json
 //	@Param			mapid			path		int	true	"Map ID"
 //	@Param			discussionid	path		int	true	"Discussion ID"
@@ -116,9 +112,9 @@ func FetchMapDiscussion(c *gin.Context) {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
-	sql := `SELECT md.id, u.steam_id, u.user_name, u.avatar_link, md.title, md.content, md.updated_at FROM map_discussions md
-	INNER JOIN users u ON md.user_id = u.steam_id WHERE md.map_id = $1 AND md.id = $2`
-	err = database.DB.QueryRow(sql, mapID, discussionID).Scan(&response.Discussion.ID, &response.Discussion.Creator.SteamID, &response.Discussion.Creator.UserName, &response.Discussion.Creator.AvatarLink, &response.Discussion.Title, &response.Discussion.Content, &response.Discussion.UpdatedAt)
+	sql := `SELECT md.id, u.steam_id, u.user_name, u.avatar_link, md.title, md.content, md.created_at, md.updated_at FROM map_discussions md
+	INNER JOIN users u ON md.user_id = u.steam_id WHERE md.map_id = $1 AND md.id = $2 AND is_deleted = false`
+	err = database.DB.QueryRow(sql, mapID, discussionID).Scan(&response.Discussion.ID, &response.Discussion.Creator.SteamID, &response.Discussion.Creator.UserName, &response.Discussion.Creator.AvatarLink, &response.Discussion.Title, &response.Discussion.Content, &response.Discussion.CreatedAt, &response.Discussion.UpdatedAt)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
@@ -150,7 +146,7 @@ func FetchMapDiscussion(c *gin.Context) {
 // POST Map Discussion
 //
 //	@Description	Create map discussion with specified map id.
-//	@Tags			maps
+//	@Tags			maps / discussions
 //	@Produce		json
 //	@Param			Authorization	header		string						true	"JWT Token"
 //	@Param			mapid			path		int							true	"Map ID"
@@ -187,10 +183,62 @@ func CreateMapDiscussion(c *gin.Context) {
 	})
 }
 
+// POST Map Discussion Comment
+//
+//	@Description	Create map discussion comment with specified map id.
+//	@Tags			maps / discussions
+//	@Produce		json
+//	@Param			Authorization	header		string								true	"JWT Token"
+//	@Param			mapid			path		int									true	"Map ID"
+//	@Param			discussionid	path		int									true	"Discussion ID"
+//	@Param			request			body		CreateMapDiscussionCommentRequest	true	"Body"
+//	@Success		200				{object}	models.Response{data=CreateMapDiscussionCommentRequest}
+//	@Router			/maps/{mapid}/discussions/{discussionid} [post]
+func CreateMapDiscussionComment(c *gin.Context) {
+	_, err := strconv.Atoi(c.Param("mapid"))
+	if err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+		return
+	}
+	discussionID, err := strconv.Atoi(c.Param("discussionid"))
+	if err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+		return
+	}
+	user, exists := c.Get("user")
+	if !exists {
+		c.JSON(http.StatusOK, models.ErrorResponse("User not logged in."))
+		return
+	}
+	var request CreateMapDiscussionCommentRequest
+	if err := c.BindJSON(&request); err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+		return
+	}
+	sql := `INSERT INTO map_discussions_comments (discussion_id,user_id,comment)
+	VALUES($1,$2,$3);`
+	_, err = database.DB.Exec(sql, discussionID, user.(models.User).SteamID, request.Comment)
+	if err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+		return
+	}
+	sql = `UPDATE map_discussions SET updated_at = $2 WHERE id = $1`
+	_, err = database.DB.Exec(sql, discussionID, time.Now().UTC())
+	if err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, models.Response{
+		Success: true,
+		Message: "Successfully created map discussion comment.",
+		Data:    request,
+	})
+}
+
 // PUT Map Discussion
 //
 //	@Description	Edit map discussion with specified map id.
-//	@Tags			maps
+//	@Tags			maps / discussions
 //	@Produce		json
 //	@Param			Authorization	header		string						true	"JWT Token"
 //	@Param			mapid			path		int							true	"Map ID"
@@ -219,7 +267,7 @@ func EditMapDiscussion(c *gin.Context) {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
-	sql := `UPDATE map_discussions SET title = $4, content = $5, updated_at = $6 WHERE id = $1 AND map_id = $2 AND user_id = $3`
+	sql := `UPDATE map_discussions SET title = $4, content = $5, updated_at = $6 WHERE id = $1 AND map_id = $2 AND user_id = $3 AND is_deleted = false`
 	result, err := database.DB.Exec(sql, discussionID, mapID, user.(models.User).SteamID, request.Title, request.Content, time.Now().UTC())
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
@@ -241,10 +289,10 @@ func EditMapDiscussion(c *gin.Context) {
 	})
 }
 
-// DELETE Map Summary
+// DELETE Map Discussion
 //
-//	@Description	Delete map summary with specified map id.
-//	@Tags			maps
+//	@Description	Delete map discussion with specified map id.
+//	@Tags			maps / discussions
 //	@Produce		json
 //	@Param			Authorization	header		string	true	"JWT Token"
 //	@Param			mapid			path		int		true	"Map ID"
@@ -267,7 +315,7 @@ func DeleteMapDiscussion(c *gin.Context) {
 		c.JSON(http.StatusOK, models.ErrorResponse("User not logged in."))
 		return
 	}
-	sql := `DELETE FROM map_discussions WHERE id = $1 AND map_id = $2 AND user_id = $3`
+	sql := `UPDATE map_discussions SET is_deleted = true WHERE id = $1 AND map_id = $2 AND user_id = $3`
 	result, err := database.DB.Exec(sql, discussionID, mapID, user.(models.User).SteamID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))

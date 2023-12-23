@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"time"
 
 	_ "github.com/lib/pq"
 )
@@ -26,6 +27,9 @@ func ConnectDB() {
 	if err = db.Ping(); err != nil {
 		panic(err)
 	}
+	db.SetMaxOpenConns(50)
+	db.SetMaxIdleConns(2)
+	db.SetConnMaxLifetime(time.Minute * 5)
 	DB = db
 	fmt.Println("Successfully connected to database!")
 }
