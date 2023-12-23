@@ -21,6 +21,10 @@ const fakedata={} //for debug
     const [data, setData] = React.useState(null);
     React.useEffect(() => {
     setData(null)
+    setDiscussionThread(null)
+    setCreatePostState(0)
+    setSelectedRun(0)
+    setCatState(1)
         fetch(`https://lp.ardapektezol.com/api/v1/maps/${location.pathname.split('/')[2]}/summary`)
         .then(r => r.json())
         .then(d => {
@@ -39,6 +43,28 @@ const fakedata={} //for debug
         .then(d => setLbData(d))
         // eslint-disable-next-line
     }, [pageNumber,location.pathname]);
+
+    const [discussions,setDiscussions] = React.useState(null)
+    function fetchDiscussions() {
+        fetch(`https://lp.ardapektezol.com/api/v1/maps/${location.pathname.split('/')[2]}/discussions`)
+        .then(r=>r.json())
+        .then(d=>setDiscussions(d.data.discussions))
+    }
+    
+    React.useEffect(()=>{
+        fetchDiscussions()
+    },[location.pathname])
+
+
+
+const [discussionThread,setDiscussionThread] = React.useState(null)
+function openDiscussion(x){
+    fetch(`https://lp.ardapektezol.com/api/v1/maps/${location.pathname.split('/')[2]}/discussions/${x}`)
+    .then(r=>r.json())
+    .then(d=>setDiscussionThread(d.data.discussion)) 
+}
+const [discussionSearch, setDiscussionSearch] = React.useState("")
+
 
 
 
@@ -204,7 +230,9 @@ function YouTubeGetID(url){
  }
 
 function TimeAgo(date) {
-    const seconds = Math.floor((new Date() - date) / 1000);
+    // const seconds = Math.floor((new Date() - date) / 1000);
+    
+    const seconds = Math.floor(((new Date(new Date() - (date.getTimezoneOffset()*-60000))) - date) / 1000);
   
     let interval = Math.floor(seconds / 31536000);
     if (interval > 1) {return interval + ' years ago';}
@@ -238,6 +266,52 @@ function TicksToTime(ticks) {
 
   return `${hours===0?"":hours+":"}${minutes===0?"":hours>0?minutes.toString().padStart(2, '0')+":":(minutes+":")}${minutes>0?seconds.toString().padStart(2, '0'):seconds}.${milliseconds.toString().padStart(3, '0')} (${ticks})`;
 }
+
+function PostComment() {
+
+    fetch(`https://lp.ardapektezol.com/api/v1/maps/${location.pathname.split('/')[2]}/discussions/${discussionThread.id}`,{
+    method:"POST",
+    headers:{authorization:token},
+    body:JSON.stringify({"comment":document.querySelector("#discussion-send>input").value})
+})
+.then(r=>r.json())
+.then(d=>{
+    document.querySelector("#discussion-send>input").value=""
+    openDiscussion(discussionThread.id)
+})
+}
+
+
+const [createPostState,setCreatePostState] = React.useState(0)
+function CreatePost() {
+
+    fetch(`https://lp.ardapektezol.com/api/v1/maps/${location.pathname.split('/')[2]}/discussions`,{
+        method:"POST",
+        headers:{authorization:token},
+        body:JSON.stringify({"title":document.querySelector("#discussion-create-title").value,"content":document.querySelector("#discussion-create-content").value})
+    })
+    .then(r=>r.json())
+    .then(d=>{
+        setCreatePostState(0)
+        fetchDiscussions()
+    })
+}
+
+function DeletePost(post) {
+if(window.confirm(`Are you sure you want to remove post: ${post.title}?`)){
+    console.log("deleted",post.id)
+    fetch(`https://lp.ardapektezol.com/api/v1/maps/${location.pathname.split('/')[2]}/discussions/${post.id}`,{
+        method:"DELETE",
+        headers:{authorization:token},
+    })
+    .then(r=>r.json())
+    .then(d=>{
+        fetchDiscussions()
+    })
+}
+}
+
+
 
 if(data!==null){
 return (
@@ -365,6 +439,8 @@ return (
             </div>    
         </section>
 
+        {/* Leaderboards */}
+
         {lbData===null?"":lbData.success===false?(
             <section id='section6' className='summary2'>
                 <h1 style={{textAlign:"center"}}>Map is not available for competitive boards.</h1>
@@ -444,6 +520,104 @@ return (
             </div>
         </section>
         )}
+
+
+        {/* Discussions */}
+        <section id='section7' className='summary3'>
+      
+    {discussionThread === null ? (
+        createPostState === 0 ? (
+        discussions !== null ? (
+        // Main screen
+        <>
+        <div id='discussion-search'> 
+            <input type="text" value={discussionSearch} placeholder={"Search for posts..."} onChange={()=>setDiscussionSearch(document.querySelector("#discussion-search>input").value)} />
+            <div><button onClick={()=>setCreatePostState(1)}>New Post</button></div>
+        </div>      
+        {discussions.filter(f=>f.title.includes(discussionSearch)).sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
+        .map((e, i) => (
+            <div id='discussion-post'>
+
+            <button key={e.id} onClick={() => openDiscussion(e.id)}>
+                <span>{e.title}</span>
+                
+                {token!==null?e.creator.steam_id===JSON.parse(atob(token.split(".")[1])).sub?
+                    <button onClick={()=>DeletePost(e)}>Delete Post</button>
+                    :<span></span>:<span></span>}
+                <span><b>{e.creator.user_name}:</b> {e.content}</span>
+                <span>last updated: {TimeAgo(new Date(e.updated_at.replace("T"," ").replace("Z","")))}</span>
+            </button>
+            </div>
+        ))}
+      </>
+            ):(   
+
+            // Main screen (no posts)
+    <>
+    <div id='discussion-search'> 
+        <input type="text" value={discussionSearch} placeholder={"Search for posts..."} onChange={()=>setDiscussionSearch(document.querySelector("#discussion-search>input").value)} />
+        <div><button onClick={()=>setCreatePostState(1)}>New Post</button></div>
+    </div> 
+    <span style={{textAlign:"center",display:"block"}}>no discussions</span>
+</>
+            )
+    ):(
+    // Creating post 
+    <div id='discussion-create'>
+        <span>Create post</span>
+        <button onClick={()=>setCreatePostState(0)}>X</button>
+        <div style={{gridColumn:"1 / span 2"}}>
+            <input id='discussion-create-title' placeholder='Title...'></input>
+            <input id='discussion-create-content' placeholder='Enter the comment...' ></input>
+        </div>
+        <div style={{placeItems:"end",gridColumn:"1 / span 2"}}>
+        <button id='discussion-create-button' onClick={()=>CreatePost()}>Post</button>
+        </div>
+            
+    </div>
+
+    )):(
+    // Post screen
+    <div id='discussion-thread'>
+        <div>
+        <span>{discussionThread.title}</span>
+        <button onClick={()=>setDiscussionThread(null)}>X</button>
+        </div>
+
+        <div>
+            <img src={discussionThread.creator.avatar_link} alt="" />
+            <div>
+                <span>{discussionThread.creator.user_name}</span>
+                <span>{TimeAgo(new Date(discussionThread.created_at.replace("T"," ").replace("Z","")))}</span>
+                <span>{discussionThread.content}</span>
+            </div>
+            {discussionThread.comments!==null?
+            discussionThread.comments.sort((a, b) => new Date(a.date) - new Date(b.date))
+            .map(e=>(
+              <>
+                <img src={e.user.avatar_link} alt="" />
+                <div>
+                    <span>{e.user.user_name}</span>
+                    <span>{TimeAgo(new Date(e.date.replace("T"," ").replace("Z","")))}</span>
+                    <span>{e.comment}</span>
+                </div>
+              </>
+
+            )):""}
+                    
+
+        </div>
+        <div id='discussion-send'>
+            <input type="text" placeholder={"Message"} onKeyDown={(e)=>e.key==="Enter"?PostComment():""}/>
+            <div><button onClick={()=>PostComment()}>Send</button></div>
+        </div>
+
+    </div>
+    
+    
+    )}
+
+        </section>
 
     </main>
     </>

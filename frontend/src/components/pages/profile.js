@@ -129,7 +129,7 @@ function UpdateProfile(){
       method: 'POST',
       headers: {Authorization: token}
     }).then(r=>r.json())
-    .then(d=>d.success?window.location.reload():window.alert(`Error: ${d.message}`))
+    .then(d=>d.success?window.alert("profile updated"):window.alert(`Error: ${d.message}`))
 }
 
 function TimeAgo(date) {
@@ -348,7 +348,7 @@ return (
           <span>{r.name}</span>
           <span style={{ display: "grid" }}>{record.scores[i].score_count}</span>
           <span style={{ display: "grid" }}>{record.scores[i].score_count-record.map_wr_count}</span>
-          <span>{TicksToTime(record.scores[i].score_time)}</span>
+          <span style={{ display: "grid" }}>{TicksToTime(record.scores[i].score_time)}</span>
           <span> </span>
           {i===0?<span>#{record.placement}</span>:<span> </span>}
           <span>{record.scores[i].date.split("T")[0]}</span>
