@@ -174,7 +174,7 @@ span.titles{
     height: 34px;
     display: grid;
     font-size: 20px;
-    padding-left: 60px;
+    padding-left: 40px;
     margin: 0 20px;
     grid-template-columns: 15% 15% 5% 15% 5% 15% 15% 15%;
 }
@@ -194,7 +194,7 @@ span.titles{
     height: 44px; 
 
     border-radius: 20px;
-    padding: 0 0 0 60px;
+    padding: 0 0 0 40px;
     font-size: 20px;
     
     color: inherit;
@@ -205,6 +205,7 @@ span.titles{
     display: grid;
     grid-template-columns: 15% 15% 5% 15% 5% 15% 15% 15%;
     overflow: hidden;
+    white-space: nowrap;
 
     transition: height .2s
 }
