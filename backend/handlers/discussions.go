@@ -222,6 +222,12 @@ func CreateMapDiscussionComment(c *gin.Context) {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
+	sql = `UPDATE map_discussions SET updated_at = $2 WHERE id = $1`
+	_, err = database.DB.Exec(sql, discussionID, time.Now().UTC())
+	if err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+		return
+	}
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully created map discussion comment.",
