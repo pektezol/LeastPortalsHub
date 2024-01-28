@@ -9,10 +9,10 @@ import (
 )
 
 // Don't try to understand it, feel it.
-func ProcessDemo(filePath string) (portalCount int, tickCount int, err error) {
+func ProcessDemo(filePath string) (portalCount int, tickCount int, hostSteamID string, partnerSteamID string, err error) {
 	file, err := os.Open(filePath)
 	if err != nil {
-		return 0, 0, err
+		return 0, 0, "", "", err
 	}
 	reader := bitreader.NewReader(file, true)
 	demoFileStamp := reader.TryReadString()
@@ -20,13 +20,13 @@ func ProcessDemo(filePath string) (portalCount int, tickCount int, err error) {
 	networkProtocol := reader.TryReadSInt32()
 	reader.SkipBytes(1056)
 	if demoFileStamp != "HL2DEMO" {
-		return 0, 0, errors.New("invalid demo file stamp")
+		return 0, 0, "", "", errors.New("invalid demo file stamp")
 	}
 	if demoProtocol != 4 {
-		return 0, 0, errors.New("this parser only supports demos from new engine")
+		return 0, 0, "", "", errors.New("this parser only supports demos from new engine")
 	}
 	if networkProtocol != 2001 {
-		return 0, 0, errors.New("this parser only supports demos from portal 2")
+		return 0, 0, "", "", errors.New("this parser only supports demos from portal 2")
 	}
 	for {
 		packetType := reader.TryReadUInt8()
@@ -217,21 +217,97 @@ func ProcessDemo(filePath string) (portalCount int, tickCount int, err error) {
 				case 33:
 					packetReader.SkipBits(packetReader.TryReadBits(32))
 				default:
-					panic("unknown msg type")
+					return 0, 0, "", "", errors.New("unknown msg type")
 				}
 			}
 		case 3, 7:
-		case 4, 6, 9:
+		case 4, 6:
 			reader.SkipBytes(uint64(reader.TryReadSInt32()))
 		case 5, 8:
 			reader.SkipBits(32)
 			reader.SkipBytes(uint64(reader.TryReadSInt32()))
+		case 9:
+			type StringTableClass struct {
+				Name string
+				Data string
+			}
+			type StringTableEntry struct {
+				Name      string
+				EntryData any
+			}
+			type StringTable struct {
+				Name         string
+				TableEntries []StringTableEntry
+				Classes      []StringTableClass
+			}
+			size := reader.TryReadSInt32()
+			stringTableReader := bitreader.NewReaderFromBytes(reader.TryReadBytesToSlice(uint64(size)), true)
+			tableCount := stringTableReader.TryReadBits(8)
+			guidCount := 0
+			for i := 0; i < int(tableCount); i++ {
+				tableName := stringTableReader.TryReadString()
+				entryCount := stringTableReader.TryReadBits(16)
+				for i := 0; i < int(entryCount); i++ {
+					stringTableReader.TryReadString()
+					if stringTableReader.TryReadBool() {
+						byteLen, err := stringTableReader.ReadBits(16)
+						if err != nil {
+							return 0, 0, "", "", errors.New("error on reading entry length")
+						}
+						stringTableEntryReader := bitreader.NewReaderFromBytes(stringTableReader.TryReadBytesToSlice(byteLen), true)
+						if tableName == "userinfo" {
+							const SignedGuidLen int32 = 32
+							const MaxPlayerNameLength int32 = 32
+							userInfo := struct {
+								SteamID         uint64
+								Name            string
+								UserID          int32
+								GUID            string
+								FriendsID       uint32
+								FriendsName     string
+								FakePlayer      bool
+								IsHltv          bool
+								CustomFiles     []uint32
+								FilesDownloaded uint8
+							}{
+								SteamID: stringTableEntryReader.TryReadUInt64(),
+								Name:    stringTableEntryReader.TryReadStringLength(uint64(MaxPlayerNameLength)),
+								UserID:  stringTableEntryReader.TryReadSInt32(),
+								GUID:    stringTableEntryReader.TryReadStringLength(uint64(SignedGuidLen) + 1),
+							}
+							stringTableEntryReader.SkipBytes(3)
+							userInfo.FriendsID = stringTableEntryReader.TryReadUInt32()
+							userInfo.FriendsName = stringTableEntryReader.TryReadStringLength(uint64(MaxPlayerNameLength))
+							userInfo.FakePlayer = stringTableEntryReader.TryReadUInt8() != 0
+							userInfo.IsHltv = stringTableEntryReader.TryReadUInt8() != 0
+							stringTableEntryReader.SkipBytes(2)
+							userInfo.CustomFiles = []uint32{stringTableEntryReader.TryReadUInt32(), stringTableEntryReader.TryReadUInt32(), stringTableEntryReader.TryReadUInt32(), stringTableEntryReader.TryReadUInt32()}
+							userInfo.FilesDownloaded = stringTableEntryReader.TryReadUInt8()
+							stringTableEntryReader.SkipBytes(3)
+							if guidCount == 0 {
+								hostSteamID = userInfo.GUID
+							} else if guidCount == 1 {
+								partnerSteamID = userInfo.GUID
+							}
+						}
+					}
+				}
+				if stringTableReader.TryReadBool() {
+					classCount := stringTableReader.TryReadBits(16)
+					for i := 0; i < int(classCount); i++ {
+						stringTableReader.TryReadString()
+						if stringTableReader.TryReadBool() {
+							stringTableReader.TryReadStringLength(uint64(stringTableReader.TryReadUInt16()))
+						}
+					}
+				}
+			}
 		default:
-			return 0, 0, errors.New("invalid packet type")
+			return 0, 0, "", "", errors.New("invalid packet type")
 		}
 		if packetType == 7 {
 			break
 		}
 	}
-	return portalCount, tickCount, nil
+	return portalCount, tickCount, hostSteamID, partnerSteamID, nil
 }

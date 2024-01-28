@@ -3,12 +3,14 @@ package handlers
 import (
 	"context"
 	"encoding/base64"
+	"fmt"
 	"io"
 	"log"
 	"mime/multipart"
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -90,6 +92,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 	}
 	var hostDemoUUID, hostDemoFileID, partnerDemoUUID, partnerDemoFileID string
 	var hostDemoScoreCount, hostDemoScoreTime int
+	var hostSteamID, partnerSteamID string
 	client := serviceAccount()
 	srv, err := drive.New(client)
 	if err != nil {
@@ -127,7 +130,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
-		hostDemoScoreCount, hostDemoScoreTime, err = parser.ProcessDemo("backend/parser/" + uuid + ".dem")
+		hostDemoScoreCount, hostDemoScoreTime, hostSteamID, partnerSteamID, err = parser.ProcessDemo("backend/parser/" + uuid + ".dem")
 		if err != nil {
 			deleteFile(srv, file.Id)
 			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionCreateRecordProcessDemoFail, err.Error())
@@ -139,6 +142,25 @@ func CreateRecordWithDemo(c *gin.Context) {
 			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionCreateRecordProcessDemoFail, err.Error())
 			c.JSON(http.StatusOK, models.ErrorResponse("Processing demo went wrong. Please contact a web admin and provide the demo in question."))
 			return
+		}
+		if !isCoop {
+			hostSplit := strings.Split(hostSteamID, ":")
+			if hostSplit[len(hostSplit)-1] != user.(models.User).SteamID {
+				c.JSON(http.StatusOK, models.ErrorResponse(fmt.Sprintf("Host SteamID from demo and request does not match! Check your submission and try again.\nDemo Host SteamID: %s\nRequest Host SteamID: %s", hostSplit[len(hostSplit)-1], user.(models.User).SteamID)))
+				return
+			}
+		} else {
+			partnerSplit := strings.Split(partnerSteamID, ":")
+			if partnerSplit[len(partnerSplit)-1] != record.PartnerID {
+				c.JSON(http.StatusOK, models.ErrorResponse(fmt.Sprintf("Partner SteamID from demo and request does not match! Check your submission and try again.\nDemo Partner SteamID: %s\nRequest Partner SteamID: %s", partnerSplit[len(partnerSplit)-1], record.PartnerID)))
+				return
+			}
+			var verifyCoopSteamID string
+			database.DB.QueryRow("SELECT steam_id FROM users WHERE steam_id = $1", record.PartnerID).Scan(&verifyCoopSteamID)
+			if verifyCoopSteamID != record.PartnerID {
+				c.JSON(http.StatusOK, models.ErrorResponse("Given partner SteamID does not match an account on LPHUB."))
+				return
+			}
 		}
 		if i == 0 {
 			hostDemoFileID = file.Id
@@ -383,4 +405,24 @@ func createFile(service *drive.Service, name string, mimeType string, content io
 // Delete Gdrive file
 func deleteFile(service *drive.Service, fileId string) {
 	service.Files.Delete(fileId)
+}
+
+// Convert from SteamID64 to Legacy SteamID bits
+func convertSteamID(steamID64 int64) int64 {
+	return (steamID64 >> 1) & 0x7FFFFFF
+}
+
+// Convert from Legacy SteamID bits to SteamID64
+func convertSteamID64(steamID string) int64 {
+	const baseSteam64ID = 76561197960265728 // Origin of this value remains unclear
+	parts := strings.Split(steamID, ":")
+	userId, err := strconv.Atoi(parts[2])
+	if err != nil {
+		return 0
+	}
+	steam64ID := baseSteam64ID + int64(userId*2) // Reason for multiplication by 2 is unknown
+	if parts[1] == "1" {
+		steam64ID++
+	}
+	return steam64ID
 }
