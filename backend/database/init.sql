@@ -16,6 +16,7 @@ CREATE TABLE games (
   id SERIAL,
   name TEXT NOT NULL,
   is_coop BOOLEAN NOT NULL,
+  image TEXT NOT NULL,
   PRIMARY KEY (id)
 );
 
@@ -24,6 +25,7 @@ CREATE TABLE chapters (
   game_id SMALLINT NOT NULL,
   name TEXT NOT NULL,
   is_disabled BOOLEAN NOT NULL DEFAULT false,
+  image TEXT NOT NULL,
   PRIMARY KEY (id),
   FOREIGN KEY (game_id) REFERENCES games(id)
 );
@@ -40,6 +42,7 @@ CREATE TABLE maps (
   chapter_id SMALLINT NOT NULL,
   name TEXT NOT NULL,
   is_disabled BOOLEAN NOT NULL DEFAULT false,
+  image TEXT NOT NULL,
   PRIMARY KEY (id),
   FOREIGN KEY (game_id) REFERENCES games(id),
   FOREIGN KEY (chapter_id) REFERENCES chapters(id)

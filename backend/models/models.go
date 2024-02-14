@@ -52,6 +52,7 @@ type Map struct {
 type MapShort struct {
 	ID         int    `json:"id"`
 	Name       string `json:"name"`
+	Image      string `json:"image"`
 	IsDisabled bool   `json:"is_disabled"`
 }
 
@@ -88,12 +89,14 @@ type UserRanking struct {
 type Game struct {
 	ID     int    `json:"id"`
 	Name   string `json:"name"`
+	Image  string `json:"image"`
 	IsCoop bool   `json:"is_coop"`
 }
 
 type Chapter struct {
 	ID         int    `json:"id"`
 	Name       string `json:"name"`
+	Image      string `json:"image"`
 	IsDisabled bool   `json:"is_disabled"`
 }
 
