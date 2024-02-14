@@ -328,7 +328,7 @@ func FetchMapLeaderboards(c *gin.Context) {
 //	@Failure		400	{object}	models.Response
 //	@Router			/games [get]
 func FetchGames(c *gin.Context) {
-	rows, err := database.DB.Query(`SELECT id, name, is_coop FROM games`)
+	rows, err := database.DB.Query(`SELECT id, name, is_coop, image FROM games`)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
@@ -336,7 +336,7 @@ func FetchGames(c *gin.Context) {
 	var games []models.Game
 	for rows.Next() {
 		var game models.Game
-		if err := rows.Scan(&game.ID, &game.Name, &game.IsCoop); err != nil {
+		if err := rows.Scan(&game.ID, &game.Name, &game.IsCoop, &game.Image); err != nil {
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
@@ -365,7 +365,7 @@ func FetchChapters(c *gin.Context) {
 		return
 	}
 	var response ChaptersResponse
-	rows, err := database.DB.Query(`SELECT c.id, c.name, g.name, c.is_disabled FROM chapters c INNER JOIN games g ON c.game_id = g.id WHERE game_id = $1`, gameID)
+	rows, err := database.DB.Query(`SELECT c.id, c.name, g.name, c.is_disabled, c.image FROM chapters c INNER JOIN games g ON c.game_id = g.id WHERE game_id = $1`, gameID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
@@ -374,7 +374,7 @@ func FetchChapters(c *gin.Context) {
 	var gameName string
 	for rows.Next() {
 		var chapter models.Chapter
-		if err := rows.Scan(&chapter.ID, &chapter.Name, &gameName, &chapter.IsDisabled); err != nil {
+		if err := rows.Scan(&chapter.ID, &chapter.Name, &gameName, &chapter.IsDisabled, &chapter.Image); err != nil {
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
@@ -405,14 +405,14 @@ func FetchMaps(c *gin.Context) {
 		return
 	}
 	var response GameMapsResponse
-	rows, err := database.DB.Query(`SELECT g.id, g.name, g.is_coop, m.id, m."name", m.is_disabled FROM games g INNER JOIN maps m ON g.id = m.game_id WHERE g.id = $1 ORDER BY m.id `, gameID)
+	rows, err := database.DB.Query(`SELECT g.id, g.name, g.is_coop, m.id, m."name", m.image m.is_disabled FROM games g INNER JOIN maps m ON g.id = m.game_id WHERE g.id = $1 ORDER BY m.id `, gameID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
 	for rows.Next() {
 		var mapShort models.MapShort
-		if err := rows.Scan(&response.Game.ID, &response.Game.Name, &response.Game.IsCoop, &mapShort.ID, &mapShort.Name, &mapShort.IsDisabled); err != nil {
+		if err := rows.Scan(&response.Game.ID, &response.Game.Name, &response.Game.IsCoop, &mapShort.ID, &mapShort.Name, &mapShort.IsDisabled, &mapShort.Image); err != nil {
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
@@ -442,7 +442,7 @@ func FetchChapterMaps(c *gin.Context) {
 		return
 	}
 	var response ChapterMapsResponse
-	rows, err := database.DB.Query(`SELECT m.id, m.name, c.name, m.is_disabled FROM maps m INNER JOIN chapters c ON m.chapter_id = c.id WHERE chapter_id = $1`, chapterID)
+	rows, err := database.DB.Query(`SELECT m.id, m.name, c.name, m.is_disabled, m.image FROM maps m INNER JOIN chapters c ON m.chapter_id = c.id WHERE chapter_id = $1`, chapterID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
@@ -451,7 +451,7 @@ func FetchChapterMaps(c *gin.Context) {
 	var chapterName string
 	for rows.Next() {
 		var mapShort models.MapShort
-		if err := rows.Scan(&mapShort.ID, &mapShort.Name, &chapterName, &mapShort.IsDisabled); err != nil {
+		if err := rows.Scan(&mapShort.ID, &mapShort.Name, &chapterName, &mapShort.IsDisabled, &mapShort.Image); err != nil {
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
