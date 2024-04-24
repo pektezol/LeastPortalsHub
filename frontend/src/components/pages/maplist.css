@@ -1,0 +1,111 @@
+.maplist-page {
+    position: absolute;
+    left: 320px;
+    color: #cdcfdf;
+    width: calc(100% - 320px);
+    font-family: BarlowSemiCondensed-Regular;
+}
+
+a {
+    color: inherit;
+}
+
+.maplist-page-content {
+    position: absolute;
+    left: 50px;
+    width: calc(100% - 100px);
+}
+
+.maplist-page-header {
+    margin-top: 50px;
+    display: grid;
+    margin-bottom: 10px;
+}
+
+.nav-btn {
+    height: 40px;
+    background-color: #2b2e46;
+    color: inherit;
+    font-size: 18px;
+    font-family: inherit;
+    border: none;
+    border-radius: 20px;
+    transition: background-color .1s;
+    cursor: default;
+    width: fit-content;
+}
+
+.nav-btn>span {
+    padding: 0 8px 0 8px;
+    font-size: 22px;
+}
+
+.nav-btn:hover {
+    background-color: #202232;
+    cursor: pointer;
+}
+
+.game {
+    width: 100%;
+    height: 192px;
+    background: #202232;
+    border-radius: 24px;
+    overflow: hidden;
+}
+
+.game-header {
+    width: 100%;
+    height: 144px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.game-header-text {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+}
+
+.game-img {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    filter: blur(4px);
+}
+
+.game-header-text>span {
+    font-size: 42px;
+    font-weight: 500;
+    margin: 5px;
+}
+
+.game-header-text span>b {
+    font-size: 96px;
+    font-weight: 600;
+}
+
+.game-nav {
+    display: flex;
+    height: 48px;
+}
+
+.game-nav-btn {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 0px;
+    color: inherit;
+    font-family: inherit;
+    font-size: 22px;
+    background: #2B2E46;
+    transition: background-color .1s;
+    margin: 0 1px;
+}
+
+.game-nav-btn:hover, .selected {
+    background-color: #202232;
+    cursor: pointer;
+}

@@ -28,7 +28,6 @@ React.useEffect(() => {
     .then(d => setProfile(d.data))
     }, [token]);
 
-
 // Locks search button for 300ms before it can be clicked again, prevents spam
 const [isLocked, setIsLocked] = React.useState(false);
 function HandleLock(arg) {
@@ -39,6 +38,9 @@ if (!isLocked) {
     }
 }
 
+
+// The menu button
+const [sidebar, setSidebar] = React.useState();
 
 // Clicked buttons
 function SidebarClick(x){
@@ -53,21 +55,19 @@ btn[x].style.backgroundColor="#202232"
 
 }
 
-
-// The menu button
-const [sidebar, setSidebar] = React.useState();
-
 function SidebarHide(){
 const btn   = document.querySelectorAll("button.sidebar-button")
 const span  = document.querySelectorAll("button.sidebar-button>span");
 const side  = document.querySelector("#sidebar-list");
 const login = document.querySelectorAll(".login>button")[1];
+const searchbar = document.querySelector("#searchbar");
 
 if(sidebar===1){
     setSidebar(0)
     side.style.width="320px"
     btn.forEach((e, i) =>{
         e.style.width="310px"
+        e.style.padding = "0.4em 0 0 11px"
         setTimeout(() => {
             span[i].style.opacity="1"
             login.style.opacity="1"
@@ -77,18 +77,19 @@ if(sidebar===1){
     side.style.zIndex="2"
 } else {
     side.style.width="40px";
+    searchbar.focus();
     setSidebar(1)
     btn.forEach((e,i) =>{
         e.style.width="40px"
+        e.style.padding = "0.4em 0 0 5px"
         span[i].style.opacity="0"
     }) 
     login.style.opacity="0"
     setTimeout(() => {
         side.style.zIndex="0"
     }, 300);
-    }
+    }    
 }
-
 // Links
 const location = useLocation()
 React.useEffect(()=>{
