@@ -405,7 +405,7 @@ func FetchMaps(c *gin.Context) {
 		return
 	}
 	var response GameMapsResponse
-	rows, err := database.DB.Query(`SELECT g.id, g.name, g.is_coop, m.id, m."name", m.image m.is_disabled FROM games g INNER JOIN maps m ON g.id = m.game_id WHERE g.id = $1 ORDER BY m.id `, gameID)
+	rows, err := database.DB.Query(`SELECT g.id, g.name, g.is_coop, m.id, m."name", m.image, m.is_disabled FROM games g INNER JOIN maps m ON g.id = m.game_id WHERE g.id = $1 ORDER BY m.id `, gameID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
