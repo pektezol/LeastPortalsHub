@@ -1869,6 +1869,9 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "image": {
+                    "type": "string"
+                },
                 "is_disabled": {
                     "type": "boolean"
                 },
@@ -1882,6 +1885,9 @@ const docTemplate = `{
             "properties": {
                 "id": {
                     "type": "integer"
+                },
+                "image": {
+                    "type": "string"
                 },
                 "is_coop": {
                     "type": "boolean"
@@ -1979,6 +1985,9 @@ const docTemplate = `{
             "properties": {
                 "id": {
                     "type": "integer"
+                },
+                "image": {
+                    "type": "string"
                 },
                 "is_disabled": {
                     "type": "boolean"

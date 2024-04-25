@@ -1863,6 +1863,9 @@
                 "id": {
                     "type": "integer"
                 },
+                "image": {
+                    "type": "string"
+                },
                 "is_disabled": {
                     "type": "boolean"
                 },
@@ -1876,6 +1879,9 @@
             "properties": {
                 "id": {
                     "type": "integer"
+                },
+                "image": {
+                    "type": "string"
                 },
                 "is_coop": {
                     "type": "boolean"
@@ -1973,6 +1979,9 @@
             "properties": {
                 "id": {
                     "type": "integer"
+                },
+                "image": {
+                    "type": "string"
                 },
                 "is_disabled": {
                     "type": "boolean"

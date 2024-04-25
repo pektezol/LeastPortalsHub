@@ -334,6 +334,8 @@ definitions:
     properties:
       id:
         type: integer
+      image:
+        type: string
       is_disabled:
         type: boolean
       name:
@@ -343,6 +345,8 @@ definitions:
     properties:
       id:
         type: integer
+      image:
+        type: string
       is_coop:
         type: boolean
       name:
@@ -406,6 +410,8 @@ definitions:
     properties:
       id:
         type: integer
+      image:
+        type: string
       is_disabled:
         type: boolean
       name:
