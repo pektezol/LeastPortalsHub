@@ -144,6 +144,7 @@ a{text-decoration: none;height: 40px;}
     transition: background-color .1s;
     background-color: #2b2e46;
     grid-template-rows: 20% 20% 60%;
+    width: calc(100% - 15px);
 }
 .search-map>span{
     color: #888;

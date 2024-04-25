@@ -3,6 +3,7 @@ import { useLocation }  from "react-router-dom";
 
 import "./maplist.css"
 import img5 from "../../imgs/5.png"
+import img6 from "../../imgs/6.png"
 
 export default function Maplist(prop) {
     const {token,setToken} = prop
@@ -49,6 +50,8 @@ export default function Maplist(prop) {
 
         const maplistImg = document.querySelector("#maplistImg");
         maplistImg.src = img5;
+        const statisticsImg = document.querySelector("#statisticsImg");
+        statisticsImg.src = img6;
 
         // difficulty stuff
         const difficulties = document.querySelectorAll(".difficulty-bar");
@@ -110,7 +113,10 @@ export default function Maplist(prop) {
                         <img id='maplistImg'/>
                         <span>Map List</span>
                     </button>
-                    <button id='maplistBtn' className='game-nav-btn'>Map List</button>
+                    <button id='maplistBtn' className='game-nav-btn'>
+                        <img id='statisticsImg'/>
+                        <span>Statistics</span>
+                    </button>
                 </div>
 
                 <div className='maplist'>
