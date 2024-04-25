@@ -1,4 +1,6 @@
 # Portal 2 Least Portals Hub
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fpektezol%2FLeastPortalsHub.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fpektezol%2FLeastPortalsHub?ref=badge_shield)
+
 
 ## About LPHUB
 
@@ -27,6 +29,9 @@ Full API documentation can be found at https://lp.ardapektezol.com/api/v1/
 ## License
 
 This project is licensed under the GNU Affero General Public License v3.0 - see the [LICENSE](https://github.com/pektezol/leastportalshub/blob/main/LICENSE) file for details.
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fpektezol%2FLeastPortalsHub.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fpektezol%2FLeastPortalsHub?ref=badge_large)
 
 ## Contact
 
