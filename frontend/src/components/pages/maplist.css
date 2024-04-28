@@ -134,10 +134,32 @@ a {
     font-size: 30px;
 }
 
+.chapter-page-div {
+    display: flex;
+    justify-content: right;
+    transform: translateY(-30px);
+}
+
+.chapter-page-div button {
+    background-color: #00000000;
+    border: 0;
+    cursor: pointer;
+    height: 30px;
+    padding: 0;
+    width: 30px;
+}
+
+.chapter-page-div span {
+    color: #cdcfdf;
+    font-family: BarlowSemiCondensed-Regular;
+    font-size: 20px;
+}
+
 .maplist-maps {
     display: grid;
     grid-template-columns: 25% 25% 25% 25%;
     margin-top: 10px;
+    transform: translateY(-30px);
 }
 
 .maplist-item {
