@@ -20,12 +20,13 @@ export default function Maplist(prop) {
 
             maxPage = 9;
             minPage = 1;
+            createCategories(1);
         } else if (location.pathname == "/games/p2-coop"){
             gameTitle = "Portal 2 Co-op";
 
             maxPage = 16;
             minPage = 10;
-            console.log(minPage, maxPage)
+            createCategories(2);
         }
 
         currentPage = minPage;
@@ -33,12 +34,69 @@ export default function Maplist(prop) {
         changePage(currentPage);
     }
 
+    function changeMaplistOrStatistics(index, name) {
+            const maplistBtns = document.querySelectorAll("#maplistBtn");
+            maplistBtns.forEach((btn, i) => {
+            if (i == index) {
+                btn.className = "game-nav-btn selected"
+
+                if (name == "maplist") {
+                    document.querySelector(".stats").style.display = "none";
+                    document.querySelector(".maplist").style.display = "block";
+                    document.querySelector(".maplist").setAttribute("currentTab", "maplist");
+                } else {
+                    document.querySelector(".stats").style.display = "block";
+                    document.querySelector(".maplist").style.display = "none";
+                    document.querySelector(".maplist").setAttribute("currentTab", "stats");
+                }
+            } else {
+                btn.className = "game-nav-btn";
+            }
+        });
+    }
+
+    function createCategories(gameID) {
+        let categoriesArr;
+        if (gameID == 1) {
+            // Portal 2 Singleplayer
+            categoriesArr = [
+                "Challenge Mode",
+                "NoSLA",
+                "Inbounds SLA",
+                "Any%",
+            ]
+        } else if (gameID == 2) {
+            categoriesArr = [
+                "Challenge Mode",
+                "All Courses",
+                "Any%",
+            ]
+        }
+
+        categoriesArr.forEach((category) => {
+            createCategory(category);
+        });
+    }
+
+    let categoryNum = 0;
+    function createCategory(categoryName) {
+        categoryNum++;
+        const gameNavBtn = document.createElement("button");
+        if (categoryNum == 1) {
+            gameNavBtn.className = "game-nav-btn selected";
+        } else {
+            gameNavBtn.className = "game-nav-btn";
+        }
+        gameNavBtn.innerText = categoryName;
+
+        const gameNav = document.querySelector(".game-nav");
+        gameNav.appendChild(gameNavBtn);
+    }
+
     async function changePage(page) {
-        console.log("changing")
         const data = await fetchMaps(page);
         const maps = data.data.maps;
         const name = data.data.chapter.name;
-        console.log(name)
         
         let chapterName = "Chapter";
         const chapterNumberOld = name.split(" - ")[0];
@@ -204,6 +262,248 @@ export default function Maplist(prop) {
 
     React.useEffect(() => {
 
+        const lineChart = document.querySelector(".line-chart")
+        function createGraph() {
+            // max
+            let items = [
+                {
+                  record: "100",
+                  x: '20',
+                  date: new Date(2018, 4, 4)
+                },
+                {
+                  record: "90",
+                  x: '300',
+                  date: new Date(2019, 6, 4)
+                },
+                {
+                  record: "88",
+                  x: '600',
+                  date: new Date(2020, 0, 1)
+                },
+                {
+                  record: "80",
+                  x: '1100',
+                  date: new Date(2022, 6, 14)
+                },
+                {
+                  record: "78",
+                  x: '1170',
+                  date: new Date(2022, 8, 19)
+                },
+                {
+                  record: "76",
+                  x: '1200',
+                  date: new Date(2023, 3, 20)
+                },
+                {
+                  record: "74",
+                  x: '1250',
+                  date: new Date(2024, 2, 25)
+                },
+            ]
+
+            function calculatePosition(date, startDate, endDate, maxWidth) {
+                const totalMilliseconds = endDate - startDate + 10000000000;
+                const millisecondsFromStart = date - startDate + 5000000000;
+                return (millisecondsFromStart / totalMilliseconds) * maxWidth
+            }
+
+            const minDate = items.reduce((min, dp) => dp.date < min ? dp.date : min, items[0].date)
+            const maxDate = items.reduce((max, dp) => dp.date > max ? dp.date : max, items[0].date)
+
+            console.log(minDate, maxDate)
+            console.log(lineChart.clientWidth)
+
+            const graph_width = document.querySelector(".portalcount-over-time-div").clientWidth
+            // console.log(graph_width)
+            
+            const uniqueYears = new Set()
+            items.forEach(dp => uniqueYears.add(dp.date.getFullYear()))
+            let minYear = Infinity;
+            let maxYear = -Infinity;
+
+            items.forEach(dp => {
+                const year = dp.date.getFullYear();
+                minYear = Math.min(minYear, year);
+                maxYear = Math.max(maxYear, year);
+            });
+
+            // Add missing years to the set
+            for (let year = minYear; year <= maxYear; year++) {
+                uniqueYears.add(year);
+            }
+            const uniqueYearsArr = Array.from(uniqueYears)
+
+            items = items.map(dp => ({
+                record: dp.record,
+                date: dp.date,
+                x: calculatePosition(dp.date, minDate, maxDate, lineChart.clientWidth),
+            }))
+            
+            const yearInterval = lineChart.clientWidth / uniqueYears.size
+            for (let index = 1; index < (uniqueYears.size); index++) {
+                const placeholderlmao = document.createElement("div")
+                const yearSpan = document.createElement("span")
+                yearSpan.style.position = "absolute"
+                placeholderlmao.style.height = "100%"
+                placeholderlmao.style.width = "2px"
+                placeholderlmao.style.backgroundColor = "#00000080"
+                placeholderlmao.style.position = `absolute`
+                console.log(uniqueYearsArr[index])
+                const thing = calculatePosition(new Date(uniqueYearsArr[index], 0, 0), minDate, maxDate, lineChart.clientWidth)
+                console.log(thing)
+                placeholderlmao.style.left = `${thing}px`
+                yearSpan.style.left = `${thing}px`
+                yearSpan.style.bottom = "-34px"
+                yearSpan.innerText = uniqueYearsArr[index]
+                yearSpan.style.fontFamily = "BarlowSemiCondensed-Regular"
+                yearSpan.style.fontSize = "22px"
+                yearSpan.style.opacity = "0.8"
+                lineChart.appendChild(yearSpan)
+                
+            }
+
+            let maxPortals;
+            let minPortals;
+            let precision;
+            let multiplier = 1;
+            for (let index = 0; index < items.length; index++) {
+                console.log(items[0].record - items[items.length - 1].record)
+                precision = Math.floor((items[0].record - items[items.length - 1].record))
+                if (precision > 20) {
+                    precision = 20
+                }
+                minPortals = Math.floor((items[items.length - 1].record) / 10) * 10
+                if (index == 0) {
+                    maxPortals = items[index].record - minPortals
+                }
+            }
+            function calculateMultiplier(value) {
+                while (value > precision) {
+                    multiplier += 1;
+                    value -= precision;
+                }
+            }
+            calculateMultiplier(items[0].record);
+            // if (items[0].record > 10) {
+            //     multiplier = 2;
+            // }
+            
+            
+            for (let index = 0; index < items.length; index++) {
+                let chart_height = 340;
+                const item = items[index];
+                // console.log(lineChart.clientWidth)
+
+                // maxPortals++;
+                // maxPortals++;
+
+                let point_height = (chart_height / maxPortals)
+
+                for (let index = 0; index < (maxPortals / multiplier); index++) {
+                    // console.log((index + 1) * multiplier)
+                    let current_portal_count = (index + 1);
+
+                    const placeholderDiv = document.createElement("div")
+                    const numPortalsText = document.createElement("span")
+                    const numPortalsTextBottom = document.createElement("span")
+                    numPortalsText.innerText = (current_portal_count * multiplier) + minPortals
+                    numPortalsTextBottom.innerText = minPortals
+                    placeholderDiv.style.position = "absolute"
+                    numPortalsText.style.position = "absolute"
+                    numPortalsTextBottom.style.position = "absolute"
+                    numPortalsText.style.left = "-37px"
+                    numPortalsText.style.opacity = "0.2"
+                    numPortalsTextBottom.style.opacity = "0.2"
+                    numPortalsText.style.fontFamily = "BarlowSemiCondensed-Regular"
+                    numPortalsTextBottom.style.fontFamily = "BarlowSemiCondensed-Regular"
+                    numPortalsText.style.fontSize = "22px"
+                    numPortalsTextBottom.style.left = "-37px"
+                    numPortalsTextBottom.style.fontSize = "22px"
+                    numPortalsTextBottom.style.fontWeight = "400"
+                    numPortalsText.style.color = "#CDCFDF"
+                    numPortalsTextBottom.style.color = "#CDCFDF"
+                    numPortalsText.style.fontFamily = "inherit"
+                    numPortalsTextBottom.style.fontFamily = "inherit"
+                    numPortalsText.style.textAlign = "right"
+                    numPortalsTextBottom.style.textAlign = "right"
+                    numPortalsText.style.width = "30px"
+                    numPortalsTextBottom.style.width = "30px"
+                    placeholderDiv.style.bottom = `${(point_height * current_portal_count * multiplier) - 2}px`
+                    numPortalsText.style.bottom = `${(point_height * current_portal_count * multiplier) - 2 - 9}px`
+                    numPortalsTextBottom.style.bottom = `${0 - 2 - 8}px`
+                    placeholderDiv.id = placeholderDiv.style.bottom
+                    placeholderDiv.style.width = "100%"                
+                    placeholderDiv.style.height = "2px"      
+                    placeholderDiv.style.backgroundColor = "#2B2E46"
+                    placeholderDiv.style.zIndex = "0"
+                    
+                    if (index == 0) {
+                        lineChart.appendChild(numPortalsTextBottom)
+                    }
+                    lineChart.appendChild(numPortalsText)
+                    lineChart.appendChild(placeholderDiv)
+                }
+
+                const li = document.createElement("li");
+                const lineSeg = document.createElement("div");
+                const dataPoint = document.createElement("div");
+
+                li.style = `--y: ${point_height * (item.record - minPortals) - 3}px; --x: ${item.x}px`;
+                lineSeg.className = "line-segment";
+                dataPoint.className = "data-point";
+
+                if (items[index + 1] !== undefined) {
+                    const hypotenuse = Math.sqrt(
+                        Math.pow(items[index + 1].x - items[index].x, 2) +
+                        Math.pow((point_height * items[index + 1].record) - point_height * item.record, 2)
+                    );
+                    const angle = Math.asin(
+                        ((point_height * item.record) - (point_height * items[index + 1].record)) / hypotenuse
+                    );
+
+                    lineSeg.style = `--hypotenuse: ${hypotenuse}; --angle: ${angle * (-180 / Math.PI)}`;
+                }
+                
+                document.querySelector("#dataPointInfo").style.left = item.x + "px";
+                document.querySelector("#dataPointInfo").style.bottom = (point_height * item.record -3) + "px";
+                li.addEventListener("mouseenter", (e) => {
+                    document.querySelector("#dataPointName").innerText = item.record;
+                    if ((lineChart.clientWidth / 2) < item.x) {
+                      document.querySelector("#dataPointInfo").style.left = item.x - 400 + "px";
+                    } else {
+                      document.querySelector("#dataPointInfo").style.left = item.x + "px";
+                    }
+                    if ((lineChart.clientHeight / 2) < (point_height * item.record -3)) {
+                        document.querySelector("#dataPointInfo").style.bottom = (point_height * (item.record - minPortals) -3) - 115 + "px";
+                    } else {
+                        document.querySelector("#dataPointInfo").style.bottom = (point_height * (item.record - minPortals) -3) + "px";
+                    }
+                    document.querySelector("#dataPointInfo").style.opacity = "1";
+                    document.querySelector("#dataPointInfo").style.zIndex = "10";
+                });
+                document.addEventListener("mousedown", () => {
+                    document.querySelector("#dataPointInfo").style.opacity = "0";
+                    setTimeout(() => {
+                        document.querySelector("#dataPointInfo").style.zIndex = "0";
+                    }, 300);
+                })
+                document.querySelector(".chart").addEventListener("mouseleave", () => {
+                    document.querySelector("#dataPointInfo").style.opacity = "0";
+                    setTimeout(() => {
+                        document.querySelector("#dataPointInfo").style.zIndex = "0";
+                    }, 300);
+                })
+
+                li.appendChild(lineSeg);
+                li.appendChild(dataPoint);
+                lineChart.appendChild(li);
+            }
+        }
+
+        createGraph()
+
         async function fetchGames() {
             try {
                 const response = await fetch("https://lp.ardapektezol.com/api/v1/games", {
@@ -239,6 +539,12 @@ export default function Maplist(prop) {
         console.log(gameTitle)
 
         fetchGames();
+
+        if (document.querySelector(".maplist").getAttribute("currentTab") == "stats") {
+            document.querySelector(".stats").style.display = "block"
+        } else {
+            document.querySelector(".stats").style.display = "none"
+        }
     })
     return (
         <div className='maplist-page'>
@@ -261,19 +567,15 @@ export default function Maplist(prop) {
                     </div>
 
                     <div className='game-nav'>
-                        <button className='game-nav-btn'>Challenge Mode</button>
-                        <button className='game-nav-btn'>NoSLA</button>
-                        <button className='game-nav-btn'>Inbounds SLA</button>
-                        <button className='game-nav-btn'>Any%</button>
                     </div>
                 </div>
 
                 <div className='gameview-nav'>
-                    <button className='game-nav-btn'>
+                    <button id='maplistBtn' onClick={() => {changeMaplistOrStatistics(0, "maplist")}} className='game-nav-btn selected'>
                         <img id='maplistImg'/>
                         <span>Map List</span>
                     </button>
-                    <button id='maplistBtn' className='game-nav-btn'>
+                    <button id='maplistBtn' onClick={() => changeMaplistOrStatistics(1, "stats")} className='game-nav-btn'>
                         <img id='statisticsImg'/>
                         <span>Statistics</span>
                     </button>
@@ -295,6 +597,24 @@ export default function Maplist(prop) {
                         </div>
                         
                         <div className='maplist-maps'></div>
+                    </div>
+                </div>
+
+                <div style={{display: "block"}} className='stats'>
+                    <div className='portalcount-over-time-div'>
+                        <span className='graph-title'>Portal count over time</span><br/>
+
+                        <div className='portalcount-graph'>
+                            <figure className='chart'>
+                                <div style={{display: "block"}}></div>
+                                <div id="dataPointInfo">
+                                    <span id='dataPointName'></span>
+                                </div>
+                                <ul className='line-chart'>
+                                    
+                                </ul>
+                            </figure>
+                        </div>
                     </div>
                 </div>
             </div>

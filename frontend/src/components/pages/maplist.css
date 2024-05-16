@@ -6,6 +6,7 @@
     width: calc(100% - 320px);
     font-family: BarlowSemiCondensed-Regular;
     overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 a {
@@ -122,6 +123,7 @@ a {
     height: 56px;
     border-radius: 24px;
     overflow: hidden;
+    background-color: #202232;
 }
 
 .maplist {
@@ -229,4 +231,95 @@ a {
     height: 3px;
     margin: 5px;
     border-radius: 10px;
+}
+
+.stats {
+    margin-top: 30px;
+}
+
+.portalcount-over-time-div {
+    width: 100%;
+    height: 450px;
+    position: relative;
+    background-color: #202232;
+    border-radius: 20px;
+}
+
+.graph-title {
+    width: 100%;
+    display: inherit;
+    font-size: 24px;
+    margin-top: 5px;
+    text-align: center;
+}
+
+.portalcount-graph {
+    height: calc(100% - 30px);
+    width: calc(100% - 80px);
+}
+
+.chart {
+    height: calc(100% - 80px);
+    width: 100%;
+    position: relative;
+    padding: 0px 0px;
+    scrollbar-width: thin;
+}
+
+.line-chart {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    border-bottom: 2px solid #2B2E46;
+}
+
+.data-point {
+    background-color: #202232;
+    border: 4px solid #006FDE;
+    border-radius: 50%;
+    height: 6px;
+    position: absolute;
+    width: 6px;
+    bottom: calc(var(--y) - 4.5px);
+    left: calc(var(--x) - 6.5px);
+    transition: all 0.2s cubic-bezier(0.075, 0.82, 0.165, 1);
+    z-index: 1;
+}
+
+.data-point:hover {
+    background-color: #006FDE;
+    box-shadow: 0px 0px 10px #006FDE;
+}
+
+.line-segment {
+    background-color: #006FDE;
+    bottom: var(--y);
+    height: 4px;
+    left: var(--x);
+    position: absolute;
+    transform: rotate(calc(var(--angle) * -1deg));
+    width: calc(var(--hypotenuse) * 1px);
+    transform-origin: left bottom;
+    border-radius: 20px;
+    z-index: 1;
+}
+
+#dataPointInfo {
+    position: absolute;
+    width: 400px;
+    height: 115px;
+    background: #202232;
+    box-shadow: 0px 4px 16px 0px #00000080;
+    transition: all 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
+    z-index: 1000;
+    opacity: 0;
+    left: auto;
+    border-radius: 20px;
+}
+
+#dataPointName {
+    text-align: center;
+    width: 100%;
+    display: block;
 }
