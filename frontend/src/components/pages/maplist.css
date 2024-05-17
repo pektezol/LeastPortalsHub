@@ -292,7 +292,7 @@ a {
     animation-fill-mode: backwards;
 }
 
-.data-point:hover {
+.data-point:hover, .data-point-active {
     background-color: #006FDE;
     box-shadow: 0px 0px 10px #006FDE;
 }

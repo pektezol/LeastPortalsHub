@@ -514,19 +514,30 @@ export default function Maplist(prop) {
                 }
                 dataPoint.style.animationDelay = delay + "s"
                 
+                let isHoveringOverData = false;
+                let isDataActive = false;
                 document.querySelector("#dataPointInfo").style.left = item.x + "px";
                 document.querySelector("#dataPointInfo").style.bottom = (point_height * item.record -3) + "px";
-                li.addEventListener("mouseenter", (e) => {
+                dataPoint.addEventListener("mouseenter", (e) => {
+                    isDataActive = true;
+                    isHoveringOverData = true;
+                    const dataPoints = document.querySelectorAll(".data-point")
+                    dataPoints.forEach(point => {
+                        point.classList.remove("data-point-active")
+                    });
+                    console.log(isHoveringOverData)
+                    dataPoint.classList.add("data-point-active")
                     document.querySelector("#dataPointRecord").innerText = item.record;
                     document.querySelector("#dataPointMap").innerText = item.map;
                     document.querySelector("#dataPointDate").innerText = item.date.toLocaleDateString("en-GB");
                     document.querySelector("#dataPointFirst").innerText = item.first;
-                    if ((lineChart.clientWidth / 2) < item.x) {
+                    if ((lineChart.clientWidth - 400) < item.x) {
                       document.querySelector("#dataPointInfo").style.left = item.x - 400 + "px";
                     } else {
                       document.querySelector("#dataPointInfo").style.left = item.x + "px";
                     }
-                    if ((lineChart.clientHeight / 2) < (point_height * item.record -3)) {
+                    if ((lineChart.clientHeight - 115) < (point_height * (item.record - minPortals) -3)) {
+                        console.log(lineChart.clientHeight / 2, point_height * item.record - 3)
                         document.querySelector("#dataPointInfo").style.bottom = (point_height * (item.record - minPortals) -3) - 115 + "px";
                     } else {
                         document.querySelector("#dataPointInfo").style.bottom = (point_height * (item.record - minPortals) -3) + "px";
@@ -534,17 +545,31 @@ export default function Maplist(prop) {
                     document.querySelector("#dataPointInfo").style.opacity = "1";
                     document.querySelector("#dataPointInfo").style.zIndex = "10";
                 });
+                document.querySelector("#dataPointInfo").addEventListener("mouseenter", (e) => {
+                    isHoveringOverData = true;
+                    console.log(isHoveringOverData)
+                })
+                document.querySelector("#dataPointInfo").addEventListener("mouseleave", (e) => {
+                    isHoveringOverData = false;
+                    console.log(isHoveringOverData)
+                })
                 document.addEventListener("mousedown", () => {
-                    document.querySelector("#dataPointInfo").style.opacity = "0";
-                    setTimeout(() => {
+                    console.log(isHoveringOverData)
+                    if (!isHoveringOverData) {
+                        isDataActive = false
+                        dataPoint.classList.remove("data-point-active")
+                        document.querySelector("#dataPointInfo").style.opacity = "0";
                         document.querySelector("#dataPointInfo").style.zIndex = "0";
-                    }, 300);
+                    }
+                })
+                dataPoint.addEventListener("mouseenter", (e) => {
+                    isHoveringOverData = false;
                 })
                 document.querySelector(".chart").addEventListener("mouseleave", () => {
+                    isDataActive = false
+                    dataPoint.classList.remove("data-point-active")
                     document.querySelector("#dataPointInfo").style.opacity = "0";
-                    setTimeout(() => {
-                        document.querySelector("#dataPointInfo").style.zIndex = "0";
-                    }, 300);
+                    document.querySelector("#dataPointInfo").style.zIndex = "0";
                 })
 
                 li.appendChild(lineSeg);
