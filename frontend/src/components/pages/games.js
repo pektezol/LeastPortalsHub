@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
-import { useLocation }  from "react-router-dom";
+import { useLocation, Link }  from "react-router-dom";
 
 import "./games.css"
 
 export default function Games(prop) {
-    const {token,setToken} = prop
+    const {token} = prop
     const [games, setGames] = React.useState(null);
     const location = useLocation();
 
@@ -25,7 +25,6 @@ export default function Games(prop) {
                     if (header.id == "sp") {
                         header.style.backgroundImage = `url(${data.data[0].image})`;
                     } else if (header.id == "mp") {
-                        console.log(header)
                         header.style.backgroundImage = `url(${data.data[1].image})`;
                     } else {
                         header.style.backgroundImage = `url(${data.data[0].image})`;
@@ -48,7 +47,7 @@ export default function Games(prop) {
             <section>
                 <div className='games-page-content'>
                     <div className='games-page-item-content'>
-                    <a href='/games/p2-sp'><div className='games-page-item'>
+                    <Link to='/games/p2-sp'><div className='games-page-item'>
                         <div className='games-page-item-header'>
                             <div id="sp" className='games-page-item-header-img'></div>
                             <span><b>Portal 2 Singleplayer</b></span>
@@ -71,8 +70,8 @@ export default function Games(prop) {
                                 <span className='games-page-item-body-item-num'>3</span>
                             </div>
                         </div>
-                    </div></a>
-                    <a href='/games/p2-coop'><div className='games-page-item'>
+                    </div></Link>
+                    <Link to='/games/p2-coop'><div className='games-page-item'>
                         <div className='games-page-item-header'>
                             <div id='mp' className='games-page-item-header-img'></div>
                             <span><b>Portal 2 Co-op</b></span>
@@ -91,8 +90,8 @@ export default function Games(prop) {
                                 <span className='games-page-item-body-item-num'>12</span>
                             </div>
                         </div>
-                    </div></a>
-                    <a href='/games/psm'><div className='games-page-item'>
+                    </div></Link>
+                    <Link to='/games/psm'><div className='games-page-item'>
                         <div className='games-page-item-header'>
                             <div className='games-page-item-header-img'></div>
                             <span><b>Portal Stories: Mel</b></span>
@@ -107,7 +106,7 @@ export default function Games(prop) {
                                 <span className='games-page-item-body-item-num'>69</span>
                             </div>
                         </div>
-                    </div></a>
+                    </div></Link>
 
                     </div>
                     

@@ -18,3 +18,8 @@ body {
     font-family: 'BarlowSemiCondensed-Regular';
     src: local('BarlowSemiCondensed-Regular'), url(./fonts/BarlowSemiCondensed-Regular.ttf) format('truetype');
 }
+
+@font-face {
+    font-family: 'BarlowSemiCondensed-SemiBold';
+    src: local('BarlowSemiCondensed-Regular'), url(./fonts/BarlowSemiCondensed-SemiBold.ttf) format('truetype');
+}

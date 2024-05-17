@@ -80,6 +80,7 @@ span>b {
 }
 
 .games-page-item-body-item-title {
+    margin-top: 0px;
     font-size: 26px;
 }
 

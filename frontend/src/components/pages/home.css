@@ -1,0 +1,38 @@
+.homepage-panel {
+    background-color: #202232;
+    margin: 10px 10px;
+    padding: 10px;
+    border-radius: 24px;
+    overflow: hidden;
+    flex: 1 1 100%;
+    align-items: stretch;
+    width: 100%;
+}
+
+.homepage-panel-title-div {
+    background-color: #2B2E46;
+    width: fit-content;
+    padding: 5px 18px;
+    border-radius: 200px;
+    font-family: BarlowSemiCondensed-SemiBold;
+    font-size: 32px;
+}
+
+.stats-div {
+    background-color: #2B2E46;
+    border-radius: 24px;
+    text-align: center;
+    display: grid;
+    padding: 10px 0px;
+    width: 100%;
+}
+
+.stats-div span {
+    font-family: BarlowSemiCondensed-Regular;
+    font-size: 18px;
+}
+
+.stats-div span>b {
+    font-family: BarlowSemiCondensed-SemiBold;
+    font-size: 42px;
+}

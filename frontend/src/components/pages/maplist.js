@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useLocation }  from "react-router-dom";
+import { useLocation, Link }  from "react-router-dom";
 
 import "./maplist.css"
 import img5 from "../../imgs/5.png"
@@ -327,9 +327,6 @@ export default function Maplist(prop) {
             const minDate = items.reduce((min, dp) => dp.date < min ? dp.date : min, items[0].date)
             const maxDate = items.reduce((max, dp) => dp.date > max ? dp.date : max, items[0].date)
 
-            console.log(minDate, maxDate)
-            console.log(lineChart.clientWidth)
-
             const graph_width = document.querySelector(".portalcount-over-time-div").clientWidth
             // console.log(graph_width)
             
@@ -367,9 +364,7 @@ export default function Maplist(prop) {
                 placeholderlmao.style.width = "2px"
                 placeholderlmao.style.backgroundColor = "#00000080"
                 placeholderlmao.style.position = `absolute`
-                console.log(uniqueYearsArr[index])
                 const thing = calculatePosition(new Date(uniqueYearsArr[index], 0, 0), minDate, maxDate, lineChart.clientWidth)
-                console.log(thing)
                 placeholderlmao.style.left = `${thing}px`
                 yearSpan.style.left = `${thing}px`
                 yearSpan.style.bottom = "-34px"
@@ -386,7 +381,6 @@ export default function Maplist(prop) {
             let precision;
             let multiplier = 1;
             for (let index = 0; index < items.length; index++) {
-                console.log(items[0].record - items[items.length - 1].record)
                 precision = Math.floor((items[0].record - items[items.length - 1].record))
                 if (precision > 20) {
                     precision = 20
@@ -525,7 +519,6 @@ export default function Maplist(prop) {
                     dataPoints.forEach(point => {
                         point.classList.remove("data-point-active")
                     });
-                    console.log(isHoveringOverData)
                     dataPoint.classList.add("data-point-active")
                     document.querySelector("#dataPointRecord").innerText = item.record;
                     document.querySelector("#dataPointMap").innerText = item.map;
@@ -537,7 +530,6 @@ export default function Maplist(prop) {
                       document.querySelector("#dataPointInfo").style.left = item.x + "px";
                     }
                     if ((lineChart.clientHeight - 115) < (point_height * (item.record - minPortals) -3)) {
-                        console.log(lineChart.clientHeight / 2, point_height * item.record - 3)
                         document.querySelector("#dataPointInfo").style.bottom = (point_height * (item.record - minPortals) -3) - 115 + "px";
                     } else {
                         document.querySelector("#dataPointInfo").style.bottom = (point_height * (item.record - minPortals) -3) + "px";
@@ -547,14 +539,11 @@ export default function Maplist(prop) {
                 });
                 document.querySelector("#dataPointInfo").addEventListener("mouseenter", (e) => {
                     isHoveringOverData = true;
-                    console.log(isHoveringOverData)
                 })
                 document.querySelector("#dataPointInfo").addEventListener("mouseleave", (e) => {
                     isHoveringOverData = false;
-                    console.log(isHoveringOverData)
                 })
                 document.addEventListener("mousedown", () => {
-                    console.log(isHoveringOverData)
                     if (!isHoveringOverData) {
                         isDataActive = false
                         dataPoint.classList.remove("data-point-active")
@@ -611,9 +600,6 @@ export default function Maplist(prop) {
         const statisticsImg = document.querySelector("#statisticsImg");
         statisticsImg.src = img6;
 
-        
-        console.log(gameTitle)
-
         fetchGames();
 
         const handleResize = (entries) => {
@@ -647,10 +633,10 @@ export default function Maplist(prop) {
         <div ref={divRef} className='maplist-page'>
             <div className='maplist-page-content'>
                 <section className='maplist-page-header'>
-                    <a href='/games'><button className='nav-btn'>
+                    <Link to='/games'><button className='nav-btn'>
                         <i className='triangle'></i>
                         <span>Games list</span>
-                    </button></a>
+                    </button></Link>
                     <span><b id='gameTitle'>undefined</b></span>
                 </section>
 
