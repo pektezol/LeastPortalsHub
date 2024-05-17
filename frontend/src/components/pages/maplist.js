@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useLocation }  from "react-router-dom";
 
 import "./maplist.css"
@@ -260,6 +260,8 @@ export default function Maplist(prop) {
         });
     }
 
+    const divRef = useRef(null);
+
     React.useEffect(() => {
 
         const lineChart = document.querySelector(".line-chart")
@@ -268,38 +270,51 @@ export default function Maplist(prop) {
             let items = [
                 {
                   record: "100",
-                  x: '20',
-                  date: new Date(2018, 4, 4)
+                  date: new Date(2018, 4, 4),
+                  map: "Container Ride",
+                  first: "tiny zach"
                 },
                 {
                   record: "90",
-                  x: '300',
-                  date: new Date(2019, 6, 4)
+                  date: new Date(2019, 6, 4),
+                  map: "Container Ride",
+                  first: "tiny zach"
                 },
                 {
                   record: "88",
-                  x: '600',
-                  date: new Date(2020, 0, 1)
+                  date: new Date(2020, 0, 1),
+                  map: "Container Ride",
+                  first: "tiny zach"
+                },
+                {
+                  record: "85",
+                  date: new Date(2021, 0, 1),
+                  map: "Container Ride",
+                  first: "tiny zach"
                 },
                 {
                   record: "80",
-                  x: '1100',
-                  date: new Date(2022, 6, 14)
+                  date: new Date(2022, 6, 14),
+                  map: "Container Ride",
+                  first: "tiny zach"
                 },
                 {
                   record: "78",
-                  x: '1170',
-                  date: new Date(2022, 8, 19)
+                  date: new Date(2022, 8, 19),
+                  map: "Container Ride",
+                  first: "tiny zach"
                 },
                 {
                   record: "76",
-                  x: '1200',
-                  date: new Date(2023, 3, 20)
+                  date: new Date(2023, 3, 20),
+                  map: "Container Ride",
+                  first: "tiny zach"
                 },
                 {
                   record: "74",
-                  x: '1250',
-                  date: new Date(2024, 2, 25)
+                  date: new Date(2024, 2, 25),
+                  map: "Container Ride",
+                  first: "tiny zach"
                 },
             ]
 
@@ -339,6 +354,8 @@ export default function Maplist(prop) {
                 record: dp.record,
                 date: dp.date,
                 x: calculatePosition(dp.date, minDate, maxDate, lineChart.clientWidth),
+                map: dp.map,
+                first: dp.first
             }))
             
             const yearInterval = lineChart.clientWidth / uniqueYears.size
@@ -389,11 +406,33 @@ export default function Maplist(prop) {
             // if (items[0].record > 10) {
             //     multiplier = 2;
             // }
+
+            // Original cubic bezier control points
+            const P0 = { x: 0, y: 0 };
+            const P1 = { x: 0.26, y: 1 };
+            const P2 = { x: 0.74, y: 1 };
+            const P3 = { x: 1, y: 0 };
+
+            function calculateIntermediateControlPoints(t, P0, P1, P2, P3) {
+                const x = (1 - t) ** 3 * P0.x +
+                        3 * (1 - t) ** 2 * t * P1.x +
+                        3 * (1 - t) * t ** 2 * P2.x +
+                        t ** 3 * P3.x;
+
+                const y = (1 - t) ** 3 * P0.y +
+                        3 * (1 - t) ** 2 * t * P1.y +
+                        3 * (1 - t) * t ** 2 * P2.y +
+                        t ** 3 * P3.y;
+
+                return { x, y };
+            }
             
             
+            let delay = 0;
             for (let index = 0; index < items.length; index++) {
                 let chart_height = 340;
                 const item = items[index];
+                delay += 0.05;
                 // console.log(lineChart.clientWidth)
 
                 // maxPortals++;
@@ -464,12 +503,24 @@ export default function Maplist(prop) {
                     );
 
                     lineSeg.style = `--hypotenuse: ${hypotenuse}; --angle: ${angle * (-180 / Math.PI)}`;
+                    const t0 = index / items.length;
+                    const t1 = (index + 1) / items.length
+
+                    const P0t0 = calculateIntermediateControlPoints(t0, P0, P1, P2, P3);
+                    const P1t1 = calculateIntermediateControlPoints(t1, P0, P1, P2, P3);
+                    const bezierStyle = `cubic-bezier(${P0t0.x.toFixed(3)}, ${P0t0.y.toFixed(3)}, ${P1t1.x.toFixed(3)}, ${P1t1.y.toFixed(3)})`
+                    lineSeg.style.animationTimingFunction = bezierStyle
+                    lineSeg.style.animationDelay = delay + "s"
                 }
+                dataPoint.style.animationDelay = delay + "s"
                 
                 document.querySelector("#dataPointInfo").style.left = item.x + "px";
                 document.querySelector("#dataPointInfo").style.bottom = (point_height * item.record -3) + "px";
                 li.addEventListener("mouseenter", (e) => {
-                    document.querySelector("#dataPointName").innerText = item.record;
+                    document.querySelector("#dataPointRecord").innerText = item.record;
+                    document.querySelector("#dataPointMap").innerText = item.map;
+                    document.querySelector("#dataPointDate").innerText = item.date.toLocaleDateString("en-GB");
+                    document.querySelector("#dataPointFirst").innerText = item.first;
                     if ((lineChart.clientWidth / 2) < item.x) {
                       document.querySelector("#dataPointInfo").style.left = item.x - 400 + "px";
                     } else {
@@ -540,14 +591,35 @@ export default function Maplist(prop) {
 
         fetchGames();
 
-        if (document.querySelector(".maplist").getAttribute("currentTab") == "stats") {
-            document.querySelector(".stats").style.display = "block"
-        } else {
-            document.querySelector(".stats").style.display = "none"
-        }
+        const handleResize = (entries) => {
+            for (let entry of entries) {
+                lineChart.innerHTML = ""
+                createGraph()
+                if (document.querySelector(".maplist").getAttribute("currentTab") == "stats") {
+                    document.querySelector(".stats").style.display = "block"
+                } else {
+                    document.querySelector(".stats").style.display = "none"
+                }
+            }
+            };
+    
+            const resizeObserver = new ResizeObserver(handleResize);
+    
+            if (divRef.current) {
+            resizeObserver.observe(divRef.current);
+            }
+    
+            return () => {
+            if (divRef.current) {
+                resizeObserver.unobserve(divRef.current);
+            }
+            resizeObserver.disconnect();
+            };
+
+        
     })
     return (
-        <div className='maplist-page'>
+        <div ref={divRef} className='maplist-page'>
             <div className='maplist-page-content'>
                 <section className='maplist-page-header'>
                     <a href='/games'><button className='nav-btn'>
@@ -608,7 +680,19 @@ export default function Maplist(prop) {
                             <figure className='chart'>
                                 <div style={{display: "block"}}></div>
                                 <div id="dataPointInfo">
-                                    <span id='dataPointName'></span>
+                                    <div className='section-header'>
+                                        <span className='header-title'>Date</span>
+                                        <span className='header-title'>Map</span>
+                                        <span className='header-title'>Record</span>
+                                        <span className='header-title'>First completion</span>
+                                    </div>
+                                    <div className='divider'></div>
+                                    <div className='section-data'>
+                                        <span id='dataPointDate'></span>
+                                        <span id='dataPointMap'></span>
+                                        <span id='dataPointRecord'></span>
+                                        <span id='dataPointFirst'>Hello</span>
+                                    </div>
                                 </div>
                                 <ul className='line-chart'>
                                     

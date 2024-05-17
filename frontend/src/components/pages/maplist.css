@@ -251,6 +251,9 @@ a {
     font-size: 24px;
     margin-top: 5px;
     text-align: center;
+    font-family: BarlowSemiCondensed-Regular;
+    font-weight: 600;
+    padding-top: 5px;
 }
 
 .portalcount-graph {
@@ -285,6 +288,8 @@ a {
     left: calc(var(--x) - 6.5px);
     transition: all 0.2s cubic-bezier(0.075, 0.82, 0.165, 1);
     z-index: 1;
+    animation: point_intro 0.2s cubic-bezier(0.075, 0.82, 0.165, 1.8);
+    animation-fill-mode: backwards;
 }
 
 .data-point:hover {
@@ -303,12 +308,14 @@ a {
     transform-origin: left bottom;
     border-radius: 20px;
     z-index: 1;
+    animation: line_intro 0.05s cubic-bezier(0, 1, 0.31, 0.96);
+    animation-fill-mode: backwards;
 }
 
 #dataPointInfo {
     position: absolute;
     width: 400px;
-    height: 115px;
+    height: 85px;
     background: #202232;
     box-shadow: 0px 4px 16px 0px #00000080;
     transition: all 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
@@ -316,10 +323,67 @@ a {
     opacity: 0;
     left: auto;
     border-radius: 20px;
+    padding: 15px 7px;
 }
 
-#dataPointName {
+.section-header {
+    display: flex;
     text-align: center;
+    font-family: BarlowSemiCondensed-Regular;
+    font-weight: 600;
+    font-size: 18px;
+    height: 40%;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.section-header span, .section-data span {
+    flex: 1;
+}
+
+.divider {
     width: 100%;
-    display: block;
+    height: 2px;
+    background-color: #2B2E46;
+    display: flex;
+    margin: 5px 0px 8px 0px;
+}
+
+.section-data {
+    display: flex;
+    grid-template-columns: 25% 25% 25% 25%;
+    text-align: center;
+    background-color: #2B2E46;
+    height: 52%;
+    border-radius: 200px;
+    align-items: center;
+    justify-content: space-evenly;
+    flex-grow: 1;
+    font-family: BarlowSemiCondensed-Regular;
+    font-size: 18px;
+    padding: 0px 5px;
+}
+
+@keyframes line_intro {
+    0% {
+        width: 0;
+    }
+    100% {
+        width: calc(var(--hypotenuse) * 1px);
+    }
+}
+
+@keyframes point_intro {
+    0% {
+        opacity: 0;
+        width: 0;
+        height: 0;
+        transform: translate(3px, -3px);
+    }
+    100% {
+        width: 6px;
+        height: 6px;
+        transform: translate(0px, 0px);
+        opacity: 1;
+    }
 }
