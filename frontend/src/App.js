@@ -28,7 +28,7 @@ export default function App() {
         <BrowserRouter>
         <Sidebar token={token} setToken={setToken}/>
         <Routes>
-            <Route index element={<Homepage/>}></Route>
+            <Route index element={<Homepage token={token} mod={mod}/>}></Route>
             <Route path="/news" element={<Main text="News"/>}></Route>
             <Route path="/records" element={<Main text="Records"/>}></Route>
             <Route path="/leaderboards" element={<Main text="Leaderboards"/>}></Route>

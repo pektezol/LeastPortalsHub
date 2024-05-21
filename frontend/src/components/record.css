@@ -1,0 +1,15 @@
+.record-container {
+    --padding: 20px;
+    width: calc(100% - calc(var(--padding * 2)));
+    height: 42px;
+    background-color: #2B2E46;
+    border-radius: 200px;
+    font-size: 18px;
+    display: grid;
+    grid-template-columns: 20% 25% 15% 15% 25%;
+    text-align: center;
+    padding: 0px var(--padding);
+    vertical-align: middle;
+    align-items: center;
+    margin-bottom: 6px;
+}
