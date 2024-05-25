@@ -81,8 +81,20 @@ span>b{
 
     transition: 
     width .3s,
-    background-color .3s,
+    background-color .15s,
     padding .3s;
+}
+
+.sidebar-button-selected {
+    background-color: #202232;
+}
+
+.sidebar-button-deselected {
+    background-color: #20223200;
+}
+
+.sidebar-button-deselected:hover {
+    background-color: #202232aa;
 }
 
 button>img {

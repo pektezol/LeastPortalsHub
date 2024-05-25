@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, Link }  from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
 
 import "./maplist.css"
 import img5 from "../../imgs/5.png"
@@ -7,6 +8,7 @@ import img6 from "../../imgs/6.png"
 
 export default function Maplist(prop) {
     const {token,setToken} = prop
+    const scrollRef = useRef(null)
     const [games, setGames] = React.useState(null);
     const location = useLocation();
     
@@ -14,6 +16,7 @@ export default function Maplist(prop) {
     let minPage;
     let maxPage;
     let currentPage;
+    let add = 0;
     async function detectGame() {
         if (location.pathname == "/games/p2-sp"){
             gameTitle = "Portal 2 Singleplayer";
@@ -26,12 +29,26 @@ export default function Maplist(prop) {
 
             maxPage = 16;
             minPage = 10;
+            add = 10
             createCategories(2);
         }
+        const url = new URL(window.location.href)
+
+        const params = new URLSearchParams(url.search)
+        
+        let chapterParam = params.get("chapter")
 
         currentPage = minPage;
 
+        if (chapterParam) {
+            currentPage = +chapterParam + add
+        }
+
         changePage(currentPage);
+
+        // if (chapterParam) {
+        //     document.querySelector("#pageNumbers").innerText = `${chapterParam - minPage + 1}/${maxPage - minPage + 1}`
+        // }
     }
 
     function changeMaplistOrStatistics(index, name) {
@@ -47,6 +64,8 @@ export default function Maplist(prop) {
                 } else {
                     document.querySelector(".stats").style.display = "block";
                     document.querySelector(".maplist").style.display = "none";
+                    
+                    document.querySelector(".maplist-page").scrollTo({ top: 372, behavior: "smooth" })
                     document.querySelector(".maplist").setAttribute("currentTab", "stats");
                 }
             } else {
@@ -117,13 +136,20 @@ export default function Maplist(prop) {
         maplistMaps.innerHTML = "";
 
         maps.forEach(map => {
-            addMap(map.name, "0", 1);
+            addMap(map.name, "0", 1, map.id);
         });
 
         const gameTitleElement = document.querySelector("#gameTitle");
         gameTitleElement.innerText = gameTitle;
 
         const pageNumbers = document.querySelector("#pageNumbers");
+        
+        const url = new URL(window.location.href)
+
+        const params = new URLSearchParams(url.search)
+        
+        let chapterParam = params.get("chapter")
+        
         pageNumbers.innerText = `${currentPage - minPage + 1}/${maxPage - minPage + 1}`;
 
         try {
@@ -151,7 +177,7 @@ export default function Maplist(prop) {
         asignDifficulties();
     }
 
-    async function addMap(mapName, mapPortalCount, difficulty) {
+    async function addMap(mapName, mapPortalCount, difficulty, mapID) {
         // jesus christ
         const maplistItem = document.createElement("div");
         const maplistTitle = document.createElement("span");
@@ -192,6 +218,11 @@ export default function Maplist(prop) {
         maplistPortalcountPortals.innerText = "portals"
         b.innerText = mapPortalCount;
         difficultyBar.setAttribute("difficulty", difficulty)
+        maplistItem.setAttribute("id", mapID)
+        maplistItem.addEventListener("click", () => {
+            console.log(mapID)
+            window.location.href = "/maps/" + mapID
+        })
 
         // appends
         // maplist item
@@ -615,6 +646,16 @@ export default function Maplist(prop) {
             };
     
             const resizeObserver = new ResizeObserver(handleResize);
+
+            if (scrollRef.current) {
+                //hi
+                if (new URLSearchParams(new URL(window.location.href).search).get("chapter")) {
+                    setTimeout(() => {
+                        scrollRef.current.scrollIntoView({ behavior: "smooth", block: "start" })
+                    }, 200);
+                }
+                
+            }
     
             if (divRef.current) {
             resizeObserver.observe(divRef.current);
@@ -664,7 +705,7 @@ export default function Maplist(prop) {
                     </button>
                 </div>
 
-                <div className='maplist'>
+                <div ref={scrollRef} className='maplist'>
                     <div className='chapter'>
                         <span className='chapter-num'>undefined</span><br/>
                         <span className='chapter-name'>undefined</span>

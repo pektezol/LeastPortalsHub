@@ -1,5 +1,5 @@
-import React from 'react';
-import { useLocation }  from "react-router-dom";
+import React, { useEffect } from 'react';
+import { useLocation, Link }  from "react-router-dom";
 import ReactMarkdown from 'react-markdown'
 
 import "./summary.css";
@@ -317,8 +317,18 @@ if(window.confirm(`Are you sure you want to remove post: ${post.title}?`)){
 }
 
 
-
 if(data!==null){
+    
+let current_chapter = data.map.chapter_name
+let isCoop = false;
+if (data.map.game_name == "Portal 2 - Cooperative") {
+    isCoop = true
+}
+
+current_chapter = data.map.chapter_name.split(" ")
+// current_chapter = current_chapter.split("-")
+current_chapter = current_chapter[1]
+
 return (
     <>
         {token!==null?mod===true?<Modview selectedRun={selectedRun} data={data} token={token}/>:"":""}
@@ -329,8 +339,8 @@ return (
     <main>
         <section id='section1' className='summary1'>
             <div>
-                <button className='nav-button'><i className='triangle'></i><span>{data.map.game_name}</span></button>
-                <button className='nav-button'><i className='triangle'></i><span>{data.map.chapter_name}</span></button>
+                <Link to="/games"><button className='nav-button' style={{borderRadius: "20px 0px 0px 20px"}}><i className='triangle'></i><span>Games list</span></button></Link>
+                <Link to={`/games/${data.map.game_name == "Portal 2 - Singleplayer" ? "p2-sp" : data.map.game_name == "Portal 2 - Cooperative" ? "p2-coop" : "psm"}?chapter=${current_chapter}`}><button className='nav-button' style={{borderRadius: "0px 20px 20px 0px", marginLeft: "2px"}}><i className='triangle'></i><span>{data.map.chapter_name}</span></button></Link>
                 <br/><span><b>{data.map.map_name}</b></span>
             </div>
 

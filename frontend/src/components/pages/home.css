@@ -73,7 +73,7 @@
     border: 7px solid #2B2E46;
 }
 
-.difficulty-bar {
+.difficulty-bar-home {
     width: 100%;
     display: grid;
     grid-template-columns: 20% 20% 20% 20% 20%;

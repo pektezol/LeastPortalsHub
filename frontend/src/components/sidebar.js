@@ -48,10 +48,13 @@ const btn = document.querySelectorAll("button.sidebar-button");
 
 if(sidebar===1){setSidebar(0);SidebarHide()}
 
+// clusterfuck
 btn.forEach((e,i) =>{
-    btn[i].style.backgroundColor="inherit"
+    btn[i].classList.remove("sidebar-button-selected")
+    btn[i].classList.add("sidebar-button-deselected")
 }) 
-btn[x].style.backgroundColor="#202232"
+btn[x].classList.add("sidebar-button-selected")
+btn[x].classList.remove("sidebar-button-deselected")
 
 }
 
@@ -95,11 +98,10 @@ const location = useLocation()
 React.useEffect(()=>{
     if(location.pathname==="/"){SidebarClick(1)}
     if(location.pathname.includes("news")){SidebarClick(2)}
-    if(location.pathname.includes("records")){SidebarClick(3)}
+    if(location.pathname.includes("games")){SidebarClick(3)}
     if(location.pathname.includes("leaderboards")){SidebarClick(4)}
-    if(location.pathname.includes("discussions")){SidebarClick(5)}
-    if(location.pathname.includes("scorelog")){SidebarClick(6)}
-    if(location.pathname.includes("profile")){SidebarClick(7)}
+    if(location.pathname.includes("scorelog")){SidebarClick(5)}
+    if(location.pathname.includes("profile")){SidebarClick(6)}
     if(location.pathname.includes("rules")){SidebarClick(9)}
     if(location.pathname.includes("about")){SidebarClick(10)}
 
@@ -140,16 +142,12 @@ return (
                     <button className='sidebar-button'><img src={img3} alt="" /><span>News</span></button>
                 </Link>
 
-                <Link to="/records" tabIndex={-1}>
-                    <button className='sidebar-button'><img src={img4} alt="" /><span>Records</span></button>
+                <Link to="/games" tabIndex={-1}>
+                    <button className='sidebar-button'><img src={img4} alt="" /><span>Games</span></button>
                 </Link>
 
                 <Link to="/leaderboards" tabIndex={-1}>
                     <button className='sidebar-button'><img src={img5} alt="" /><span>Leaderboards</span></button>
-                </Link>
-
-                <Link to="/discussions" tabIndex={-1}>
-                    <button className='sidebar-button'><img src={img6} alt="" /><span>Discussions</span></button>
                 </Link>
 
                 <Link to="/scorelog" tabIndex={-1}>

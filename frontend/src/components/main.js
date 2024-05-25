@@ -10,7 +10,6 @@ export default function Main(props) {
 return (
     <main>
         <h1>{props.text}</h1>
-        <Link to={"/games"}>Yuh</Link>
     </main>
         )
 }

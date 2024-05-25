@@ -148,7 +148,7 @@ export default function Homepage(prop) {
                                 <span style={{fontFamily: "BarlowSemiCondensed-SemiBold", fontSize: "32px", width: "100%", display: "block"}}>Container Ride</span>
                                 <span style={{fontSize: "20px"}}>Your Record: 4 portals</span>
                                 <span style={{fontFamily: "BarlowSemiCondensed-SemiBold", fontSize: "36px", width: "100%", display: "block"}}>World Record: 2 portals</span>
-                                <div className='difficulty-bar'>
+                                <div className='difficulty-bar-home'>
                                     <div className='difficulty-point' style={{backgroundColor: "#51C355"}}></div>
                                     <div className='difficulty-point'></div>
                                     <div className='difficulty-point'></div>
