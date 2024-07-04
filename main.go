@@ -22,12 +22,12 @@ import (
 //	@host		lp.ardapektezol.com
 //	@BasePath	/api/v1
 func main() {
-	if os.Getenv("ENV") == "PROD" {
-		gin.SetMode(gin.ReleaseMode)
-	}
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
+	}
+	if os.Getenv("ENV") == "PROD" {
+		gin.SetMode(gin.ReleaseMode)
 	}
 	router := gin.Default()
 	database.ConnectDB()
