@@ -48,25 +48,14 @@ CREATE TABLE maps (
   FOREIGN KEY (chapter_id) REFERENCES chapters(id)
 );
 
-CREATE TABLE map_routes (
-  id SERIAL,
-  map_id SMALLINT NOT NULL,
-  category_id SMALLINT NOT NULL,
-  score_count SMALLINT NOT NULL,
-  description TEXT NOT NULL,
-  showcase TEXT NOT NULL DEFAULT,
-  PRIMARY KEY (id),
-  FOREIGN KEY (map_id) REFERENCES maps(id),
-  FOREIGN KEY (category_id) REFERENCES categories(id),
-  UNIQUE (map_id, category_id, score_count)
-);
-
 CREATE TABLE map_history (
   id SERIAL,
   map_id SMALLINT NOT NULL,
   category_id SMALLINT NOT NULL,
   user_name TEXT NOT NULL,
   score_count SMALLINT NOT NULL,
+  description TEXT NOT NULL,
+  showcase TEXT NOT NULL DEFAULT,
   record_date DATE NOT NULL,
   PRIMARY KEY (id),
   FOREIGN KEY (category_id) REFERENCES categories(id),

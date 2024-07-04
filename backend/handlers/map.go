@@ -87,12 +87,11 @@ func FetchMapSummary(c *gin.Context) {
 		return
 	}
 	// Get map routes and histories
-	sql = `SELECT r.id, c.id, c.name, h.user_name, h.score_count, h.record_date, r.description, r.showcase, COALESCE(avg(rating), 0.0) FROM map_routes r
-    INNER JOIN categories c ON r.category_id = c.id
-    INNER JOIN map_history h ON r.map_id = h.map_id AND r.category_id = h.category_id
-    LEFT JOIN map_ratings rt ON r.map_id = rt.map_id AND r.category_id = rt.category_id 
-	WHERE r.map_id = $1 AND h.score_count = r.score_count GROUP BY r.id, c.id, h.user_name, h.score_count, h.record_date, r.description, r.showcase
-	ORDER BY h.record_date ASC;`
+	sql = `SELECT mh.id, c.id, c.name, mh.user_name, mh.score_count, mh.record_date, mh.description, mh.showcase, COALESCE(avg(rating), 0.0) FROM map_history mh
+    INNER JOIN categories c ON mh.category_id = c.id
+    LEFT JOIN map_ratings rt ON mh.map_id = rt.map_id AND mh.category_id = rt.category_id 
+	WHERE mh.map_id = $1 AND mh.score_count = mh.score_count GROUP BY mh.id, c.id, mh.user_name, mh.score_count, mh.record_date, mh.description, mh.showcase
+	ORDER BY mh.record_date ASC;`
 	rows, err := database.DB.Query(sql, id)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
