@@ -99,15 +99,15 @@ func Profile(c *gin.Context) {
 	// Get user completion count
 	sql = `SELECT 'records_sp' AS table_name, COUNT(sp.id)
 	FROM records_sp sp JOIN (
-    	SELECT mr.map_id, MIN(mr.score_count) AS min_score_count
-    	FROM public.map_routes mr WHERE mr.category_id = 1 GROUP BY mr.map_id
+    	SELECT mh.map_id, MIN(mh.score_count) AS min_score_count
+    	FROM public.map_history mh WHERE mh.category_id = 1 GROUP BY mh.map_id
 	) AS subquery_sp ON sp.map_id = subquery_sp.map_id AND sp.score_count = subquery_sp.min_score_count
 	WHERE sp.user_id = $1 AND sp.is_deleted = false
 	UNION ALL
 	SELECT 'records_mp' AS table_name, COUNT(mp.id)
 	FROM public.records_mp mp JOIN (
-    	SELECT mr.map_id, MIN(mr.score_count) AS min_score_count
-    	FROM public.map_routes mr WHERE mr.category_id = 1 GROUP BY mr.map_id
+    	SELECT mh.map_id, MIN(mh.score_count) AS min_score_count
+    	FROM public.map_history mh WHERE mh.category_id = 1 GROUP BY mh.map_id
 	) AS subquery_mp ON mp.map_id = subquery_mp.map_id AND mp.score_count = subquery_mp.min_score_count
 	WHERE (mp.host_id = $1 OR mp.partner_id = $1) AND mp.is_deleted = false`
 	rows, err := database.DB.Query(sql, user.(models.User).SteamID)
@@ -293,7 +293,7 @@ func Profile(c *gin.Context) {
 	}
 	records := []ProfileRecords{}
 	// Get singleplayer records
-	sql = `SELECT sp.id, m.game_id, m.chapter_id, sp.map_id, m."name", (SELECT mr.score_count FROM map_routes mr WHERE mr.map_id = sp.map_id ORDER BY mr.score_count ASC LIMIT 1) AS wr_count, sp.score_count, sp.score_time, sp.demo_id, sp.record_date
+	sql = `SELECT sp.id, m.game_id, m.chapter_id, sp.map_id, m."name", (SELECT mh.score_count FROM map_history mh WHERE mh.map_id = sp.map_id ORDER BY mh.score_count ASC LIMIT 1) AS wr_count, sp.score_count, sp.score_time, sp.demo_id, sp.record_date
 	FROM records_sp sp INNER JOIN maps m ON sp.map_id = m.id WHERE sp.user_id = $1 AND sp.is_deleted = false ORDER BY sp.map_id, sp.score_count, sp.score_time`
 	rows, err = database.DB.Query(sql, user.(models.User).SteamID)
 	if err != nil {
@@ -347,7 +347,7 @@ func Profile(c *gin.Context) {
 		records[len(records)-1].Scores = append(records[len(records)-1].Scores, score)
 	}
 	// Get multiplayer records
-	sql = `SELECT mp.id, m.game_id, m.chapter_id, mp.map_id, m."name", (SELECT mr.score_count FROM map_routes mr WHERE mr.map_id = mp.map_id ORDER BY mr.score_count ASC LIMIT 1) AS wr_count,  mp.score_count, mp.score_time, CASE WHEN host_id = $1 THEN mp.host_demo_id WHEN partner_id = $1 THEN mp.partner_demo_id END demo_id, mp.record_date
+	sql = `SELECT mp.id, m.game_id, m.chapter_id, mp.map_id, m."name", (SELECT mh.score_count FROM map_history mh WHERE mh.map_id = mp.map_id ORDER BY mh.score_count ASC LIMIT 1) AS wr_count,  mp.score_count, mp.score_time, CASE WHEN host_id = $1 THEN mp.host_demo_id WHEN partner_id = $1 THEN mp.partner_demo_id END demo_id, mp.record_date
 	FROM records_mp mp INNER JOIN maps m ON mp.map_id = m.id WHERE (mp.host_id = $1 OR mp.partner_id = $1) AND mp.is_deleted = false ORDER BY mp.map_id, mp.score_count, mp.score_time`
 	rows, err = database.DB.Query(sql, user.(models.User).SteamID)
 	if err != nil {
@@ -473,15 +473,15 @@ func FetchUser(c *gin.Context) {
 	// Get user completion count
 	sql = `SELECT 'records_sp' AS table_name, COUNT(sp.id)
 	FROM records_sp sp JOIN (
-    	SELECT mr.map_id, MIN(mr.score_count) AS min_score_count
-    	FROM public.map_routes mr WHERE mr.category_id = 1 GROUP BY mr.map_id
+    	SELECT mh.map_id, MIN(mh.score_count) AS min_score_count
+    	FROM public.map_history mh WHERE mh.category_id = 1 GROUP BY mh.map_id
 	) AS subquery_sp ON sp.map_id = subquery_sp.map_id AND sp.score_count = subquery_sp.min_score_count
 	WHERE sp.user_id = $1 AND sp.is_deleted = false
 	UNION ALL
 	SELECT 'records_mp' AS table_name, COUNT(mp.id)
 	FROM public.records_mp mp JOIN (
-    	SELECT mr.map_id, MIN(mr.score_count) AS min_score_count
-    	FROM public.map_routes mr WHERE mr.category_id = 1 GROUP BY mr.map_id
+    	SELECT mh.map_id, MIN(mh.score_count) AS min_score_count
+    	FROM public.map_history mh WHERE mh.category_id = 1 GROUP BY mh.map_id
 	) AS subquery_mp ON mp.map_id = subquery_mp.map_id AND mp.score_count = subquery_mp.min_score_count
 	WHERE (mp.host_id = $1 OR mp.partner_id = $1) AND mp.is_deleted = false`
 	rows, err = database.DB.Query(sql, user.SteamID)
@@ -667,7 +667,7 @@ func FetchUser(c *gin.Context) {
 	}
 	records := []ProfileRecords{}
 	// Get singleplayer records
-	sql = `SELECT sp.id, m.game_id, m.chapter_id, sp.map_id, m."name", (SELECT mr.score_count FROM map_routes mr WHERE mr.map_id = sp.map_id ORDER BY mr.score_count ASC LIMIT 1) AS wr_count, sp.score_count, sp.score_time, sp.demo_id, sp.record_date
+	sql = `SELECT sp.id, m.game_id, m.chapter_id, sp.map_id, m."name", (SELECT mh.score_count FROM map_history mh WHERE mh.map_id = sp.map_id ORDER BY mh.score_count ASC LIMIT 1) AS wr_count, sp.score_count, sp.score_time, sp.demo_id, sp.record_date
 	FROM records_sp sp INNER JOIN maps m ON sp.map_id = m.id WHERE sp.user_id = $1 AND sp.is_deleted = false ORDER BY sp.map_id, sp.score_count, sp.score_time`
 	rows, err = database.DB.Query(sql, user.SteamID)
 	if err != nil {
@@ -721,7 +721,7 @@ func FetchUser(c *gin.Context) {
 		records[len(records)-1].Scores = append(records[len(records)-1].Scores, score)
 	}
 	// Get multiplayer records
-	sql = `SELECT mp.id, m.game_id, m.chapter_id, mp.map_id, m."name", (SELECT mr.score_count FROM map_routes mr WHERE mr.map_id = mp.map_id ORDER BY mr.score_count ASC LIMIT 1) AS wr_count,  mp.score_count, mp.score_time, CASE WHEN host_id = $1 THEN mp.host_demo_id WHEN partner_id = $1 THEN mp.partner_demo_id END demo_id, mp.record_date
+	sql = `SELECT mp.id, m.game_id, m.chapter_id, mp.map_id, m."name", (SELECT mh.score_count FROM map_history mh WHERE mh.map_id = mp.map_id ORDER BY mh.score_count ASC LIMIT 1) AS wr_count,  mp.score_count, mp.score_time, CASE WHEN host_id = $1 THEN mp.host_demo_id WHEN partner_id = $1 THEN mp.partner_demo_id END demo_id, mp.record_date
 	FROM records_mp mp INNER JOIN maps m ON mp.map_id = m.id WHERE (mp.host_id = $1 OR mp.partner_id = $1) AND mp.is_deleted = false ORDER BY mp.map_id, mp.score_count, mp.score_time`
 	rows, err = database.DB.Query(sql, user.SteamID)
 	if err != nil {
