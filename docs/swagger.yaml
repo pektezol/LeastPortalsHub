@@ -53,6 +53,7 @@ definitions:
     - category_id
     - description
     - record_date
+    - score_count
     - user_name
     type: object
   handlers.DeleteMapSummaryRequest:
@@ -97,6 +98,7 @@ definitions:
     - description
     - record_date
     - route_id
+    - score_count
     - user_name
     type: object
   handlers.LoginResponse:
@@ -330,6 +332,13 @@ definitions:
       name:
         type: string
     type: object
+  models.CategoryPortal:
+    properties:
+      category:
+        $ref: '#/definitions/models.Category'
+      portal_count:
+        type: integer
+    type: object
   models.Chapter:
     properties:
       id:
@@ -343,6 +352,10 @@ definitions:
     type: object
   models.Game:
     properties:
+      category_portals:
+        items:
+          $ref: '#/definitions/models.CategoryPortal'
+        type: array
       id:
         type: integer
       image:
@@ -408,6 +421,8 @@ definitions:
     type: object
   models.MapShort:
     properties:
+      difficulty:
+        type: integer
       id:
         type: integer
       image:
@@ -416,6 +431,8 @@ definitions:
         type: boolean
       name:
         type: string
+      portal_count:
+        type: integer
     type: object
   models.MapSummary:
     properties:

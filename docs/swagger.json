@@ -1412,6 +1412,7 @@
                 "category_id",
                 "description",
                 "record_date",
+                "score_count",
                 "user_name"
             ],
             "properties": {
@@ -1478,6 +1479,7 @@
                 "description",
                 "record_date",
                 "route_id",
+                "score_count",
                 "user_name"
             ],
             "properties": {
@@ -1857,6 +1859,17 @@
                 }
             }
         },
+        "models.CategoryPortal": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "$ref": "#/definitions/models.Category"
+                },
+                "portal_count": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.Chapter": {
             "type": "object",
             "properties": {
@@ -1877,6 +1890,12 @@
         "models.Game": {
             "type": "object",
             "properties": {
+                "category_portals": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.CategoryPortal"
+                    }
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -1977,6 +1996,9 @@
         "models.MapShort": {
             "type": "object",
             "properties": {
+                "difficulty": {
+                    "type": "integer"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -1988,6 +2010,9 @@
                 },
                 "name": {
                     "type": "string"
+                },
+                "portal_count": {
+                    "type": "integer"
                 }
             }
         },
