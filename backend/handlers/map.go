@@ -339,6 +339,44 @@ func FetchGames(c *gin.Context) {
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
+		categoryPortalRows, err := database.DB.Query(`SELECT c.id, c.name FROM game_categories gc JOIN categories c ON gc.category_id = c.id WHERE gc.game_id = $1`, game.ID)
+		if err != nil {
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+			return
+		}
+		for categoryPortalRows.Next() {
+			var categoryPortals models.CategoryPortal
+			if err := categoryPortalRows.Scan(&categoryPortals.Category.ID, &categoryPortals.Category.Name); err != nil {
+				c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+				return
+			}
+			getCategoryPortalCount := `
+			SELECT
+				SUM(mh.lowest_score_count) AS total_lowest_scores
+			FROM (
+				SELECT
+					map_id,
+					category_id,
+					MIN(score_count) AS lowest_score_count
+				FROM
+					map_history
+				GROUP BY
+					map_id,
+					category_id
+			) mh
+			JOIN maps m ON mh.map_id = m.id
+			JOIN games g ON m.game_id = g.id
+			WHERE
+				mh.category_id = $1 and g.id = $2
+			GROUP BY
+				g.id,
+				g.name,
+				mh.category_id;
+			`
+			database.DB.QueryRow(getCategoryPortalCount, categoryPortals.Category.ID, game.ID).Scan(&categoryPortals.PortalCount)
+			// not checking for errors since there can be no record for category - just let it have 0
+			game.CategoryPortals = append(game.CategoryPortals, categoryPortals)
+		}
 		games = append(games, game)
 	}
 	c.JSON(http.StatusOK, models.Response{
@@ -441,7 +479,7 @@ func FetchChapterMaps(c *gin.Context) {
 		return
 	}
 	var response ChapterMapsResponse
-	rows, err := database.DB.Query(`SELECT m.id, m.name, c.name, m.is_disabled, m.image FROM maps m INNER JOIN chapters c ON m.chapter_id = c.id WHERE chapter_id = $1`, chapterID)
+	rows, err := database.DB.Query(`SELECT m.id, m.name, c.name, m.is_disabled, m.image, MIN(mh.score_count) FROM maps m INNER JOIN chapters c ON m.chapter_id = c.id INNER JOIN map_history mh ON m.id = mh.map_id WHERE chapter_id = $1 GROUP BY m.id, c.name ORDER BY m.id;`, chapterID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
@@ -450,7 +488,7 @@ func FetchChapterMaps(c *gin.Context) {
 	var chapterName string
 	for rows.Next() {
 		var mapShort models.MapShort
-		if err := rows.Scan(&mapShort.ID, &mapShort.Name, &chapterName, &mapShort.IsDisabled, &mapShort.Image); err != nil {
+		if err := rows.Scan(&mapShort.ID, &mapShort.Name, &chapterName, &mapShort.IsDisabled, &mapShort.Image, &mapShort.PortalCount); err != nil {
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
