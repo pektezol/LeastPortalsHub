@@ -1418,6 +1418,7 @@ const docTemplate = `{
                 "category_id",
                 "description",
                 "record_date",
+                "score_count",
                 "user_name"
             ],
             "properties": {
@@ -1484,6 +1485,7 @@ const docTemplate = `{
                 "description",
                 "record_date",
                 "route_id",
+                "score_count",
                 "user_name"
             ],
             "properties": {
@@ -1863,6 +1865,17 @@ const docTemplate = `{
                 }
             }
         },
+        "models.CategoryPortal": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "$ref": "#/definitions/models.Category"
+                },
+                "portal_count": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.Chapter": {
             "type": "object",
             "properties": {
@@ -1883,6 +1896,12 @@ const docTemplate = `{
         "models.Game": {
             "type": "object",
             "properties": {
+                "category_portals": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.CategoryPortal"
+                    }
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -1983,6 +2002,9 @@ const docTemplate = `{
         "models.MapShort": {
             "type": "object",
             "properties": {
+                "difficulty": {
+                    "type": "integer"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -1994,6 +2016,9 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "portal_count": {
+                    "type": "integer"
                 }
             }
         },

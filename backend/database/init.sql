@@ -36,6 +36,15 @@ CREATE TABLE categories (
   PRIMARY KEY (id)
 );
 
+CREATE TABLE game_categories (
+  id SERIAL,
+  game_id SMALLINT NOT NULL,
+  category_id SMALLINT NOT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (game_id) REFERENCES games(id),
+  FOREIGN KEY (category_id) REFERENCES categories(id)
+);
+
 CREATE TABLE maps (
   id SERIAL,
   game_id SMALLINT NOT NULL,

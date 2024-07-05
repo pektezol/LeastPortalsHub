@@ -50,10 +50,12 @@ type Map struct {
 }
 
 type MapShort struct {
-	ID         int    `json:"id"`
-	Name       string `json:"name"`
-	Image      string `json:"image"`
-	IsDisabled bool   `json:"is_disabled"`
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+	Image       string `json:"image"`
+	IsDisabled  bool   `json:"is_disabled"`
+	PortalCount int    `json:"portal_count"`
+	Difficulty  int    `json:"difficulty"`
 }
 
 type MapSummary struct {
@@ -87,10 +89,11 @@ type UserRanking struct {
 }
 
 type Game struct {
-	ID     int    `json:"id"`
-	Name   string `json:"name"`
-	Image  string `json:"image"`
-	IsCoop bool   `json:"is_coop"`
+	ID              int              `json:"id"`
+	Name            string           `json:"name"`
+	Image           string           `json:"image"`
+	IsCoop          bool             `json:"is_coop"`
+	CategoryPortals []CategoryPortal `json:"category_portals"`
 }
 
 type Chapter struct {
@@ -98,6 +101,11 @@ type Chapter struct {
 	Name       string `json:"name"`
 	Image      string `json:"image"`
 	IsDisabled bool   `json:"is_disabled"`
+}
+
+type CategoryPortal struct {
+	Category    Category `json:"category"`
+	PortalCount int      `json:"portal_count"`
 }
 
 type Category struct {
