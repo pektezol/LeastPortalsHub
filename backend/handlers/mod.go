@@ -94,7 +94,7 @@ func CreateMapSummary(c *gin.Context) {
 	}
 	// Update database with new data
 	sql = `INSERT INTO map_history (map_id,category_id,user_name,score_count,description,showcase,record_date)
-	VALUES ($1,$2,$3,$4,$5)`
+	VALUES ($1,$2,$3,$4,$5,$6,$7)`
 	_, err = tx.Exec(sql, mapID, request.CategoryID, request.UserName, *request.ScoreCount, request.Description, request.Showcase, request.RecordDate)
 	if err != nil {
 		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryCreateFail, fmt.Sprintf("INSERT#map_history: %s", err.Error()))
