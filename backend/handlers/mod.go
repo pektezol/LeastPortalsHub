@@ -16,7 +16,7 @@ type CreateMapSummaryRequest struct {
 	Description string    `json:"description" binding:"required"`
 	Showcase    string    `json:"showcase"`
 	UserName    string    `json:"user_name" binding:"required"`
-	ScoreCount  int       `json:"score_count" binding:"required"`
+	ScoreCount  *int      `json:"score_count" binding:"required"`
 	RecordDate  time.Time `json:"record_date" binding:"required"`
 }
 
@@ -25,7 +25,7 @@ type EditMapSummaryRequest struct {
 	Description string    `json:"description" binding:"required"`
 	Showcase    string    `json:"showcase"`
 	UserName    string    `json:"user_name" binding:"required"`
-	ScoreCount  int       `json:"score_count" binding:"required"`
+	ScoreCount  *int      `json:"score_count" binding:"required"`
 	RecordDate  time.Time `json:"record_date" binding:"required"`
 }
 
@@ -95,7 +95,7 @@ func CreateMapSummary(c *gin.Context) {
 	// Update database with new data
 	sql = `INSERT INTO map_history (map_id,category_id,user_name,score_count,description,showcase,record_date)
 	VALUES ($1,$2,$3,$4,$5)`
-	_, err = tx.Exec(sql, mapID, request.CategoryID, request.UserName, request.ScoreCount, request.Description, request.Showcase, request.RecordDate)
+	_, err = tx.Exec(sql, mapID, request.CategoryID, request.UserName, *request.ScoreCount, request.Description, request.Showcase, request.RecordDate)
 	if err != nil {
 		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryCreateFail, fmt.Sprintf("INSERT#map_history: %s", err.Error()))
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
@@ -105,7 +105,7 @@ func CreateMapSummary(c *gin.Context) {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
-	CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryCreateSuccess, fmt.Sprintf("MapID: %d | CategoryID: %d | ScoreCount: %d", mapID, request.CategoryID, request.ScoreCount))
+	CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryCreateSuccess, fmt.Sprintf("MapID: %d | CategoryID: %d | ScoreCount: %d", mapID, request.CategoryID, *request.ScoreCount))
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,
 		Message: "Successfully created map summary.",
@@ -158,7 +158,7 @@ func EditMapSummary(c *gin.Context) {
 	defer tx.Rollback()
 	// Update database with new data
 	sql := `UPDATE map_history SET user_name = $2, score_count = $3, record_date = $4, description = $5, showcase = $6 WHERE id = $1`
-	_, err = tx.Exec(sql, request.RouteID, request.UserName, request.ScoreCount, request.RecordDate, request.Description, request.Showcase)
+	_, err = tx.Exec(sql, request.RouteID, request.UserName, *request.ScoreCount, request.RecordDate, request.Description, request.Showcase)
 	if err != nil {
 		CreateLog(user.(models.User).SteamID, LogTypeMod, LogDescriptionMapSummaryEditFail, fmt.Sprintf("(HistoryID: %d) UPDATE#map_history: %s", request.RouteID, err.Error()))
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
