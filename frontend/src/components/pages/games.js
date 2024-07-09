@@ -30,6 +30,17 @@ export default function Games(prop) {
                         header.style.backgroundImage = `url(${data.data[0].image})`;
                     }
                 });
+
+                // sp
+                document.querySelector("#spcm").innerText = data.data[0].category_portals[0].portal_count
+                document.querySelector("#spnosla").innerText = data.data[0].category_portals[1].portal_count
+                document.querySelector("#spinbsla").innerText = data.data[0].category_portals[2].portal_count
+                document.querySelector("#spany").innerText = data.data[0].category_portals[3].portal_count
+
+                // coop
+                document.querySelector("#mpcm").innerText = data.data[1].category_portals[0].portal_count
+                document.querySelector("#mpany").innerText = data.data[1].category_portals[2].portal_count
+                document.querySelector("#mpac").innerText = data.data[1].category_portals[1].portal_count
             } catch (err) {
                 console.error("Error fetching games:", err);
             }
@@ -55,19 +66,19 @@ export default function Games(prop) {
                         <div className='games-page-item-body'>
                             <div className='games-page-item-body-item'>
                                 <span className='games-page-item-body-item-title'>Challenge Mode</span><br/>
-                                <span className='games-page-item-body-item-num'>74</span>
+                                <span className='games-page-item-body-item-num' id='spcm'></span>
                             </div>
                             <div className='games-page-item-body-item'>
                                 <span className='games-page-item-body-item-title'>NoSLA</span><br/>
-                                <span className='games-page-item-body-item-num'>54</span>
+                                <span className='games-page-item-body-item-num' id='spnosla'></span>
                             </div>
                             <div className='games-page-item-body-item'>
                                 <span className='games-page-item-body-item-title'>Inbounds SLA</span><br/>
-                                <span className='games-page-item-body-item-num'>46</span>
+                                <span className='games-page-item-body-item-num' id='spinbsla'></span>
                             </div>
                             <div className='games-page-item-body-item'>
                                 <span className='games-page-item-body-item-title'>Any%</span><br/>
-                                <span className='games-page-item-body-item-num'>3</span>
+                                <span className='games-page-item-body-item-num' id='spany'></span>
                             </div>
                         </div>
                     </div></Link>
@@ -79,15 +90,15 @@ export default function Games(prop) {
                         <div className='games-page-item-body'>
                             <div className='games-page-item-body-item'>
                                 <span className='games-page-item-body-item-title'>Challenge Mode</span><br/>
-                                <span className='games-page-item-body-item-num'>45</span>
+                                <span className='games-page-item-body-item-num' id='mpcm'>45</span>
                             </div>
                             <div className='games-page-item-body-item'>
                                 <span className='games-page-item-body-item-title'>All Courses</span><br/>
-                                <span className='games-page-item-body-item-num'>53</span>
+                                <span className='games-page-item-body-item-num' id='mpac'>53</span>
                             </div>
                             <div className='games-page-item-body-item'>
                                 <span className='games-page-item-body-item-title'>Any%</span><br/>
-                                <span className='games-page-item-body-item-num'>12</span>
+                                <span className='games-page-item-body-item-num' id='mpany'>12</span>
                             </div>
                         </div>
                     </div></Link>
@@ -99,11 +110,11 @@ export default function Games(prop) {
                         <div className='games-page-item-body'>
                             <div className='games-page-item-body-item'>
                                 <span className='games-page-item-body-item-title'>Story Mode</span><br/>
-                                <span className='games-page-item-body-item-num'>69</span>
+                                <span className='games-page-item-body-item-num' id='melsm'>69</span>
                             </div>
                             <div className='games-page-item-body-item'>
                                 <span className='games-page-item-body-item-title'>Advanced Mode</span><br/>
-                                <span className='games-page-item-body-item-num'>69</span>
+                                <span className='games-page-item-body-item-num' id='melam'>69</span>
                             </div>
                         </div>
                     </div></Link>

@@ -253,9 +253,8 @@ a {
     font-size: 24px;
     margin-top: 5px;
     text-align: center;
-    font-family: BarlowSemiCondensed-Regular;
-    font-weight: 600;
-    padding-top: 5px;
+    font-family: BarlowSemiCondensed-SemiBold;
+    padding-top: 7px;
 }
 
 .portalcount-graph {
@@ -331,8 +330,7 @@ a {
 .section-header {
     display: flex;
     text-align: center;
-    font-family: BarlowSemiCondensed-Regular;
-    font-weight: 600;
+    font-family: BarlowSemiCondensed-SemiBold;
     font-size: 18px;
     height: 40%;
     justify-content: space-evenly;

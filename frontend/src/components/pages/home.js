@@ -180,7 +180,7 @@ export default function Homepage(prop) {
                     </section>
                 </div>
                 {/* Column 2 */}
-                <div id='column2' style={{display: "flex", alignItems: "stretch", height: "0px"}}>
+                <div id='column2' style={{display: "flex", alignItems: "stretch", height: "87px"}}>
                     <section title="News" className='homepage-panel'>
                         <div id='newsContent' style={{ display: "block", width: "100%", overflowY: "scroll", height: "calc(100% - 50px)"}}>
                             {newsList.map((newsList, index) => (

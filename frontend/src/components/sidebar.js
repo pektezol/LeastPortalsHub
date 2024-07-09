@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link, useLocation } from "react-router-dom";
 
 import "../App.css"
@@ -18,6 +18,7 @@ import Login from "./login.js"
 export default function Sidebar(prop) {
 const {token,setToken} = prop
 const [profile, setProfile] = React.useState(null);
+
 React.useEffect(() => {
     fetch(`https://lp.ardapektezol.com/api/v1/profile`,{
         headers: {
@@ -81,6 +82,7 @@ if(sidebar===1){
 } else {
     side.style.width="40px";
     searchbar.focus();
+    setSearch(searchbar.value)
     setSidebar(1)
     btn.forEach((e,i) =>{
         e.style.width="40px"
@@ -110,6 +112,7 @@ React.useEffect(()=>{
 
 const [search,setSearch] = React.useState(null)
 const [searchData,setSearchData] = React.useState(null)
+
 React.useEffect(()=>{
     fetch(`https://lp.ardapektezol.com/api/v1/search?q=${search}`)
         .then(r=>r.json())

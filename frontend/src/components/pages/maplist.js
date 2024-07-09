@@ -136,7 +136,7 @@ export default function Maplist(prop) {
         maplistMaps.innerHTML = "";
 
         maps.forEach(map => {
-            addMap(map.name, "0", 1, map.id);
+            addMap(map.name, map.portal_count, map.image, 1, map.id);
         });
 
         const gameTitleElement = document.querySelector("#gameTitle");
@@ -165,10 +165,10 @@ export default function Maplist(prop) {
 
             gameImg.style.backgroundImage = `url(${data.data[0].image})`;
 
-            const mapImg = document.querySelectorAll(".maplist-img");
-            mapImg.forEach((map) => {
-                map.style.backgroundImage = `url(${data.data[0].image})`;
-            });
+            // const mapImg = document.querySelectorAll(".maplist-img");
+            // mapImg.forEach((map) => {
+            //     map.style.backgroundImage = `url(${data.data[0].image})`;
+            // });
 
         } catch (error) {
             console.log("error fetching games:", error);
@@ -177,7 +177,7 @@ export default function Maplist(prop) {
         asignDifficulties();
     }
 
-    async function addMap(mapName, mapPortalCount, difficulty, mapID) {
+    async function addMap(mapName, mapPortalCount, mapImage, difficulty, mapID) {
         // jesus christ
         const maplistItem = document.createElement("div");
         const maplistTitle = document.createElement("span");
@@ -217,6 +217,7 @@ export default function Maplist(prop) {
         difficultyLabel.innerText =  "Difficulty: "
         maplistPortalcountPortals.innerText = "portals"
         b.innerText = mapPortalCount;
+        maplistImg.style.backgroundImage = `url(${mapImage})`;
         difficultyBar.setAttribute("difficulty", difficulty)
         maplistItem.setAttribute("id", mapID)
         maplistItem.addEventListener("click", () => {
@@ -301,49 +302,85 @@ export default function Maplist(prop) {
             let items = [
                 {
                   record: "100",
-                  date: new Date(2018, 4, 4),
+                  date: new Date(2011, 4, 4),
+                  map: "Container Ride",
+                  first: "tiny zach"
+                },
+                {
+                  record: "98",
+                  date: new Date(2012, 6, 4),
+                  map: "Container Ride",
+                  first: "tiny zach"
+                },
+                {
+                  record: "94",
+                  date: new Date(2013, 0, 1),
                   map: "Container Ride",
                   first: "tiny zach"
                 },
                 {
                   record: "90",
-                  date: new Date(2019, 6, 4),
+                  date: new Date(2014, 0, 1),
                   map: "Container Ride",
                   first: "tiny zach"
                 },
                 {
                   record: "88",
-                  date: new Date(2020, 0, 1),
+                  date: new Date(2015, 6, 14),
                   map: "Container Ride",
                   first: "tiny zach"
                 },
                 {
-                  record: "85",
-                  date: new Date(2021, 0, 1),
+                  record: "84",
+                  date: new Date(2016, 8, 19),
+                  map: "Container Ride",
+                  first: "tiny zach"
+                },
+                {
+                  record: "82",
+                  date: new Date(2017, 3, 20),
+                  map: "Container Ride",
+                  first: "tiny zach"
+                },
+                {
+                  record: "81",
+                  date: new Date(2018, 2, 25),
                   map: "Container Ride",
                   first: "tiny zach"
                 },
                 {
                   record: "80",
-                  date: new Date(2022, 6, 14),
+                  date: new Date(2019, 3, 4),
                   map: "Container Ride",
                   first: "tiny zach"
                 },
                 {
                   record: "78",
-                  date: new Date(2022, 8, 19),
+                  date: new Date(2020, 11, 21),
+                  map: "Container Ride",
+                  first: "tiny zach"
+                },
+                {
+                  record: "77",
+                  date: new Date(2021, 10, 25),
                   map: "Container Ride",
                   first: "tiny zach"
                 },
                 {
                   record: "76",
-                  date: new Date(2023, 3, 20),
+                  date: new Date(2022, 4, 17),
+                  map: "Container Ride",
+                  first: "tiny zach"
+                },
+                {
+                  record: "75",
+                  date: new Date(2023, 9, 31),
                   map: "Container Ride",
                   first: "tiny zach"
                 },
                 {
                   record: "74",
-                  date: new Date(2024, 2, 25),
+                  date: new Date(2024, 4, 4),
                   map: "Container Ride",
                   first: "tiny zach"
                 },
@@ -614,10 +651,10 @@ export default function Maplist(prop) {
 
                 gameImg.style.backgroundImage = `url(${data.data[0].image})`;
 
-                const mapImg = document.querySelectorAll(".maplist-img");
-                mapImg.forEach((map) => {
-                    map.style.backgroundImage = `url(${data.data[0].image})`;
-                });
+                // const mapImg = document.querySelectorAll(".maplist-img");
+                // mapImg.forEach((map) => {
+                //     map.style.backgroundImage = `url(${data.data[0].image})`;
+                // });
 
             } catch (error) {
                 console.log("error fetching games:", error);
@@ -647,15 +684,15 @@ export default function Maplist(prop) {
     
             const resizeObserver = new ResizeObserver(handleResize);
 
-            if (scrollRef.current) {
-                //hi
-                if (new URLSearchParams(new URL(window.location.href).search).get("chapter")) {
-                    setTimeout(() => {
-                        scrollRef.current.scrollIntoView({ behavior: "smooth", block: "start" })
-                    }, 200);
-                }
+            // if (scrollRef.current) {
+            //     //hi
+            //     if (new URLSearchParams(new URL(window.location.href).search).get("chapter")) {
+            //         setTimeout(() => {
+            //             scrollRef.current.scrollIntoView({ behavior: "smooth", block: "start" })
+            //         }, 200);
+            //     }
                 
-            }
+            // }
     
             if (divRef.current) {
             resizeObserver.observe(divRef.current);
