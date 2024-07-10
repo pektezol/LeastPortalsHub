@@ -58,6 +58,15 @@ type MapShort struct {
 	Difficulty  int    `json:"difficulty"`
 }
 
+type MapSelect struct {
+	ID              int              `json:"id"`
+	Name            string           `json:"name"`
+	Image           string           `json:"image"`
+	IsDisabled      bool             `json:"is_disabled"`
+	Difficulty      int              `json:"difficulty"`
+	CategoryPortals []CategoryPortal `json:"category_portals"`
+}
+
 type MapSummary struct {
 	Routes []MapRoute `json:"routes"`
 }
