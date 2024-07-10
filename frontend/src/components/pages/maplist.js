@@ -17,24 +17,38 @@ export default function Maplist(prop) {
     let maxPage;
     let currentPage;
     let add = 0;
+    let gameState;
+    let catState = 0;
     async function detectGame() {
-        if (location.pathname == "/games/p2-sp"){
-            gameTitle = "Portal 2 Singleplayer";
+        const response = await fetch("https://lp.ardapektezol.com/api/v1/games", {
+            headers: {
+                'Authorization': token
+            }
+        });
+
+        const data = await response.json();
+
+        const url = new URL(window.location.href)
+
+        const params = new URLSearchParams(url.search)
+        gameState = parseFloat(params.get("game"))
+
+        document.querySelector("#catPortalCount").innerText = data.data[gameState - 1].category_portals[0].portal_count;
+
+        if (gameState == 1){
+            gameTitle = data.data[0].name;
 
             maxPage = 9;
             minPage = 1;
             createCategories(1);
-        } else if (location.pathname == "/games/p2-coop"){
-            gameTitle = "Portal 2 Co-op";
+        } else if (gameState == 2){
+            gameTitle = data.data[1].name;
 
             maxPage = 16;
             minPage = 10;
             add = 10
             createCategories(2);
         }
-        const url = new URL(window.location.href)
-
-        const params = new URLSearchParams(url.search)
         
         let chapterParam = params.get("chapter")
 
@@ -74,31 +88,27 @@ export default function Maplist(prop) {
         });
     }
 
-    function createCategories(gameID) {
-        let categoriesArr;
-        if (gameID == 1) {
-            // Portal 2 Singleplayer
-            categoriesArr = [
-                "Challenge Mode",
-                "NoSLA",
-                "Inbounds SLA",
-                "Any%",
-            ]
-        } else if (gameID == 2) {
-            categoriesArr = [
-                "Challenge Mode",
-                "All Courses",
-                "Any%",
-            ]
-        }
+    async function createCategories(gameID) {
+        const response = await fetch("https://lp.ardapektezol.com/api/v1/games", {
+            headers: {
+                'Authorization': token
+            }
+        });
 
+        const data = await response.json();
+        let categoriesArr = data.data[gameID - 1].category_portals;
+
+        const gameNav = document.querySelector(".game-nav");
+        gameNav.innerHTML = "";
         categoriesArr.forEach((category) => {
             createCategory(category);
         });
     }
 
     let categoryNum = 0;
-    function createCategory(categoryName) {
+    function createCategory(category) {
+        const gameNav = document.querySelector(".game-nav");
+
         categoryNum++;
         const gameNavBtn = document.createElement("button");
         if (categoryNum == 1) {
@@ -106,10 +116,31 @@ export default function Maplist(prop) {
         } else {
             gameNavBtn.className = "game-nav-btn";
         }
-        gameNavBtn.innerText = categoryName;
+        gameNavBtn.id = "catBtn"
+        gameNavBtn.innerText = category.category.name;
 
-        const gameNav = document.querySelector(".game-nav");
+        gameNavBtn.addEventListener("click", (e) => {
+            changeCategory(category, e);
+        })
+
         gameNav.appendChild(gameNavBtn);
+    }
+
+    async function changeCategory(category, btn) {
+        const response = await fetch("https://lp.ardapektezol.com/api/v1/games", {
+            headers: {
+                'Authorization': token
+            }
+        });
+
+        const data = await response.json();
+        const navBtns = document.querySelectorAll("#catBtn");
+        navBtns.forEach((btns) => {
+            btns.classList.remove("selected");
+        });
+
+        btn.srcElement.classList.add("selected");
+        document.querySelector("#catPortalCount").innerText = category.portal_count;
     }
 
     async function changePage(page) {
@@ -136,7 +167,7 @@ export default function Maplist(prop) {
         maplistMaps.innerHTML = "";
 
         maps.forEach(map => {
-            addMap(map.name, map.portal_count, map.image, 1, map.id);
+            addMap(map.name, map.portal_count, map.image, map.difficulty + 1, map.id);
         });
 
         const gameTitleElement = document.querySelector("#gameTitle");
@@ -722,7 +753,7 @@ export default function Maplist(prop) {
                     <div className='game-header'>
                         <div className='game-img'></div>
                         <div className='game-header-text'>
-                            <span><b>74</b></span>
+                            <span><b id='catPortalCount'>0</b></span>
                             <span>portals</span>
                         </div>
                     </div>

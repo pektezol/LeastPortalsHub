@@ -51,6 +51,7 @@ span>b {
     height: 100%;
     backdrop-filter: blur(4px);
     filter: blur(4px);
+    background-size: cover;
 }
 
 .games-page-item-header span>b {

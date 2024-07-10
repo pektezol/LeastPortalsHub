@@ -1,11 +1,12 @@
-import React, { useEffect } from 'react';
-import { useLocation, Link }  from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { useLocation, Link } from "react-router-dom";
 
 import "./games.css"
+import GameEntry from './game';
 
 export default function Games(prop) {
-    const {token} = prop
-    const [games, setGames] = React.useState(null);
+    const { token } = prop;
+    const [games, setGames] = useState([]);
     const location = useLocation();
 
     useEffect(() => {
@@ -18,36 +19,26 @@ export default function Games(prop) {
                 });
 
                 const data = await response.json();
+                setGames(data.data);
 
                 const headers = document.querySelectorAll(".games-page-item-header-img");
                 headers.forEach((header) => {
-                        header.style.backgroundSize = "cover";
-                    if (header.id == "sp") {
+                    header.style.backgroundSize = "cover";
+                    if (header.id === "sp") {
                         header.style.backgroundImage = `url(${data.data[0].image})`;
-                    } else if (header.id == "mp") {
+                    } else if (header.id === "mp") {
                         header.style.backgroundImage = `url(${data.data[1].image})`;
                     } else {
                         header.style.backgroundImage = `url(${data.data[0].image})`;
                     }
                 });
-
-                // sp
-                document.querySelector("#spcm").innerText = data.data[0].category_portals[0].portal_count
-                document.querySelector("#spnosla").innerText = data.data[0].category_portals[1].portal_count
-                document.querySelector("#spinbsla").innerText = data.data[0].category_portals[2].portal_count
-                document.querySelector("#spany").innerText = data.data[0].category_portals[3].portal_count
-
-                // coop
-                document.querySelector("#mpcm").innerText = data.data[1].category_portals[0].portal_count
-                document.querySelector("#mpany").innerText = data.data[1].category_portals[2].portal_count
-                document.querySelector("#mpac").innerText = data.data[1].category_portals[1].portal_count
             } catch (err) {
                 console.error("Error fetching games:", err);
             }
-        }
+        };
 
         fetchGames();
-    }, []);
+    }, [token]);
 
     return (
         <div className='games-page'>
@@ -58,71 +49,12 @@ export default function Games(prop) {
             <section>
                 <div className='games-page-content'>
                     <div className='games-page-item-content'>
-                    <Link to='/games/p2-sp'><div className='games-page-item'>
-                        <div className='games-page-item-header'>
-                            <div id="sp" className='games-page-item-header-img'></div>
-                            <span><b>Portal 2 Singleplayer</b></span>
-                        </div>
-                        <div className='games-page-item-body'>
-                            <div className='games-page-item-body-item'>
-                                <span className='games-page-item-body-item-title'>Challenge Mode</span><br/>
-                                <span className='games-page-item-body-item-num' id='spcm'></span>
-                            </div>
-                            <div className='games-page-item-body-item'>
-                                <span className='games-page-item-body-item-title'>NoSLA</span><br/>
-                                <span className='games-page-item-body-item-num' id='spnosla'></span>
-                            </div>
-                            <div className='games-page-item-body-item'>
-                                <span className='games-page-item-body-item-title'>Inbounds SLA</span><br/>
-                                <span className='games-page-item-body-item-num' id='spinbsla'></span>
-                            </div>
-                            <div className='games-page-item-body-item'>
-                                <span className='games-page-item-body-item-title'>Any%</span><br/>
-                                <span className='games-page-item-body-item-num' id='spany'></span>
-                            </div>
-                        </div>
-                    </div></Link>
-                    <Link to='/games/p2-coop'><div className='games-page-item'>
-                        <div className='games-page-item-header'>
-                            <div id='mp' className='games-page-item-header-img'></div>
-                            <span><b>Portal 2 Co-op</b></span>
-                        </div>
-                        <div className='games-page-item-body'>
-                            <div className='games-page-item-body-item'>
-                                <span className='games-page-item-body-item-title'>Challenge Mode</span><br/>
-                                <span className='games-page-item-body-item-num' id='mpcm'>45</span>
-                            </div>
-                            <div className='games-page-item-body-item'>
-                                <span className='games-page-item-body-item-title'>All Courses</span><br/>
-                                <span className='games-page-item-body-item-num' id='mpac'>53</span>
-                            </div>
-                            <div className='games-page-item-body-item'>
-                                <span className='games-page-item-body-item-title'>Any%</span><br/>
-                                <span className='games-page-item-body-item-num' id='mpany'>12</span>
-                            </div>
-                        </div>
-                    </div></Link>
-                    <Link to='/games/psm'><div className='games-page-item'>
-                        <div className='games-page-item-header'>
-                            <div className='games-page-item-header-img'></div>
-                            <span><b>Portal Stories: Mel</b></span>
-                        </div>
-                        <div className='games-page-item-body'>
-                            <div className='games-page-item-body-item'>
-                                <span className='games-page-item-body-item-title'>Story Mode</span><br/>
-                                <span className='games-page-item-body-item-num' id='melsm'>69</span>
-                            </div>
-                            <div className='games-page-item-body-item'>
-                                <span className='games-page-item-body-item-title'>Advanced Mode</span><br/>
-                                <span className='games-page-item-body-item-num' id='melam'>69</span>
-                            </div>
-                        </div>
-                    </div></Link>
-
+                        {games.map((game, index) => (
+                            <GameEntry gameInfo={game} key={index} />
+                        ))}
                     </div>
-                    
                 </div>
             </section>
         </div>
-    )
+    );
 }

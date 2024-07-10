@@ -340,7 +340,7 @@ return (
         <section id='section1' className='summary1'>
             <div>
                 <Link to="/games"><button className='nav-button' style={{borderRadius: "20px 0px 0px 20px"}}><i className='triangle'></i><span>Games list</span></button></Link>
-                <Link to={`/games/${data.map.game_name == "Portal 2 - Singleplayer" ? "p2-sp" : data.map.game_name == "Portal 2 - Cooperative" ? "p2-coop" : "psm"}?chapter=${current_chapter}`}><button className='nav-button' style={{borderRadius: "0px 20px 20px 0px", marginLeft: "2px"}}><i className='triangle'></i><span>{data.map.chapter_name}</span></button></Link>
+                <Link to={`/games/${data.map.game_name == "Portal 2 - Singleplayer" ? "game?game=1" : data.map.game_name == "Portal 2 - Cooperative" ? "game?game=2" : "psm"}&chapter=${current_chapter}`}><button className='nav-button' style={{borderRadius: "0px 20px 20px 0px", marginLeft: "2px"}}><i className='triangle'></i><span>{data.map.chapter_name}</span></button></Link>
                 <br/><span><b>{data.map.map_name}</b></span>
             </div>
 
