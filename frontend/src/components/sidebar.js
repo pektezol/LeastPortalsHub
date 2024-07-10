@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link, useLocation } from "react-router-dom";
 
 import "../App.css"
@@ -18,6 +18,7 @@ import Login from "./login.js"
 export default function Sidebar(prop) {
 const {token,setToken} = prop
 const [profile, setProfile] = React.useState(null);
+
 React.useEffect(() => {
     fetch(`https://lp.ardapektezol.com/api/v1/profile`,{
         headers: {
@@ -27,7 +28,6 @@ React.useEffect(() => {
     .then(r => r.json())
     .then(d => setProfile(d.data))
     }, [token]);
-
 
 // Locks search button for 300ms before it can be clicked again, prevents spam
 const [isLocked, setIsLocked] = React.useState(false);
@@ -40,34 +40,38 @@ if (!isLocked) {
 }
 
 
+// The menu button
+const [sidebar, setSidebar] = React.useState();
+
 // Clicked buttons
 function SidebarClick(x){
 const btn = document.querySelectorAll("button.sidebar-button");
 
 if(sidebar===1){setSidebar(0);SidebarHide()}
 
+// clusterfuck
 btn.forEach((e,i) =>{
-    btn[i].style.backgroundColor="inherit"
+    btn[i].classList.remove("sidebar-button-selected")
+    btn[i].classList.add("sidebar-button-deselected")
 }) 
-btn[x].style.backgroundColor="#202232"
+btn[x].classList.add("sidebar-button-selected")
+btn[x].classList.remove("sidebar-button-deselected")
 
 }
-
-
-// The menu button
-const [sidebar, setSidebar] = React.useState();
 
 function SidebarHide(){
 const btn   = document.querySelectorAll("button.sidebar-button")
 const span  = document.querySelectorAll("button.sidebar-button>span");
 const side  = document.querySelector("#sidebar-list");
 const login = document.querySelectorAll(".login>button")[1];
+const searchbar = document.querySelector("#searchbar");
 
 if(sidebar===1){
     setSidebar(0)
     side.style.width="320px"
     btn.forEach((e, i) =>{
         e.style.width="310px"
+        e.style.padding = "0.4em 0 0 11px"
         setTimeout(() => {
             span[i].style.opacity="1"
             login.style.opacity="1"
@@ -77,28 +81,29 @@ if(sidebar===1){
     side.style.zIndex="2"
 } else {
     side.style.width="40px";
+    searchbar.focus();
+    setSearch(searchbar.value)
     setSidebar(1)
     btn.forEach((e,i) =>{
         e.style.width="40px"
+        e.style.padding = "0.4em 0 0 5px"
         span[i].style.opacity="0"
     }) 
     login.style.opacity="0"
     setTimeout(() => {
         side.style.zIndex="0"
     }, 300);
-    }
+    }    
 }
-
 // Links
 const location = useLocation()
 React.useEffect(()=>{
     if(location.pathname==="/"){SidebarClick(1)}
     if(location.pathname.includes("news")){SidebarClick(2)}
-    if(location.pathname.includes("records")){SidebarClick(3)}
+    if(location.pathname.includes("games")){SidebarClick(3)}
     if(location.pathname.includes("leaderboards")){SidebarClick(4)}
-    if(location.pathname.includes("discussions")){SidebarClick(5)}
-    if(location.pathname.includes("scorelog")){SidebarClick(6)}
-    if(location.pathname.includes("profile")){SidebarClick(7)}
+    if(location.pathname.includes("scorelog")){SidebarClick(5)}
+    if(location.pathname.includes("profile")){SidebarClick(6)}
     if(location.pathname.includes("rules")){SidebarClick(9)}
     if(location.pathname.includes("about")){SidebarClick(10)}
 
@@ -107,6 +112,7 @@ React.useEffect(()=>{
 
 const [search,setSearch] = React.useState(null)
 const [searchData,setSearchData] = React.useState(null)
+
 React.useEffect(()=>{
     fetch(`https://lp.ardapektezol.com/api/v1/search?q=${search}`)
         .then(r=>r.json())
@@ -139,16 +145,12 @@ return (
                     <button className='sidebar-button'><img src={img3} alt="" /><span>News</span></button>
                 </Link>
 
-                <Link to="/records" tabIndex={-1}>
-                    <button className='sidebar-button'><img src={img4} alt="" /><span>Records</span></button>
+                <Link to="/games" tabIndex={-1}>
+                    <button className='sidebar-button'><img src={img4} alt="" /><span>Games</span></button>
                 </Link>
 
                 <Link to="/leaderboards" tabIndex={-1}>
                     <button className='sidebar-button'><img src={img5} alt="" /><span>Leaderboards</span></button>
-                </Link>
-
-                <Link to="/discussions" tabIndex={-1}>
-                    <button className='sidebar-button'><img src={img6} alt="" /><span>Discussions</span></button>
                 </Link>
 
                 <Link to="/scorelog" tabIndex={-1}>
