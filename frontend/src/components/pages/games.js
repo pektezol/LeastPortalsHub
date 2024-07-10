@@ -20,24 +20,20 @@ export default function Games(prop) {
 
                 const data = await response.json();
                 setGames(data.data);
-
-                const headers = document.querySelectorAll(".games-page-item-header-img");
-                headers.forEach((header) => {
-                    header.style.backgroundSize = "cover";
-                    if (header.id === "sp") {
-                        header.style.backgroundImage = `url(${data.data[0].image})`;
-                    } else if (header.id === "mp") {
-                        header.style.backgroundImage = `url(${data.data[1].image})`;
-                    } else {
-                        header.style.backgroundImage = `url(${data.data[0].image})`;
-                    }
-                });
+                pageLoad();
             } catch (err) {
                 console.error("Error fetching games:", err);
             }
         };
 
         fetchGames();
+
+        function pageLoad() {
+            const loaders = document.querySelectorAll(".loader");
+            loaders.forEach((loader) => {
+                loader.style.display = "none";
+            });
+        }
     }, [token]);
 
     return (
@@ -49,6 +45,8 @@ export default function Games(prop) {
             <section>
                 <div className='games-page-content'>
                     <div className='games-page-item-content'>
+                        <div className='loader loader-game'></div>
+                        <div className='loader loader-game'></div>
                         {games.map((game, index) => (
                             <GameEntry gameInfo={game} key={index} />
                         ))}

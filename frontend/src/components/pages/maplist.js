@@ -121,6 +121,7 @@ export default function Maplist(prop) {
 
         gameNavBtn.addEventListener("click", (e) => {
             changeCategory(category, e);
+            changePage(currentPage);
         })
 
         gameNav.appendChild(gameNavBtn);
@@ -134,6 +135,8 @@ export default function Maplist(prop) {
         });
 
         const data = await response.json();
+        catState = category.category.id - 1;
+        console.log(catState)
         const navBtns = document.querySelectorAll("#catBtn");
         navBtns.forEach((btns) => {
             btns.classList.remove("selected");
@@ -144,6 +147,19 @@ export default function Maplist(prop) {
     }
 
     async function changePage(page) {
+
+        const pageNumbers = document.querySelector("#pageNumbers");
+        
+        pageNumbers.innerText = `${currentPage - minPage + 1}/${maxPage - minPage + 1}`;
+
+        const maplistMaps = document.querySelector(".maplist-maps");
+        maplistMaps.innerHTML = "";
+        for (let index = 0; index < 8; index++) {
+            const loadingAnimation = document.createElement("div");
+            loadingAnimation.classList.add("loader");
+            loadingAnimation.classList.add("loader-map")
+            maplistMaps.appendChild(loadingAnimation);
+        }
         const data = await fetchMaps(page);
         const maps = data.data.maps;
         const name = data.data.chapter.name;
@@ -163,25 +179,25 @@ export default function Maplist(prop) {
         chapterNumberElement.innerText = chapterName + " " + chapterNumber;
         chapterTitleElement.innerText = chapterTitle;
 
-        const maplistMaps = document.querySelector(".maplist-maps");
         maplistMaps.innerHTML = "";
-
         maps.forEach(map => {
-            addMap(map.name, map.portal_count, map.image, map.difficulty + 1, map.id);
+            let portalCount;
+            if (map.category_portals[catState] != undefined) {
+                portalCount = map.category_portals[catState].portal_count;
+            } else {
+                portalCount = map.category_portals[0].portal_count;
+            }
+            addMap(map.name, portalCount, map.image, map.difficulty + 1, map.id);
         });
 
         const gameTitleElement = document.querySelector("#gameTitle");
         gameTitleElement.innerText = gameTitle;
-
-        const pageNumbers = document.querySelector("#pageNumbers");
         
         const url = new URL(window.location.href)
 
         const params = new URLSearchParams(url.search)
         
         let chapterParam = params.get("chapter")
-        
-        pageNumbers.innerText = `${currentPage - minPage + 1}/${maxPage - minPage + 1}`;
 
         try {
             const response = await fetch("https://lp.ardapektezol.com/api/v1/games", {
@@ -746,7 +762,7 @@ export default function Maplist(prop) {
                         <i className='triangle'></i>
                         <span>Games list</span>
                     </button></Link>
-                    <span><b id='gameTitle'>undefined</b></span>
+                    <span><b id='gameTitle'>&nbsp;</b></span>
                 </section>
 
                 <div className='game'>
@@ -779,16 +795,17 @@ export default function Maplist(prop) {
                         <span className='chapter-name'>undefined</span>
 
                         <div className='chapter-page-div'>
-                            <button onClick={() => { currentPage--; currentPage < minPage ? currentPage = minPage : changePage(currentPage); }}>
+                            <button id='pageChanger' onClick={() => { currentPage--; currentPage < minPage ? currentPage = minPage : changePage(currentPage); }}>
                                 <i className='triangle'></i>
                             </button>
                             <span id='pageNumbers'>0/0</span>
-                            <button onClick={() => { currentPage++; currentPage > maxPage ? currentPage = maxPage : changePage(currentPage); }}>
+                            <button id='pageChanger' onClick={() => { currentPage++; currentPage > maxPage ? currentPage = maxPage : changePage(currentPage); }}>
                                 <i style={{ transform: "rotate(180deg)" }} className='triangle'></i>
                             </button>
                         </div>
                         
-                        <div className='maplist-maps'></div>
+                        <div className='maplist-maps'>
+                        </div>
                     </div>
                 </div>
 
