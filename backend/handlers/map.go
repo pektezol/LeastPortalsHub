@@ -27,8 +27,8 @@ type ChaptersResponse struct {
 }
 
 type ChapterMapsResponse struct {
-	Chapter models.Chapter    `json:"chapter"`
-	Maps    []models.MapShort `json:"maps"`
+	Chapter models.Chapter     `json:"chapter"`
+	Maps    []models.MapSelect `json:"maps"`
 }
 
 type GameMapsResponse struct {
@@ -479,20 +479,62 @@ func FetchChapterMaps(c *gin.Context) {
 		return
 	}
 	var response ChapterMapsResponse
-	rows, err := database.DB.Query(`SELECT m.id, m.name, c.name, m.is_disabled, m.image, MIN(mh.score_count) FROM maps m INNER JOIN chapters c ON m.chapter_id = c.id INNER JOIN map_history mh ON m.id = mh.map_id WHERE chapter_id = $1 GROUP BY m.id, c.name ORDER BY m.id;`, chapterID)
+	rows, err := database.DB.Query(`
+	SELECT 
+		m.id, 
+		m.name AS map_name, 
+		c.name AS chapter_name, 
+		m.is_disabled,
+		m.image,
+		cat.id,
+		cat.name,
+		mh.min_score_count AS score_count
+	FROM 
+		maps m
+	INNER JOIN 
+		chapters c ON m.chapter_id = c.id
+	INNER JOIN 
+		game_categories gc ON gc.game_id = c.game_id
+	INNER JOIN
+		categories cat ON cat.id = gc.category_id
+	INNER JOIN 
+		(
+			SELECT 
+				map_id, 
+				category_id, 
+				MIN(score_count) AS min_score_count
+			FROM 
+				map_history
+			GROUP BY 
+				map_id, 
+				category_id
+		) mh ON m.id = mh.map_id AND gc.category_id = mh.category_id
+	WHERE 
+		m.chapter_id = $1
+	ORDER BY 
+		m.id, gc.category_id, mh.min_score_count ASC;
+	`, chapterID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
-	var maps []models.MapShort
+	var maps []models.MapSelect
 	var chapterName string
+	var lastMapID int
 	for rows.Next() {
-		var mapShort models.MapShort
-		if err := rows.Scan(&mapShort.ID, &mapShort.Name, &chapterName, &mapShort.IsDisabled, &mapShort.Image, &mapShort.PortalCount); err != nil {
+		var mapShort models.MapSelect
+		var categoryPortal models.CategoryPortal
+		if err := rows.Scan(&mapShort.ID, &mapShort.Name, &chapterName, &mapShort.IsDisabled, &mapShort.Image, &categoryPortal.Category.ID, &categoryPortal.Category.Name, &categoryPortal.PortalCount); err != nil {
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
-		maps = append(maps, mapShort)
+		if mapShort.ID == lastMapID {
+			maps[len(maps)-1].CategoryPortals = append(maps[len(maps)-1].CategoryPortals, categoryPortal)
+		} else {
+			mapShort.CategoryPortals = append(mapShort.CategoryPortals, categoryPortal)
+			maps = append(maps, mapShort)
+			lastMapID = mapShort.ID
+		}
 	}
 	response.Chapter.ID = intID
 	response.Chapter.Name = chapterName

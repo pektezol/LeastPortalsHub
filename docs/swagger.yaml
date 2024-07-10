@@ -6,7 +6,7 @@ definitions:
         $ref: '#/definitions/models.Chapter'
       maps:
         items:
-          $ref: '#/definitions/models.MapShort'
+          $ref: '#/definitions/models.MapSelect'
         type: array
     type: object
   handlers.ChaptersResponse:
@@ -417,6 +417,23 @@ definitions:
       route_id:
         type: integer
       showcase:
+        type: string
+    type: object
+  models.MapSelect:
+    properties:
+      category_portals:
+        items:
+          $ref: '#/definitions/models.CategoryPortal'
+        type: array
+      difficulty:
+        type: integer
+      id:
+        type: integer
+      image:
+        type: string
+      is_disabled:
+        type: boolean
+      name:
         type: string
     type: object
   models.MapShort:

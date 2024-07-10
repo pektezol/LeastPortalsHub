@@ -1367,7 +1367,7 @@ const docTemplate = `{
                 "maps": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/models.MapShort"
+                        "$ref": "#/definitions/models.MapSelect"
                     }
                 }
             }
@@ -1995,6 +1995,32 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "showcase": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.MapSelect": {
+            "type": "object",
+            "properties": {
+                "category_portals": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.CategoryPortal"
+                    }
+                },
+                "difficulty": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "is_disabled": {
+                    "type": "boolean"
+                },
+                "name": {
                     "type": "string"
                 }
             }
