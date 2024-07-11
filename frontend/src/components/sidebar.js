@@ -46,6 +46,7 @@ const [sidebar, setSidebar] = React.useState();
 // Clicked buttons
 function SidebarClick(x){
 const btn = document.querySelectorAll("button.sidebar-button");
+console.log(x)
 
 if(sidebar===1){setSidebar(0);SidebarHide()}
 
@@ -104,8 +105,8 @@ React.useEffect(()=>{
     if(location.pathname.includes("leaderboards")){SidebarClick(4)}
     if(location.pathname.includes("scorelog")){SidebarClick(5)}
     if(location.pathname.includes("profile")){SidebarClick(6)}
-    if(location.pathname.includes("rules")){SidebarClick(9)}
-    if(location.pathname.includes("about")){SidebarClick(10)}
+    if(location.pathname.includes("rules")){SidebarClick(8)}
+    if(location.pathname.includes("about")){SidebarClick(9)}
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
 },  [location.pathname])
