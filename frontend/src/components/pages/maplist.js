@@ -31,7 +31,7 @@ export default function Maplist(prop) {
         const url = new URL(window.location.href)
 
         const params = new URLSearchParams(url.search)
-        gameState = parseFloat(params.get("game"))
+        gameState = parseFloat(location.pathname.split("/")[2])
 
         document.querySelector("#catPortalCount").innerText = data.data[gameState - 1].category_portals[0].portal_count;
 
