@@ -10,6 +10,10 @@ export default function Games(prop) {
     const location = useLocation();
 
     useEffect(() => {
+        document.querySelectorAll(".games-page-item-body").forEach((game, index) => {
+            game.innerHTML = "";
+        })
+
         const fetchGames = async () => {
             try {
                 const response = await fetch("https://lp.ardapektezol.com/api/v1/games", {
