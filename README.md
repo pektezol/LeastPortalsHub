@@ -10,10 +10,11 @@ In addition, we host a leaderboard section for each map where users can compare 
 
 ## Project Team
 
-* [@pektezol](https://github.com/pektezol) - Project Lead
+* [@pektezol](https://github.com/pektezol) - Project Lead & Backend
 * [@Krzyhau](https://github.com/Krzyhau) - Visual Design
-* [@Nidboj132](https://github.com/Nidboj132) - Frontend
+* [@Nidboj132](https://github.com/Nidboj132) - Frontend & Subject Expert
 * [@Oryn](https://github.com/Oryn-Goia) - Subject Expert
+* [@Wolfboy248](https://github.com/Wolfboy248) - Frontend
 
 ## Special Thanks
 
