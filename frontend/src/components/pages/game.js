@@ -34,7 +34,7 @@ export default function GameEntry({ gameInfo }) {
     })
 
     return (
-        <Link to={"/games/game?game=" + gameInfo.id}><div className='games-page-item'>
+        <Link to={"/games/" + gameInfo.id}><div className='games-page-item'>
             <div className='games-page-item-header'>
                 <div style={{backgroundImage: `url(${gameInfo.image})`}} className='games-page-item-header-img'></div>
                 <span><b>{gameInfo.name}</b></span>

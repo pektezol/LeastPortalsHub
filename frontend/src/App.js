@@ -40,7 +40,7 @@ export default function App() {
             <Route path="/about" element={<About/>}></Route>
             <Route path="/maps/*" element={<Summary token={token} mod={mod}/>}></Route>
             <Route path="/games" element={<Games/>}></Route>
-            <Route path="/games/game" element={<Maplist token={token} mod={mod} />}></Route>
+            <Route path="/games/*" element={<Maplist token={token} mod={mod} />}></Route>
             <Route path="*" element={<Main text="404 Page not found"/>}></Route>
         </Routes>
         </BrowserRouter>
