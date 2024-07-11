@@ -23,7 +23,11 @@ const [isLoggedIn, setIsLoggedIn] = React.useState(false);
 React.useEffect(() => {
     fetch(`https://lp.ardapektezol.com/api/v1/token`)
     .then(r => r.json())
-    .then(d => setToken(d.data.token))
+    .then(d => {
+        if (d.data != null) {
+            setToken(d.data.token)
+        }
+    })
     }, []);
 
 

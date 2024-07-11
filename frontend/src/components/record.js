@@ -8,16 +8,15 @@ export default function Record({ name, place, portals, time, date }) {
     const [record, setRecord] = useState(null);
     const location = useLocation();
 
-    useEffect(() => {
-        console.log(name, place, portals, time, date);
-    })
+    // useEffect(() => {
+    //     console.log(name, place, portals, time, date);
+    // })
 
     function timeSince() {
         const now = new Date();
         const dateNew = new Date(date);
       
         const secondsPast = Math.floor((now - dateNew) / 1000);
-        console.log('Seconds past:', secondsPast);
       
         if (secondsPast < 60) {
           return `${secondsPast} seconds ago`;

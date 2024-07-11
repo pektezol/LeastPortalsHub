@@ -98,6 +98,9 @@ export default function Maplist(prop) {
         const data = await response.json();
         let categoriesArr = data.data[gameID - 1].category_portals;
 
+        if (document.querySelector(".maplist-maps") == null) {
+            return;
+        }
         const gameNav = document.querySelector(".game-nav");
         gameNav.innerHTML = "";
         categoriesArr.forEach((category) => {
@@ -147,7 +150,6 @@ export default function Maplist(prop) {
     }
 
     async function changePage(page) {
-
         const pageNumbers = document.querySelector("#pageNumbers");
         
         pageNumbers.innerText = `${currentPage - minPage + 1}/${maxPage - minPage + 1}`;
@@ -174,6 +176,9 @@ export default function Maplist(prop) {
         const chapterNumber = chapterNumber1.toString().padStart(2, "0");
         const chapterTitle = name.split(" - ")[1];
 
+        if (document.querySelector(".maplist-maps") == null) {
+            return;
+        }
         const chapterNumberElement = document.querySelector(".chapter-num")
         const chapterTitleElement = document.querySelector(".chapter-name")
         chapterNumberElement.innerText = chapterName + " " + chapterNumber;
@@ -623,7 +628,7 @@ export default function Maplist(prop) {
                 }
                 dataPoint.style.animationDelay = delay + "s"
                 
-                let isHoveringOverData = false;
+                let isHoveringOverData = true;
                 let isDataActive = false;
                 document.querySelector("#dataPointInfo").style.left = item.x + "px";
                 document.querySelector("#dataPointInfo").style.bottom = (point_height * item.record -3) + "px";
@@ -671,6 +676,8 @@ export default function Maplist(prop) {
                 })
                 document.querySelector(".chart").addEventListener("mouseleave", () => {
                     isDataActive = false
+                    // fuck you
+                    isHoveringOverData = true;
                     dataPoint.classList.remove("data-point-active")
                     document.querySelector("#dataPointInfo").style.opacity = "0";
                     document.querySelector("#dataPointInfo").style.zIndex = "0";
