@@ -53,7 +53,7 @@ func Login(c *gin.Context) {
 				return
 			}
 			// Empty country code check
-			if user.LocCountryCode == "" {
+			if user.LocCountryCode == "" || user.LocCountryCode == "  " {
 				user.LocCountryCode = "XX"
 			}
 			// Insert new user to database
