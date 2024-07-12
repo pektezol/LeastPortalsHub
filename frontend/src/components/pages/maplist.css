@@ -52,7 +52,7 @@ a {
 .game {
     width: 100%;
     height: 192px;
-    background: #202232;
+    /* background: #202232; */
     border-radius: 24px;
     overflow: hidden;
 }
@@ -112,9 +112,12 @@ a {
     align-items: center;
 }
 
-.game-nav-btn:hover, .selected {
-    background-color: #202232;
+.game-nav-btn:hover {
     cursor: pointer;
+}
+
+.selected {
+    background-color: #202232;
 }
 
 .gameview-nav {
@@ -123,7 +126,8 @@ a {
     height: 56px;
     border-radius: 24px;
     overflow: hidden;
-    background-color: #202232;
+    gap: 0.06em;
+    /* background-color: #202232; */
 }
 
 .maplist {

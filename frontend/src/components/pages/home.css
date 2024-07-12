@@ -68,9 +68,11 @@
 
 .recommended-map-img {
     width: 250px;
-    border-radius: 24px;
+    border-radius: 19px;
     margin-bottom: 0;
-    border: 7px solid #2B2E46;
+    /* border: 7px solid #2B2E46; */
+    background-size: cover;
+    background-position-x: 50%;
 }
 
 .difficulty-bar-home {
@@ -78,13 +80,13 @@
     display: grid;
     grid-template-columns: 20% 20% 20% 20% 20%;
     align-items: center;
-    margin: 5px;
-    margin-top: 16px;
+    margin: 0px;
+    margin-top: 7px;
 }
 
 .difficulty-point {
     background: #2B2E46;
-    height: 3px;
+    height: 4px;
     margin: 5px;
     border-radius: 10px;
 }

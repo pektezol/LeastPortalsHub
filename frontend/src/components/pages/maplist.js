@@ -10,6 +10,8 @@ export default function Maplist(prop) {
     const {token,setToken} = prop
     const scrollRef = useRef(null)
     const [games, setGames] = React.useState(null);
+    const [hasOpenedStatistics, setHasOpenedStatistics] = React.useState(false);
+    const [totalPortals, setTotalPortals] = React.useState(0);
     const location = useLocation();
     
     let gameTitle;
@@ -81,6 +83,7 @@ export default function Maplist(prop) {
                     
                     document.querySelector(".maplist-page").scrollTo({ top: 372, behavior: "smooth" })
                     document.querySelector(".maplist").setAttribute("currentTab", "stats");
+                    setHasOpenedStatistics(true);
                 }
             } else {
                 btn.className = "game-nav-btn";
@@ -349,7 +352,23 @@ export default function Maplist(prop) {
     React.useEffect(() => {
 
         const lineChart = document.querySelector(".line-chart")
-        function createGraph() {
+        let tempTotalPortals = 0
+        fetch("https://lp.ardapektezol.com/api/v1/games/1/maps", {
+            headers: {
+                'Authorization': token
+            }
+        })
+        .then(r => r.json())
+        .then(d => {
+            d.data.maps.forEach((map, i) => {
+                tempTotalPortals += map.portal_count
+            })
+        })
+        .then(() => {
+            setTotalPortals(tempTotalPortals)
+        })
+        async function createGraph() {
+            console.log(totalPortals)
             // max
             let items = [
                 {
@@ -689,8 +708,6 @@ export default function Maplist(prop) {
             }
         }
 
-        createGraph()
-
         async function fetchGames() {
             try {
                 const response = await fetch("https://lp.ardapektezol.com/api/v1/games", {
@@ -726,8 +743,10 @@ export default function Maplist(prop) {
 
         const handleResize = (entries) => {
             for (let entry of entries) {
-                lineChart.innerHTML = ""
-                createGraph()
+                if (hasOpenedStatistics) {
+                    lineChart.innerHTML = ""
+                    createGraph()
+                }
                 if (document.querySelector(".maplist").getAttribute("currentTab") == "stats") {
                     document.querySelector(".stats").style.display = "block"
                 } else {
