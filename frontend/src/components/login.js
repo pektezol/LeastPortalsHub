@@ -28,9 +28,6 @@ React.useEffect(() => {
             setToken(d.data.token)
         }
     })
-    .then(d => {
-        setToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjMzNzc5OTksIm1vZCI6ZmFsc2UsInN1YiI6Ijc2NTYxMTk5MDg4MjU3MDk4In0.HNqWFuoXiqra4M3lApHn7V-q87l5UUszu1J-qsNDY1A")
-    })
     }, []);
 
 
