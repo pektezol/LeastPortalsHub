@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useLocation, Link }  from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
 
 import "./maplist.css"
@@ -7,12 +7,16 @@ import img5 from "../../imgs/5.png"
 import img6 from "../../imgs/6.png"
 
 export default function Maplist(prop) {
-    const {token,setToken} = prop
+    const { token, setToken } = prop
     const scrollRef = useRef(null)
     const [games, setGames] = React.useState(null);
+    const [hasOpenedStatistics, setHasOpenedStatistics] = React.useState(false);
+    const [totalPortals, setTotalPortals] = React.useState(0);
+    const [loading, setLoading] = React.useState(true)
     const location = useLocation();
-    
-    let gameTitle;
+
+    const [gameTitle, setGameTitle] = React.useState("");
+    const [catPortalCount, setCatPortalCount] = React.useState(0);
     let minPage;
     let maxPage;
     let currentPage;
@@ -33,23 +37,21 @@ export default function Maplist(prop) {
         const params = new URLSearchParams(url.search)
         gameState = parseFloat(location.pathname.split("/")[2])
 
-        document.querySelector("#catPortalCount").innerText = data.data[gameState - 1].category_portals[0].portal_count;
-
-        if (gameState == 1){
-            gameTitle = data.data[0].name;
+        if (gameState == 1) {
+            setGameTitle(data.data[0].name);
 
             maxPage = 9;
             minPage = 1;
             createCategories(1);
-        } else if (gameState == 2){
-            gameTitle = data.data[1].name;
+        } else if (gameState == 2) {
+            setGameTitle(data.data[1].name);
 
             maxPage = 16;
             minPage = 10;
             add = 10
             createCategories(2);
         }
-        
+
         let chapterParam = params.get("chapter")
 
         currentPage = minPage;
@@ -60,14 +62,22 @@ export default function Maplist(prop) {
 
         changePage(currentPage);
 
+        // if (!loading) {
+
+        //     document.querySelector("#catPortalCount").innerText = data.data[gameState - 1].category_portals[0].portal_count;
+
+        // }
+
+        setCatPortalCount(data.data[gameState - 1].category_portals[0].portal_count);
+
         // if (chapterParam) {
         //     document.querySelector("#pageNumbers").innerText = `${chapterParam - minPage + 1}/${maxPage - minPage + 1}`
         // }
     }
 
     function changeMaplistOrStatistics(index, name) {
-            const maplistBtns = document.querySelectorAll("#maplistBtn");
-            maplistBtns.forEach((btn, i) => {
+        const maplistBtns = document.querySelectorAll("#maplistBtn");
+        maplistBtns.forEach((btn, i) => {
             if (i == index) {
                 btn.className = "game-nav-btn selected"
 
@@ -78,9 +88,10 @@ export default function Maplist(prop) {
                 } else {
                     document.querySelector(".stats").style.display = "block";
                     document.querySelector(".maplist").style.display = "none";
-                    
+
                     document.querySelector(".maplist-page").scrollTo({ top: 372, behavior: "smooth" })
                     document.querySelector(".maplist").setAttribute("currentTab", "stats");
+                    setHasOpenedStatistics(true);
                 }
             } else {
                 btn.className = "game-nav-btn";
@@ -106,6 +117,8 @@ export default function Maplist(prop) {
         categoriesArr.forEach((category) => {
             createCategory(category);
         });
+
+        setLoading(false);
     }
 
     let categoryNum = 0;
@@ -131,6 +144,12 @@ export default function Maplist(prop) {
     }
 
     async function changeCategory(category, btn) {
+        const navBtns = document.querySelectorAll("#catBtn");
+        navBtns.forEach((btns) => {
+            btns.classList.remove("selected");
+        });
+
+        btn.srcElement.classList.add("selected");
         const response = await fetch("https://lp.ardapektezol.com/api/v1/games", {
             headers: {
                 'Authorization': token
@@ -139,19 +158,13 @@ export default function Maplist(prop) {
 
         const data = await response.json();
         catState = category.category.id - 1;
-        console.log(catState)
-        const navBtns = document.querySelectorAll("#catBtn");
-        navBtns.forEach((btns) => {
-            btns.classList.remove("selected");
-        });
-
-        btn.srcElement.classList.add("selected");
+        // console.log(catState)
         document.querySelector("#catPortalCount").innerText = category.portal_count;
     }
 
     async function changePage(page) {
         const pageNumbers = document.querySelector("#pageNumbers");
-        
+
         pageNumbers.innerText = `${currentPage - minPage + 1}/${maxPage - minPage + 1}`;
 
         const maplistMaps = document.querySelector(".maplist-maps");
@@ -165,7 +178,7 @@ export default function Maplist(prop) {
         const data = await fetchMaps(page);
         const maps = data.data.maps;
         const name = data.data.chapter.name;
-        
+
         let chapterName = "Chapter";
         const chapterNumberOld = name.split(" - ")[0];
         let chapterNumber1 = chapterNumberOld.split("Chapter ")[1];
@@ -195,13 +208,10 @@ export default function Maplist(prop) {
             addMap(map.name, portalCount, map.image, map.difficulty + 1, map.id);
         });
 
-        const gameTitleElement = document.querySelector("#gameTitle");
-        gameTitleElement.innerText = gameTitle;
-        
         const url = new URL(window.location.href)
 
         const params = new URLSearchParams(url.search)
-        
+
         let chapterParam = params.get("chapter")
 
         try {
@@ -263,10 +273,10 @@ export default function Maplist(prop) {
         difficultyPoint3.className = "difficulty-point";
         difficultyPoint4.className = "difficulty-point";
         difficultyPoint5.className = "difficulty-point";
-        
+
 
         maplistTitle.innerText = mapName;
-        difficultyLabel.innerText =  "Difficulty: "
+        difficultyLabel.innerText = "Difficulty: "
         maplistPortalcountPortals.innerText = "portals"
         b.innerText = mapPortalCount;
         maplistImg.style.backgroundImage = `url(${mapImage})`;
@@ -301,7 +311,7 @@ export default function Maplist(prop) {
     }
 
     async function fetchMaps(chapterID) {
-        try{
+        try {
             const response = await fetch(`https://lp.ardapektezol.com/api/v1/chapters/${chapterID}`, {
                 headers: {
                     'Authorization': token
@@ -349,92 +359,108 @@ export default function Maplist(prop) {
     React.useEffect(() => {
 
         const lineChart = document.querySelector(".line-chart")
-        function createGraph() {
+        let tempTotalPortals = 0
+        fetch("https://lp.ardapektezol.com/api/v1/games/1/maps", {
+            headers: {
+                'Authorization': token
+            }
+        })
+            .then(r => r.json())
+            .then(d => {
+                d.data.maps.forEach((map, i) => {
+                    tempTotalPortals += map.portal_count
+                })
+            })
+            .then(() => {
+                setTotalPortals(tempTotalPortals)
+            })
+        async function createGraph() {
+            console.log(totalPortals)
             // max
             let items = [
                 {
-                  record: "100",
-                  date: new Date(2011, 4, 4),
-                  map: "Container Ride",
-                  first: "tiny zach"
+                    record: "100",
+                    date: new Date(2011, 4, 4),
+                    map: "Container Ride",
+                    first: "tiny zach"
                 },
                 {
-                  record: "98",
-                  date: new Date(2012, 6, 4),
-                  map: "Container Ride",
-                  first: "tiny zach"
+                    record: "98",
+                    date: new Date(2012, 6, 4),
+                    map: "Container Ride",
+                    first: "tiny zach"
                 },
                 {
-                  record: "94",
-                  date: new Date(2013, 0, 1),
-                  map: "Container Ride",
-                  first: "tiny zach"
+                    record: "94",
+                    date: new Date(2013, 0, 1),
+                    map: "Container Ride",
+                    first: "tiny zach"
                 },
                 {
-                  record: "90",
-                  date: new Date(2014, 0, 1),
-                  map: "Container Ride",
-                  first: "tiny zach"
+                    record: "90",
+                    date: new Date(2014, 0, 1),
+                    map: "Container Ride",
+                    first: "tiny zach"
                 },
                 {
-                  record: "88",
-                  date: new Date(2015, 6, 14),
-                  map: "Container Ride",
-                  first: "tiny zach"
+                    record: "88",
+                    date: new Date(2015, 6, 14),
+                    map: "Container Ride",
+                    first: "tiny zach"
                 },
                 {
-                  record: "84",
-                  date: new Date(2016, 8, 19),
-                  map: "Container Ride",
-                  first: "tiny zach"
+                    record: "84",
+                    date: new Date(2016, 8, 19),
+                    map: "Container Ride",
+                    first: "tiny zach"
                 },
                 {
-                  record: "82",
-                  date: new Date(2017, 3, 20),
-                  map: "Container Ride",
-                  first: "tiny zach"
+                    record: "82",
+                    date: new Date(2017, 3, 20),
+                    map: "Container Ride",
+                    first: "tiny zach"
                 },
                 {
-                  record: "81",
-                  date: new Date(2018, 2, 25),
-                  map: "Container Ride",
-                  first: "tiny zach"
+                    record: "81",
+                    date: new Date(2018, 2, 25),
+                    map: "Container Ride",
+                    first: "tiny zach"
                 },
                 {
-                  record: "80",
-                  date: new Date(2019, 3, 4),
-                  map: "Container Ride",
-                  first: "tiny zach"
+                    record: "80",
+                    date: new Date(2019, 3, 4),
+                    map: "Container Ride",
+                    first: "tiny zach"
                 },
                 {
-                  record: "78",
-                  date: new Date(2020, 11, 21),
-                  map: "Container Ride",
-                  first: "tiny zach"
+                    record: "78",
+                    date: new Date(2020, 11, 21),
+                    map: "Container Ride",
+                    first: "tiny zach"
                 },
                 {
-                  record: "77",
-                  date: new Date(2021, 10, 25),
-                  map: "Container Ride",
-                  first: "tiny zach"
+                    record: "77",
+                    date: new Date(2021, 10, 25),
+                    map: "Container Ride",
+                    first: "tiny zach"
                 },
                 {
-                  record: "76",
-                  date: new Date(2022, 4, 17),
-                  map: "Container Ride",
-                  first: "tiny zach"
+                    record: "76",
+                    date: new Date(2022, 4, 17),
+                    map: "Container Ride",
+                    first: "tiny zach"
                 },
                 {
-                  record: "75",
-                  date: new Date(2023, 9, 31),
-                  map: "Container Ride",
-                  first: "tiny zach"
+                    record: "75",
+                    date: new Date(2023, 9, 31),
+                    map: "Container Ride",
+                    first: "tiny zach"
                 },
                 {
-                  record: "74",
-                  date: new Date(2024, 4, 4),
-                  map: "Container Ride",
-                  first: "tiny zach"
+                    record: "74",
+                    date: new Date(2024, 4, 4),
+                    map: "Container Ride",
+                    first: "tiny zach"
                 },
             ]
 
@@ -449,7 +475,7 @@ export default function Maplist(prop) {
 
             const graph_width = document.querySelector(".portalcount-over-time-div").clientWidth
             // console.log(graph_width)
-            
+
             const uniqueYears = new Set()
             items.forEach(dp => uniqueYears.add(dp.date.getFullYear()))
             let minYear = Infinity;
@@ -474,7 +500,7 @@ export default function Maplist(prop) {
                 map: dp.map,
                 first: dp.first
             }))
-            
+
             const yearInterval = lineChart.clientWidth / uniqueYears.size
             for (let index = 1; index < (uniqueYears.size); index++) {
                 const placeholderlmao = document.createElement("div")
@@ -493,7 +519,7 @@ export default function Maplist(prop) {
                 yearSpan.style.fontSize = "22px"
                 yearSpan.style.opacity = "0.8"
                 lineChart.appendChild(yearSpan)
-                
+
             }
 
             let maxPortals;
@@ -529,19 +555,19 @@ export default function Maplist(prop) {
 
             function calculateIntermediateControlPoints(t, P0, P1, P2, P3) {
                 const x = (1 - t) ** 3 * P0.x +
-                        3 * (1 - t) ** 2 * t * P1.x +
-                        3 * (1 - t) * t ** 2 * P2.x +
-                        t ** 3 * P3.x;
+                    3 * (1 - t) ** 2 * t * P1.x +
+                    3 * (1 - t) * t ** 2 * P2.x +
+                    t ** 3 * P3.x;
 
                 const y = (1 - t) ** 3 * P0.y +
-                        3 * (1 - t) ** 2 * t * P1.y +
-                        3 * (1 - t) * t ** 2 * P2.y +
-                        t ** 3 * P3.y;
+                    3 * (1 - t) ** 2 * t * P1.y +
+                    3 * (1 - t) * t ** 2 * P2.y +
+                    t ** 3 * P3.y;
 
                 return { x, y };
             }
-            
-            
+
+
             let delay = 0;
             for (let index = 0; index < items.length; index++) {
                 let chart_height = 340;
@@ -587,11 +613,11 @@ export default function Maplist(prop) {
                     numPortalsText.style.bottom = `${(point_height * current_portal_count * multiplier) - 2 - 9}px`
                     numPortalsTextBottom.style.bottom = `${0 - 2 - 8}px`
                     placeholderDiv.id = placeholderDiv.style.bottom
-                    placeholderDiv.style.width = "100%"                
-                    placeholderDiv.style.height = "2px"      
+                    placeholderDiv.style.width = "100%"
+                    placeholderDiv.style.height = "2px"
                     placeholderDiv.style.backgroundColor = "#2B2E46"
                     placeholderDiv.style.zIndex = "0"
-                    
+
                     if (index == 0) {
                         lineChart.appendChild(numPortalsTextBottom)
                     }
@@ -627,11 +653,11 @@ export default function Maplist(prop) {
                     lineSeg.style.animationDelay = delay + "s"
                 }
                 dataPoint.style.animationDelay = delay + "s"
-                
+
                 let isHoveringOverData = true;
                 let isDataActive = false;
                 document.querySelector("#dataPointInfo").style.left = item.x + "px";
-                document.querySelector("#dataPointInfo").style.bottom = (point_height * item.record -3) + "px";
+                document.querySelector("#dataPointInfo").style.bottom = (point_height * item.record - 3) + "px";
                 dataPoint.addEventListener("mouseenter", (e) => {
                     isDataActive = true;
                     isHoveringOverData = true;
@@ -645,14 +671,14 @@ export default function Maplist(prop) {
                     document.querySelector("#dataPointDate").innerText = item.date.toLocaleDateString("en-GB");
                     document.querySelector("#dataPointFirst").innerText = item.first;
                     if ((lineChart.clientWidth - 400) < item.x) {
-                      document.querySelector("#dataPointInfo").style.left = item.x - 400 + "px";
+                        document.querySelector("#dataPointInfo").style.left = item.x - 400 + "px";
                     } else {
-                      document.querySelector("#dataPointInfo").style.left = item.x + "px";
+                        document.querySelector("#dataPointInfo").style.left = item.x + "px";
                     }
-                    if ((lineChart.clientHeight - 115) < (point_height * (item.record - minPortals) -3)) {
-                        document.querySelector("#dataPointInfo").style.bottom = (point_height * (item.record - minPortals) -3) - 115 + "px";
+                    if ((lineChart.clientHeight - 115) < (point_height * (item.record - minPortals) - 3)) {
+                        document.querySelector("#dataPointInfo").style.bottom = (point_height * (item.record - minPortals) - 3) - 115 + "px";
                     } else {
-                        document.querySelector("#dataPointInfo").style.bottom = (point_height * (item.record - minPortals) -3) + "px";
+                        document.querySelector("#dataPointInfo").style.bottom = (point_height * (item.record - minPortals) - 3) + "px";
                     }
                     document.querySelector("#dataPointInfo").style.opacity = "1";
                     document.querySelector("#dataPointInfo").style.zIndex = "10";
@@ -689,8 +715,6 @@ export default function Maplist(prop) {
             }
         }
 
-        createGraph()
-
         async function fetchGames() {
             try {
                 const response = await fetch("https://lp.ardapektezol.com/api/v1/games", {
@@ -726,40 +750,42 @@ export default function Maplist(prop) {
 
         const handleResize = (entries) => {
             for (let entry of entries) {
-                lineChart.innerHTML = ""
-                createGraph()
+                if (hasOpenedStatistics) {
+                    lineChart.innerHTML = ""
+                    createGraph()
+                }
                 if (document.querySelector(".maplist").getAttribute("currentTab") == "stats") {
                     document.querySelector(".stats").style.display = "block"
                 } else {
                     document.querySelector(".stats").style.display = "none"
                 }
             }
-            };
-    
-            const resizeObserver = new ResizeObserver(handleResize);
+        };
 
-            // if (scrollRef.current) {
-            //     //hi
-            //     if (new URLSearchParams(new URL(window.location.href).search).get("chapter")) {
-            //         setTimeout(() => {
-            //             scrollRef.current.scrollIntoView({ behavior: "smooth", block: "start" })
-            //         }, 200);
-            //     }
-                
-            // }
-    
-            if (divRef.current) {
+        const resizeObserver = new ResizeObserver(handleResize);
+
+        // if (scrollRef.current) {
+        //     //hi
+        //     if (new URLSearchParams(new URL(window.location.href).search).get("chapter")) {
+        //         setTimeout(() => {
+        //             scrollRef.current.scrollIntoView({ behavior: "smooth", block: "start" })
+        //         }, 200);
+        //     }
+
+        // }
+
+        if (divRef.current) {
             resizeObserver.observe(divRef.current);
-            }
-    
-            return () => {
+        }
+
+        return () => {
             if (divRef.current) {
                 resizeObserver.unobserve(divRef.current);
             }
             resizeObserver.disconnect();
-            };
+        };
 
-        
+
     })
     return (
         <div ref={divRef} className='maplist-page'>
@@ -769,36 +795,49 @@ export default function Maplist(prop) {
                         <i className='triangle'></i>
                         <span>Games list</span>
                     </button></Link>
-                    <span><b id='gameTitle'>&nbsp;</b></span>
+                    {!loading ?
+                        <span><b id='gameTitle'>{gameTitle}</b></span>
+                        :
+                        <span><b id='gameTitle' className='loader-text'>LOADINGLOADING</b></span>}
                 </section>
 
                 <div className='game'>
-                    <div className='game-header'>
-                        <div className='game-img'></div>
-                        <div className='game-header-text'>
-                            <span><b id='catPortalCount'>0</b></span>
-                            <span>portals</span>
+                    {!loading ?
+                        <div className='game-header'>
+                            <div className='game-img'></div>
+                            <div className='game-header-text'>
+                                <span><b id='catPortalCount'>{catPortalCount}</b></span>
+                                <span>portals</span>
+                            </div>
                         </div>
-                    </div>
-
-                    <div className='game-nav'>
-                    </div>
+                        : <div className='game-header loader'>
+                            <div className='game-img'></div>
+                            <div className='game-header-text'>
+                                <span className='loader-text'><b id='catPortalCount'>00</b></span>
+                                <span className='loader-text'>portals</span>
+                            </div>
+                        </div>}
+                    {!loading ?
+                        <div className='game-nav'>
+                        </div>
+                        : <div className='game-nav loader'>
+                        </div>}
                 </div>
 
                 <div className='gameview-nav'>
-                    <button id='maplistBtn' onClick={() => {changeMaplistOrStatistics(0, "maplist")}} className='game-nav-btn selected'>
-                        <img id='maplistImg'/>
+                    <button id='maplistBtn' onClick={() => { changeMaplistOrStatistics(0, "maplist") }} className='game-nav-btn selected'>
+                        <img id='maplistImg' />
                         <span>Map List</span>
                     </button>
                     <button id='maplistBtn' onClick={() => changeMaplistOrStatistics(1, "stats")} className='game-nav-btn'>
-                        <img id='statisticsImg'/>
+                        <img id='statisticsImg' />
                         <span>Statistics</span>
                     </button>
                 </div>
 
                 <div ref={scrollRef} className='maplist'>
                     <div className='chapter'>
-                        <span className='chapter-num'>undefined</span><br/>
+                        <span className='chapter-num'>undefined</span><br />
                         <span className='chapter-name'>undefined</span>
 
                         <div className='chapter-page-div'>
@@ -810,19 +849,19 @@ export default function Maplist(prop) {
                                 <i style={{ transform: "rotate(180deg)" }} className='triangle'></i>
                             </button>
                         </div>
-                        
+
                         <div className='maplist-maps'>
                         </div>
                     </div>
                 </div>
 
-                <div style={{display: "block"}} className='stats'>
+                <div style={{ display: "block" }} className='stats'>
                     <div className='portalcount-over-time-div'>
-                        <span className='graph-title'>Portal count over time</span><br/>
+                        <span className='graph-title'>Portal count over time</span><br />
 
                         <div className='portalcount-graph'>
                             <figure className='chart'>
-                                <div style={{display: "block"}}></div>
+                                <div style={{ display: "block" }}></div>
                                 <div id="dataPointInfo">
                                     <div className='section-header'>
                                         <span className='header-title'>Date</span>
@@ -839,7 +878,7 @@ export default function Maplist(prop) {
                                     </div>
                                 </div>
                                 <ul className='line-chart'>
-                                    
+
                                 </ul>
                             </figure>
                         </div>

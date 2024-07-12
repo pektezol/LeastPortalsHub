@@ -4,14 +4,45 @@ import { useLocation, Link } from "react-router-dom";
 import "./home.css"
 import News from '../news';
 import Record from '../record';
+import Login from '../login';
 
 export default function Homepage(prop) {
-    const {token, setToken} = prop
+    const { token, setToken } = prop
     const [home, setHome] = React.useState(null);
+    const [profile, setProfile] = React.useState(null);
+    const [loading, setLoading] = React.useState(true)
     const location = useLocation();
+
+    const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+    React.useEffect(() => {
+        try {
+            fetch(`https://lp.ardapektezol.com/api/v1/profile`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: token
+                }
+            })
+                .then(r => r.json())
+                .then(d => setProfile(d.data))
+                .then(d => {
+                    if (profile != null) {
+                        setIsLoggedIn(true)
+                    }
+                })
+                .then(d => {
+                    setLoading(false)
+                })
+        } catch (error) {
+            console.log(error)
+        }
+        
+    }, [token, profile]);
 
     useEffect(() => {
         async function fetchMapImg() {
+            if (!isLoggedIn) {
+                return;
+            }
             try {
                 const response = await fetch("https://lp.ardapektezol.com/api/v1/games", {
                     headers: {
@@ -23,11 +54,11 @@ export default function Homepage(prop) {
 
                 const recommendedMapImg = document.querySelector("#recommendedMapImg");
 
-                recommendedMapImg.src = `${data.data[0].image}`
+                recommendedMapImg.style.backgroundImage = `url(${data.data[0].image})`
 
                 const column1 = document.querySelector("#column1");
                 const column2 = document.querySelector("#column2");
-        
+
                 column2.style.height = column1.clientHeight + "px";
             } catch (error) {
                 console.log(error)
@@ -115,41 +146,57 @@ export default function Homepage(prop) {
         },
     ]
 
+    if (loading) {
+        return (
+            <main>
+            </main>
+        )
+    }
+
     return (
         <main>
-            <section style={{marginTop: "40px", userSelect: "none"}}>
-                <span style={{fontSize: "40px"}}>Welcome back,</span><br/>
-                <span><b style={{ fontSize: "96px", transform: "translateY(-20px)", display: "block"}}>Krzyhau</b></span>
+            <section style={{ userSelect: "none", display: "flex" }}>
+                <h1 style={{ marginTop: "53.6px", fontSize: "80px", marginBottom: "15px" }}>Home</h1>
+                {isLoggedIn ?
+                    <div style={{ textAlign: "right", width: "100%", marginTop: "20px" }}>
+                        <span style={{ fontSize: "25px" }}>Welcome back,</span><br />
+
+                        <span><b style={{ fontSize: "80px", transform: "translateY(-20px)", display: "block" }}>Wolfboy248</b></span>
+                    </div>
+                    : null}
             </section>
 
-            <div style={{display: "grid", gridTemplateColumns: "calc(50%) calc(50%)"}}>
+            <div style={{ display: "grid", gridTemplateColumns: "calc(50%) calc(50%)" }}>
                 <div id='column1' style={{ display: "flex", alignItems: "self-start", flexWrap: "wrap", alignContent: "start" }}>
                     {/* Column 1 */}
+                    {isLoggedIn ?
                     <section title="Your Profile" className='homepage-panel'>
-                        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px"}}>
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px" }}>
                             <div className='stats-div'>
-                                <span>Overall rank</span><br/>
-                                <span><b>#69</b></span>
+                                <span>Overall rank</span><br />
+                                <span><b>{profile.rankings.overall.rank > 0 ? "#" + profile.rankings.overall.rank : "No rank"}</b></span>
                             </div>
                             <div className='stats-div'>
-                                <span>Singleplayer</span><br/>
-                                <span style={{fontSize: "22px"}}><b>#10</b>&nbsp;(60/62)</span>
+                                <span>Singleplayer</span><br />
+                                <span style={{ fontSize: "22px" }}><b>{profile.rankings.singleplayer.rank > 0 ? "#" + profile.rankings.singleplayer.rank : "No rank"}</b>&nbsp;{profile.rankings.singleplayer.rank > 0 ? "(" + profile.rankings.singleplayer.completion_count + "/" + profile.rankings.singleplayer.completion_total + ")" : ""}</span>
                             </div>
                             <div className='stats-div'>
-                                <span>Overall rank</span><br/>
-                                <span style={{fontSize: "22px"}}><b>#69</b>&nbsp;(13/37)</span>
+                                <span>Cooperative rank</span><br />
+                                <span style={{ fontSize: "22px" }}><b>{profile.rankings.cooperative.rank > 0 ? "#" + profile.rankings.cooperative.rank : "No rank"}</b>&nbsp;{profile.rankings.cooperative.rank > 0 ? "(" + profile.rankings.cooperative.completion_count + "/" + profile.rankings.cooperative.completion_total + ")" : ""}</span>
                             </div>
                         </div>
                     </section>
+                    : null}
+                    {isLoggedIn ?
                     <section title="What's Next?" className='homepage-panel'>
-                        <div style={{display: "flex"}}>
-                            <img className='recommended-map-img' id="recommendedMapImg"></img>
-                            <div style={{marginLeft: "12px", display: "block", width: "100%"}}>
-                                <span style={{fontFamily: "BarlowSemiCondensed-SemiBold", fontSize: "32px", width: "100%", display: "block"}}>Container Ride</span>
-                                <span style={{fontSize: "20px"}}>Your Record: 4 portals</span>
-                                <span style={{fontFamily: "BarlowSemiCondensed-SemiBold", fontSize: "36px", width: "100%", display: "block"}}>World Record: 2 portals</span>
+                        <div style={{ display: "flex" }}>
+                            <div className='recommended-map-img' id="recommendedMapImg"></div>
+                            <div style={{ marginLeft: "12px", display: "block", width: "100%" }}>
+                                <span style={{ fontFamily: "BarlowSemiCondensed-SemiBold", fontSize: "32px", width: "100%", display: "block" }}>Container Ride</span>
+                                <span style={{ fontSize: "20px", display: "block" }}>Your Record: 4 portals</span>
+                                <span style={{ fontFamily: "BarlowSemiCondensed-SemiBold", fontSize: "36px", width: "100%", display: "block" }}>World Record: 2 portals</span>
                                 <div className='difficulty-bar-home'>
-                                    <div className='difficulty-point' style={{backgroundColor: "#51C355"}}></div>
+                                    <div className='difficulty-point' style={{ backgroundColor: "#51C355" }}></div>
                                     <div className='difficulty-point'></div>
                                     <div className='difficulty-point'></div>
                                     <div className='difficulty-point'></div>
@@ -158,17 +205,39 @@ export default function Homepage(prop) {
                             </div>
                         </div>
                     </section>
-                    <section title="Newest Records" className='homepage-panel' style={{height: "250px"}}>
+                    : null}
+                    <section title="Newest Records" className='homepage-panel' style={{ height: isLoggedIn ? "250px" : "960px" }}>
                         <div className='record-title'>
                             <div>
                                 <span>Place</span>
-                                <span style={{textAlign: "left"}}>Runner</span>
+                                <span style={{ textAlign: "left" }}>Runner</span>
                                 <span>Portals</span>
                                 <span>Time</span>
                                 <span>Date</span>
                             </div>
                         </div>
-                        <div style={{overflowY: "scroll", height: "calc(100% - 90px)", paddingRight: "10px"}}>
+                        <div style={{ overflowY: "scroll", height: "calc(100% - 90px)", paddingRight: "10px" }}>
+                            <Record name={"Krzyhau"} portals={"2"} date={new Date("2024-05-21T08:45:00")} place={"2"} time={"20.20"}></Record>
+                            <Record name={"Krzyhau"} portals={"2"} date={new Date("2024-05-21T08:45:00")} place={"2"} time={"20.20"}></Record>
+                            <Record name={"Krzyhau"} portals={"2"} date={new Date("2024-05-21T08:45:00")} place={"2"} time={"20.20"}></Record>
+                            <Record name={"Krzyhau"} portals={"2"} date={new Date("2024-05-21T08:45:00")} place={"2"} time={"20.20"}></Record>
+                            <Record name={"Krzyhau"} portals={"2"} date={new Date("2024-05-21T08:45:00")} place={"2"} time={"20.20"}></Record>
+                            <Record name={"Krzyhau"} portals={"2"} date={new Date("2024-05-21T08:45:00")} place={"2"} time={"20.20"}></Record>
+                            <Record name={"Krzyhau"} portals={"2"} date={new Date("2024-05-21T08:45:00")} place={"2"} time={"20.20"}></Record>
+                            <Record name={"Krzyhau"} portals={"2"} date={new Date("2024-05-21T08:45:00")} place={"2"} time={"20.20"}></Record>
+                            <Record name={"Krzyhau"} portals={"2"} date={new Date("2024-05-21T08:45:00")} place={"2"} time={"20.20"}></Record>
+                            <Record name={"Krzyhau"} portals={"2"} date={new Date("2024-05-21T08:45:00")} place={"2"} time={"20.20"}></Record>
+                            <Record name={"Krzyhau"} portals={"2"} date={new Date("2024-05-21T08:45:00")} place={"2"} time={"20.20"}></Record>
+                            <Record name={"Krzyhau"} portals={"2"} date={new Date("2024-05-21T08:45:00")} place={"2"} time={"20.20"}></Record>
+                            <Record name={"Krzyhau"} portals={"2"} date={new Date("2024-05-21T08:45:00")} place={"2"} time={"20.20"}></Record>
+                            <Record name={"Krzyhau"} portals={"2"} date={new Date("2024-05-21T08:45:00")} place={"2"} time={"20.20"}></Record>
+                            <Record name={"Krzyhau"} portals={"2"} date={new Date("2024-05-21T08:45:00")} place={"2"} time={"20.20"}></Record>
+                            <Record name={"Krzyhau"} portals={"2"} date={new Date("2024-05-21T08:45:00")} place={"2"} time={"20.20"}></Record>
+                            <Record name={"Krzyhau"} portals={"2"} date={new Date("2024-05-21T08:45:00")} place={"2"} time={"20.20"}></Record>
+                            <Record name={"Krzyhau"} portals={"2"} date={new Date("2024-05-21T08:45:00")} place={"2"} time={"20.20"}></Record>
+                            <Record name={"Krzyhau"} portals={"2"} date={new Date("2024-05-21T08:45:00")} place={"2"} time={"20.20"}></Record>
+                            <Record name={"Krzyhau"} portals={"2"} date={new Date("2024-05-21T08:45:00")} place={"2"} time={"20.20"}></Record>
+                            <Record name={"Krzyhau"} portals={"2"} date={new Date("2024-05-21T08:45:00")} place={"2"} time={"20.20"}></Record>
                             <Record name={"Krzyhau"} portals={"2"} date={new Date("2024-05-21T08:45:00")} place={"2"} time={"20.20"}></Record>
                             <Record name={"Krzyhau"} portals={"2"} date={new Date("2024-05-21T08:45:00")} place={"2"} time={"20.20"}></Record>
                             <Record name={"Krzyhau"} portals={"2"} date={new Date("2024-05-21T08:45:00")} place={"2"} time={"20.20"}></Record>
@@ -180,9 +249,9 @@ export default function Homepage(prop) {
                     </section>
                 </div>
                 {/* Column 2 */}
-                <div id='column2' style={{display: "flex", alignItems: "stretch", height: "87px"}}>
+                <div id='column2' style={{ display: "flex", alignItems: "stretch", height: "1000px" }}>
                     <section title="News" className='homepage-panel'>
-                        <div id='newsContent' style={{ display: "block", width: "100%", overflowY: "scroll", height: "calc(100% - 50px)"}}>
+                        <div id='newsContent' style={{ display: "block", width: "100%", overflowY: "scroll", height: "calc(100% - 50px)" }}>
                             {newsList.map((newsList, index) => (
                                 <News newsInfo={newsList} key={index}></News>
                             ))}
@@ -190,9 +259,9 @@ export default function Homepage(prop) {
                     </section>
                 </div>
             </div>
-            
 
-            
+
+
         </main>
     )
 }

@@ -46,7 +46,6 @@ const [sidebar, setSidebar] = React.useState();
 // Clicked buttons
 function SidebarClick(x){
 const btn = document.querySelectorAll("button.sidebar-button");
-console.log(x)
 
 if(sidebar===1){setSidebar(0);SidebarHide()}
 
