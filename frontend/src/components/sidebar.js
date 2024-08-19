@@ -99,8 +99,8 @@ if(sidebar===1){
 const location = useLocation()
 React.useEffect(()=>{
     if(location.pathname==="/"){SidebarClick(1)}
-    if(location.pathname.includes("news")){SidebarClick(2)}
-    if(location.pathname.includes("games")){SidebarClick(3)}
+    if(location.pathname.includes("games")){SidebarClick(2)}
+    if(location.pathname.includes("news")){SidebarClick(3)}
     if(location.pathname.includes("leaderboards")){SidebarClick(4)}
     if(location.pathname.includes("scorelog")){SidebarClick(5)}
     if(location.pathname.includes("profile")){SidebarClick(6)}
@@ -123,6 +123,7 @@ React.useEffect(()=>{
 
 return (
     <div id='sidebar'>
+        <Link to={"/"}>
         <div id='logo'> {/* logo */}
             <img src={logo} alt="" height={"80px"}/>
             <div id='logo-text'>
@@ -130,6 +131,7 @@ return (
                 <span>Least Portals</span>
             </div>
         </div>
+        </Link>
         <div id='sidebar-list'> {/* List */}
             <div id='sidebar-toplist'> {/* Top */} 
 
@@ -141,12 +143,12 @@ return (
                     <button className='sidebar-button'><img src={img2} alt="" /><span>Home&nbsp;Page</span></button>
                 </Link>
 
-                <Link to="/news" tabIndex={-1}>
-                    <button className='sidebar-button'><img src={img3} alt="" /><span>News</span></button>
-                </Link>
-
                 <Link to="/games" tabIndex={-1}>
                     <button className='sidebar-button'><img src={img4} alt="" /><span>Games</span></button>
+                </Link>
+
+                <Link to="/news" tabIndex={-1}>
+                    <button className='sidebar-button'><img src={img3} alt="" /><span>News</span></button>
                 </Link>
 
                 <Link to="/leaderboards" tabIndex={-1}>

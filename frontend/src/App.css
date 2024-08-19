@@ -20,6 +20,13 @@ body {
     border-radius: 1000px;
 }
 
+.loader-text.header {
+    height: calc(100% - 10px);
+    display: flex;
+    width: fit-content;
+    transform: translateY(10px);
+}
+
 @keyframes loader {
     0% {
         background-position: 100% 20%;

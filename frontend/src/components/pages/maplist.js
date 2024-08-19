@@ -35,6 +35,13 @@ export default function Maplist(prop) {
         const url = new URL(window.location.href)
 
         const params = new URLSearchParams(url.search)
+        
+        if (params.get("cat") != null) {
+            catState = parseFloat(params.get("cat"))
+        }
+
+        console.log(catState)
+
         gameState = parseFloat(location.pathname.split("/")[2])
 
         if (gameState == 1) {
@@ -68,7 +75,7 @@ export default function Maplist(prop) {
 
         // }
 
-        setCatPortalCount(data.data[gameState - 1].category_portals[0].portal_count);
+        setCatPortalCount(data.data[gameState - 1].category_portals[catState].portal_count);
 
         // if (chapterParam) {
         //     document.querySelector("#pageNumbers").innerText = `${chapterParam - minPage + 1}/${maxPage - minPage + 1}`
@@ -127,7 +134,7 @@ export default function Maplist(prop) {
 
         categoryNum++;
         const gameNavBtn = document.createElement("button");
-        if (categoryNum == 1) {
+        if (categoryNum == catState + 1) {
             gameNavBtn.className = "game-nav-btn selected";
         } else {
             gameNavBtn.className = "game-nav-btn";
@@ -158,12 +165,14 @@ export default function Maplist(prop) {
 
         const data = await response.json();
         catState = category.category.id - 1;
-        // console.log(catState)
+        console.log(catState)
         document.querySelector("#catPortalCount").innerText = category.portal_count;
     }
 
     async function changePage(page) {
         const pageNumbers = document.querySelector("#pageNumbers");
+
+        if (pageNumbers == null) return;
 
         pageNumbers.innerText = `${currentPage - minPage + 1}/${maxPage - minPage + 1}`;
 
@@ -798,7 +807,7 @@ export default function Maplist(prop) {
                     {!loading ?
                         <span><b id='gameTitle'>{gameTitle}</b></span>
                         :
-                        <span><b id='gameTitle' className='loader-text'>LOADINGLOADING</b></span>}
+                        <span><b id='gameTitle' className='loader-text header'>LOADINGLOADING</b></span>}
                 </section>
 
                 <div className='game'>
