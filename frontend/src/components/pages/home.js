@@ -36,7 +36,7 @@ export default function Homepage(prop) {
             console.log(error)
         }
         
-    }, [token]);
+    }, [token, profile]);
 
     useEffect(() => {
         async function fetchMapImg() {
