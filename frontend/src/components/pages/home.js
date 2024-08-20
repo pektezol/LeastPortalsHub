@@ -13,7 +13,6 @@ export default function Homepage(prop) {
     const [loading, setLoading] = React.useState(false)
     const location = useLocation();
 
-<<<<<<< Updated upstream
     const [isLoggedIn, setIsLoggedIn] = React.useState(false);
     // React.useEffect(() => {
     //     try {
@@ -161,69 +160,6 @@ export default function Homepage(prop) {
                 {isLoggedIn ?
                     <div style={{ textAlign: "right", width: "100%", marginTop: "20px" }}>
                         <span style={{ fontSize: "25px" }}>Welcome back,</span><br />
-=======
-//     useEffect(() => {
-
-//         if (!token) {
-//             return;
-//         }
-
-//         async function home() {
-
-//             const profileResponse = await fetch(`https://lp.ardapektezol.com/api/v1/profile`, {
-//                 headers: {
-//                     Authorization: token
-//                 }
-//             })
-
-//             const profileData = await profileResponse.json();
-
-//             setProfile(profileData);
-
-//             const gamesResponse = await fetch("https://lp.ardapektezol.com/api/v1/games", {
-//                 headers: {
-//                     Authorization: token
-//                 }
-//             });
-
-//             const gamesData = await gamesResponse.json();
-
-//             const recommendedMapImg = document.querySelector("#recommendedMapImg");
-
-//             recommendedMapImg.style.backgroundImage = `url(${gamesData.data[0].image})`
-
-//             const column1 = document.querySelector("#column1");
-//             const column2 = document.querySelector("#column2");
-
-//             column2.style.height = column1.clientHeight + "px";
-
-//             const panels = document.querySelectorAll(".homepage-panel");
-//             panels.forEach(e => {
-//                 // this is cuz react is silly
-//                 if (e.innerHTML.includes('<div class="homepage-panel-title-div">')) {
-//                     return
-//                 }
-//                 const title = e.getAttribute("title");
-
-//                 const titleDiv = document.createElement("div");
-//                 const titleSpan = document.createElement("span");
-
-//                 titleDiv.classList.add("homepage-panel-title-div")
-
-//                 titleSpan.innerText = title
-
-//                 titleDiv.appendChild(titleSpan)
-//                 e.insertBefore(titleDiv, e.firstChild)
-//             });
-//     }
-//     try {
-//         home();
-//     } catch (e) {
-//         console.log("error while setting up home page:", e);
-//     }
-
-// }, [token]);
->>>>>>> Stashed changes
 
                         <span><b style={{ fontSize: "80px", transform: "translateY(-20px)", display: "block" }}>Wolfboy248</b></span>
                     </div>
