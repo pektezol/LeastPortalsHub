@@ -10,82 +10,82 @@ export default function Homepage(prop) {
     const { token, setToken } = prop
     const [home, setHome] = React.useState(null);
     const [profile, setProfile] = React.useState(null);
-    const [loading, setLoading] = React.useState(true)
+    const [loading, setLoading] = React.useState(false)
     const location = useLocation();
 
     const [isLoggedIn, setIsLoggedIn] = React.useState(false);
-    React.useEffect(() => {
-        try {
-            fetch(`https://lp.ardapektezol.com/api/v1/profile`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: token
-                }
-            })
-                .then(r => r.json())
-                .then(d => setProfile(d.data))
-                .then(d => {
-                    if (profile != null) {
-                        setIsLoggedIn(true)
-                    }
-                })
-                .then(d => {
-                    setLoading(false)
-                })
-        } catch (error) {
-            console.log(error)
-        }
+    // React.useEffect(() => {
+    //     try {
+    //         fetch(`https://lp.ardapektezol.com/api/v1/profile`, {
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //                 Authorization: token
+    //             }
+    //         })
+    //             .then(r => r.json())
+    //             .then(d => setProfile(d.data))
+    //             .then(d => {
+    //                 if (profile != null) {
+    //                     setIsLoggedIn(true)
+    //                 }
+    //             })
+    //             .then(d => {
+    //                 setLoading(false)
+    //             })
+    //     } catch (error) {
+    //         console.log(error)
+    //     }
         
-    }, [token, profile]);
+    // }, [token, profile]);
 
-    useEffect(() => {
-        async function fetchMapImg() {
-            if (!isLoggedIn) {
-                return;
-            }
-            try {
-                const response = await fetch("https://lp.ardapektezol.com/api/v1/games", {
-                    headers: {
-                        'Authorization': token
-                    }
-                });
+    // useEffect(() => {
+    //     async function fetchMapImg() {
+    //         if (!isLoggedIn) {
+    //             return;
+    //         }
+    //         try {
+    //             const response = await fetch("https://lp.ardapektezol.com/api/v1/games", {
+    //                 headers: {
+    //                     'Authorization': token
+    //                 }
+    //             });
 
-                const data = await response.json();
+    //             const data = await response.json();
 
-                const recommendedMapImg = document.querySelector("#recommendedMapImg");
+    //             const recommendedMapImg = document.querySelector("#recommendedMapImg");
 
-                recommendedMapImg.style.backgroundImage = `url(${data.data[0].image})`
+    //             recommendedMapImg.style.backgroundImage = `url(${data.data[0].image})`
 
-                const column1 = document.querySelector("#column1");
-                const column2 = document.querySelector("#column2");
+    //             const column1 = document.querySelector("#column1");
+    //             const column2 = document.querySelector("#column2");
 
-                column2.style.height = column1.clientHeight + "px";
-            } catch (error) {
-                console.log(error)
-            }
-        }
+    //             column2.style.height = column1.clientHeight + "px";
+    //         } catch (error) {
+    //             console.log(error)
+    //         }
+    //     }
 
-        fetchMapImg()
+    //     fetchMapImg()
 
-        const panels = document.querySelectorAll(".homepage-panel");
-        panels.forEach(e => {
-            // this is cuz react is silly
-            if (e.innerHTML.includes('<div class="homepage-panel-title-div">')) {
-                return
-            }
-            const title = e.getAttribute("title");
+    //     const panels = document.querySelectorAll(".homepage-panel");
+    //     panels.forEach(e => {
+    //         // this is cuz react is silly
+    //         if (e.innerHTML.includes('<div class="homepage-panel-title-div">')) {
+    //             return
+    //         }
+    //         const title = e.getAttribute("title");
 
-            const titleDiv = document.createElement("div");
-            const titleSpan = document.createElement("span");
+    //         const titleDiv = document.createElement("div");
+    //         const titleSpan = document.createElement("span");
 
-            titleDiv.classList.add("homepage-panel-title-div")
+    //         titleDiv.classList.add("homepage-panel-title-div")
 
-            titleSpan.innerText = title
+    //         titleSpan.innerText = title
 
-            titleDiv.appendChild(titleSpan)
-            e.insertBefore(titleDiv, e.firstChild)
-        });
-    }, [token])
+    //         titleDiv.appendChild(titleSpan)
+    //         e.insertBefore(titleDiv, e.firstChild)
+    //     });
+    // }, [token])
 
     const newsList = [
         {
