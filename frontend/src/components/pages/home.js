@@ -84,7 +84,7 @@ export default function Homepage({ token }) {
             titleDiv.appendChild(titleSpan)
             e.insertBefore(titleDiv, e.firstChild)
         });
-    }, [])
+    }, [token])
 
     const newsList = [
         {
