@@ -1,20 +1,19 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useLocation, Link } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
 
 import "./home.css"
 import News from '../news';
 import Record from '../record';
-import Login from '../login';
 
-export default function Homepage(prop) {
-    const { token, setToken } = prop
-    const [home, setHome] = React.useState(null);
-    const [profile, setProfile] = React.useState(null);
-    const [loading, setLoading] = React.useState(true)
-    const location = useLocation();
+export default function Homepage({ token }) {
+    const [profile, setProfile] = useState(null);
+    const [loading, setLoading] = useState(true)
 
-    const [isLoggedIn, setIsLoggedIn] = React.useState(false);
-    React.useEffect(() => {
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    useEffect(() => {
+        if (!token) {
+            return;
+        }
         try {
             fetch(`https://lp.ardapektezol.com/api/v1/profile`, {
                 headers: {
@@ -35,8 +34,8 @@ export default function Homepage(prop) {
         } catch (error) {
             console.log(error)
         }
-        
-    }, [token, profile]);
+
+    }, [token]);
 
     useEffect(() => {
         async function fetchMapImg() {
@@ -85,7 +84,7 @@ export default function Homepage(prop) {
             titleDiv.appendChild(titleSpan)
             e.insertBefore(titleDiv, e.firstChild)
         });
-    })
+    }, [])
 
     const newsList = [
         {
@@ -170,42 +169,42 @@ export default function Homepage(prop) {
                 <div id='column1' style={{ display: "flex", alignItems: "self-start", flexWrap: "wrap", alignContent: "start" }}>
                     {/* Column 1 */}
                     {isLoggedIn ?
-                    <section title="Your Profile" className='homepage-panel'>
-                        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px" }}>
-                            <div className='stats-div'>
-                                <span>Overall rank</span><br />
-                                <span><b>{profile.rankings.overall.rank > 0 ? "#" + profile.rankings.overall.rank : "No rank"}</b></span>
-                            </div>
-                            <div className='stats-div'>
-                                <span>Singleplayer</span><br />
-                                <span style={{ fontSize: "22px" }}><b>{profile.rankings.singleplayer.rank > 0 ? "#" + profile.rankings.singleplayer.rank : "No rank"}</b>&nbsp;{profile.rankings.singleplayer.rank > 0 ? "(" + profile.rankings.singleplayer.completion_count + "/" + profile.rankings.singleplayer.completion_total + ")" : ""}</span>
-                            </div>
-                            <div className='stats-div'>
-                                <span>Cooperative rank</span><br />
-                                <span style={{ fontSize: "22px" }}><b>{profile.rankings.cooperative.rank > 0 ? "#" + profile.rankings.cooperative.rank : "No rank"}</b>&nbsp;{profile.rankings.cooperative.rank > 0 ? "(" + profile.rankings.cooperative.completion_count + "/" + profile.rankings.cooperative.completion_total + ")" : ""}</span>
-                            </div>
-                        </div>
-                    </section>
-                    : null}
-                    {isLoggedIn ?
-                    <section title="What's Next?" className='homepage-panel'>
-                        <div style={{ display: "flex" }}>
-                            <div className='recommended-map-img' id="recommendedMapImg"></div>
-                            <div style={{ marginLeft: "12px", display: "block", width: "100%" }}>
-                                <span style={{ fontFamily: "BarlowSemiCondensed-SemiBold", fontSize: "32px", width: "100%", display: "block" }}>Container Ride</span>
-                                <span style={{ fontSize: "20px", display: "block" }}>Your Record: 4 portals</span>
-                                <span style={{ fontFamily: "BarlowSemiCondensed-SemiBold", fontSize: "36px", width: "100%", display: "block" }}>World Record: 2 portals</span>
-                                <div className='difficulty-bar-home'>
-                                    <div className='difficulty-point' style={{ backgroundColor: "#51C355" }}></div>
-                                    <div className='difficulty-point'></div>
-                                    <div className='difficulty-point'></div>
-                                    <div className='difficulty-point'></div>
-                                    <div className='difficulty-point'></div>
+                        <section title="Your Profile" className='homepage-panel'>
+                            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "12px" }}>
+                                <div className='stats-div'>
+                                    <span>Overall rank</span><br />
+                                    <span><b>{profile.rankings.overall.rank > 0 ? "#" + profile.rankings.overall.rank : "No rank"}</b></span>
+                                </div>
+                                <div className='stats-div'>
+                                    <span>Singleplayer</span><br />
+                                    <span style={{ fontSize: "22px" }}><b>{profile.rankings.singleplayer.rank > 0 ? "#" + profile.rankings.singleplayer.rank : "No rank"}</b>&nbsp;{profile.rankings.singleplayer.rank > 0 ? "(" + profile.rankings.singleplayer.completion_count + "/" + profile.rankings.singleplayer.completion_total + ")" : ""}</span>
+                                </div>
+                                <div className='stats-div'>
+                                    <span>Cooperative rank</span><br />
+                                    <span style={{ fontSize: "22px" }}><b>{profile.rankings.cooperative.rank > 0 ? "#" + profile.rankings.cooperative.rank : "No rank"}</b>&nbsp;{profile.rankings.cooperative.rank > 0 ? "(" + profile.rankings.cooperative.completion_count + "/" + profile.rankings.cooperative.completion_total + ")" : ""}</span>
                                 </div>
                             </div>
-                        </div>
-                    </section>
-                    : null}
+                        </section>
+                        : null}
+                    {isLoggedIn ?
+                        <section title="What's Next?" className='homepage-panel'>
+                            <div style={{ display: "flex" }}>
+                                <div className='recommended-map-img' id="recommendedMapImg"></div>
+                                <div style={{ marginLeft: "12px", display: "block", width: "100%" }}>
+                                    <span style={{ fontFamily: "BarlowSemiCondensed-SemiBold", fontSize: "32px", width: "100%", display: "block" }}>Container Ride</span>
+                                    <span style={{ fontSize: "20px", display: "block" }}>Your Record: 4 portals</span>
+                                    <span style={{ fontFamily: "BarlowSemiCondensed-SemiBold", fontSize: "36px", width: "100%", display: "block" }}>World Record: 2 portals</span>
+                                    <div className='difficulty-bar-home'>
+                                        <div className='difficulty-point' style={{ backgroundColor: "#51C355" }}></div>
+                                        <div className='difficulty-point'></div>
+                                        <div className='difficulty-point'></div>
+                                        <div className='difficulty-point'></div>
+                                        <div className='difficulty-point'></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        : null}
                     <section title="Newest Records" className='homepage-panel' style={{ height: isLoggedIn ? "250px" : "960px" }}>
                         <div className='record-title'>
                             <div>
