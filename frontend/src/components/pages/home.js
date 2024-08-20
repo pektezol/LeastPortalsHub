@@ -36,7 +36,7 @@ export default function Homepage(prop) {
             console.log(error)
         }
         
-    }, [token, profile]);
+    }, [token]);
 
     useEffect(() => {
         async function fetchMapImg() {
@@ -85,7 +85,7 @@ export default function Homepage(prop) {
             titleDiv.appendChild(titleSpan)
             e.insertBefore(titleDiv, e.firstChild)
         });
-    })
+    }, [token])
 
     const newsList = [
         {
