@@ -7,67 +7,67 @@ import Record from '../record';
 export default function Homepage({ token }) {
     const [profile, setProfile] = useState(null);
 
-    useEffect(() => {
+//     useEffect(() => {
 
-        if (!token) {
-            return;
-        }
+//         if (!token) {
+//             return;
+//         }
 
-        async function home() {
+//         async function home() {
 
-            const profileResponse = await fetch(`https://lp.ardapektezol.com/api/v1/profile`, {
-                headers: {
-                    Authorization: token
-                }
-            })
+//             const profileResponse = await fetch(`https://lp.ardapektezol.com/api/v1/profile`, {
+//                 headers: {
+//                     Authorization: token
+//                 }
+//             })
 
-            const profileData = await profileResponse.json();
+//             const profileData = await profileResponse.json();
 
-            setProfile(profileData);
+//             setProfile(profileData);
 
-            const gamesResponse = await fetch("https://lp.ardapektezol.com/api/v1/games", {
-                headers: {
-                    Authorization: token
-                }
-            });
+//             const gamesResponse = await fetch("https://lp.ardapektezol.com/api/v1/games", {
+//                 headers: {
+//                     Authorization: token
+//                 }
+//             });
 
-            const gamesData = await gamesResponse.json();
+//             const gamesData = await gamesResponse.json();
 
-            const recommendedMapImg = document.querySelector("#recommendedMapImg");
+//             const recommendedMapImg = document.querySelector("#recommendedMapImg");
 
-            recommendedMapImg.style.backgroundImage = `url(${gamesData.data[0].image})`
+//             recommendedMapImg.style.backgroundImage = `url(${gamesData.data[0].image})`
 
-            const column1 = document.querySelector("#column1");
-            const column2 = document.querySelector("#column2");
+//             const column1 = document.querySelector("#column1");
+//             const column2 = document.querySelector("#column2");
 
-            column2.style.height = column1.clientHeight + "px";
+//             column2.style.height = column1.clientHeight + "px";
 
-            const panels = document.querySelectorAll(".homepage-panel");
-            panels.forEach(e => {
-                // this is cuz react is silly
-                if (e.innerHTML.includes('<div class="homepage-panel-title-div">')) {
-                    return
-                }
-                const title = e.getAttribute("title");
+//             const panels = document.querySelectorAll(".homepage-panel");
+//             panels.forEach(e => {
+//                 // this is cuz react is silly
+//                 if (e.innerHTML.includes('<div class="homepage-panel-title-div">')) {
+//                     return
+//                 }
+//                 const title = e.getAttribute("title");
 
-                const titleDiv = document.createElement("div");
-                const titleSpan = document.createElement("span");
+//                 const titleDiv = document.createElement("div");
+//                 const titleSpan = document.createElement("span");
 
-                titleDiv.classList.add("homepage-panel-title-div")
+//                 titleDiv.classList.add("homepage-panel-title-div")
 
-                titleSpan.innerText = title
+//                 titleSpan.innerText = title
 
-                titleDiv.appendChild(titleSpan)
-                e.insertBefore(titleDiv, e.firstChild)
-            });
-    }
-    try {
-        home();
-    } catch (e) {
-        console.log("error while setting up home page:", e);
-    }
+//                 titleDiv.appendChild(titleSpan)
+//                 e.insertBefore(titleDiv, e.firstChild)
+//             });
+//     }
+//     try {
+//         home();
+//     } catch (e) {
+//         console.log("error while setting up home page:", e);
+//     }
 
-}, [token]);
+// }, [token]);
 
 const newsList = [
     {
