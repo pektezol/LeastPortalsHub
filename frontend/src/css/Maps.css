@@ -65,7 +65,7 @@
 #section3{
     margin: 40px 0 0 0;
 
-    display: none; 
+    display: grid; 
     grid-template-columns: 1fr 1fr;
     gap: 20px;
 }
@@ -239,7 +239,7 @@ p>span.portal-count{font-weight: bold;font-size: 100px;vertical-align: -15%;}
 /* Section 4: Difficulty + count */
 
 #section4{
-    display: none;
+    display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 20px;
     margin: 40px 0 0 0;
@@ -424,6 +424,7 @@ text-align: center;
 
 .hover-popup {
     position: relative;
+    display: inline-block;
   }
   
   .hover-popup::after {
@@ -438,7 +439,12 @@ text-align: center;
     border-radius: 8px;
     visibility: hidden;
     opacity: 0;
+    color: #cdcfdf;
     /* transition: visibility 0s, opacity 0.3s ease; */
+  }
+
+  .hover-popup:hover {
+    color: transparent;
   }
   
   .hover-popup:hover::after {

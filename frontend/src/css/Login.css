@@ -13,7 +13,7 @@ span>img {
 
     padding-left: 10px;
     background-color: #00000000 !important;
-    transition: opacity .1s;
+    /* transition: opacity .1s; */
 }
 
 .login{
