@@ -5,10 +5,11 @@ import { SteamIcon, TwitchIcon, YouTubeIcon, PortalIcon, FlagIcon, StatisticsIco
 import { UserProfile } from '../types/Profile';
 import { Game, GameChapters } from '../types/Game';
 import { Map } from '../types/Map';
+import { ticks_to_time } from '../utils/Time';
 import "../css/Profile.css";
 
 interface ProfileProps {
-  profile: UserProfile;
+  profile?: UserProfile;
 }
 
 const Profile: React.FC<ProfileProps> = ({ profile }) => {
@@ -53,45 +54,34 @@ const Profile: React.FC<ProfileProps> = ({ profile }) => {
       .then(d => d.success ? window.alert("profile updated") : window.alert(`Error: ${d.message}`))
   }
 
-  function TicksToTime(ticks: number) {
-
-    let seconds = Math.floor(ticks / 60)
-    let minutes = Math.floor(seconds / 60)
-    let hours = Math.floor(minutes / 60)
-
-    let milliseconds = Math.floor((ticks % 60) * 1000 / 60)
-    seconds = seconds % 60;
-    minutes = minutes % 60;
-
-    return `${hours === 0 ? "" : hours + ":"}${minutes === 0 ? "" : hours > 0 ? minutes.toString().padStart(2, '0') + ":" : (minutes + ":")}${minutes > 0 ? seconds.toString().padStart(2, '0') : seconds}.${milliseconds.toString().padStart(3, '0')} (${ticks})`;
-  }
-
   React.useEffect(() => {
-    fetch("https://lp.ardapektezol.com/api/v1/games")
-      .then(r => r.json())
-      .then(d => {
-        setGameData(d.data)
-        setGame("0")
-      })
-
-  }, [location]);
-
-  React.useEffect(() => {
-    if (game && game !== "0") {
-      fetch(`https://lp.ardapektezol.com/api/v1/games/${game}`)
+    if (profile) {
+      fetch("https://lp.ardapektezol.com/api/v1/games")
         .then(r => r.json())
         .then(d => {
-          setChapterData(d.data)
-          setChapter("0");
-          // (document.querySelector('#select-chapter') as HTMLInputElement).value = "0"
+          setGameData(d.data)
+          setGame("0")
         })
-
-    } else if (game && game === "0") {
-      setPageMax(Math.ceil(profile.records.length / 20))
-      setPageNumber(1)
     }
+  }, [profile, location]);
 
-  }, [game, location]);
+  React.useEffect(() => {
+    if (profile) {
+      if (game && game !== "0") {
+        fetch(`https://lp.ardapektezol.com/api/v1/games/${game}`)
+          .then(r => r.json())
+          .then(d => {
+            setChapterData(d.data)
+            setChapter("0");
+            // (document.querySelector('#select-chapter') as HTMLInputElement).value = "0"
+          })
+  
+      } else if (game && game === "0") {
+        setPageMax(Math.ceil(profile.records.length / 20))
+        setPageNumber(1)
+      }
+    }
+  }, [profile, game, location]);
 
   React.useEffect(() => {
     if (game !== "0") {
@@ -115,6 +105,12 @@ const Profile: React.FC<ProfileProps> = ({ profile }) => {
       }
     }
   }, [game, chapter, chapterData])
+
+  if (!profile) {
+    return (
+      <></>
+    );
+  };
 
   return (
     <main>
@@ -249,7 +245,7 @@ const Profile: React.FC<ProfileProps> = ({ profile }) => {
                         <span style={{ display: "grid" }}>{e.score_count}</span>
 
                         <span style={{ display: "grid" }}>{e.score_count - r.map_wr_count}</span>
-                        <span style={{ display: "grid" }}>{TicksToTime(e.score_time)}</span>
+                        <span style={{ display: "grid" }}>{ticks_to_time(e.score_time)}</span>
                         <span> </span>
                         {i === 0 ? <span>#{r.placement}</span> : <span> </span>}
                         <span>{e.date.split("T")[0]}</span>
@@ -294,7 +290,7 @@ const Profile: React.FC<ProfileProps> = ({ profile }) => {
                           <span>{r.name}</span>
                           <span style={{ display: "grid" }}>{record!.scores[i].score_count}</span>
                           <span style={{ display: "grid" }}>{record!.scores[i].score_count - record!.map_wr_count}</span>
-                          <span style={{ display: "grid" }}>{TicksToTime(record!.scores[i].score_time)}</span>
+                          <span style={{ display: "grid" }}>{ticks_to_time(record!.scores[i].score_time)}</span>
                           <span> </span>
                           {i === 0 ? <span>#{record!.placement}</span> : <span> </span>}
                           <span>{record!.scores[i].date.split("T")[0]}</span>

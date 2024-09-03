@@ -27,7 +27,7 @@ const App: React.FC = () => {
       <Sidebar setToken={setToken} profile={profile} setProfile={setProfile} />
       <Routes>
         <Route path="/" element={<div>yo</div>} />
-        <Route path="/profile" element={<Profile profile={profile!} />} />
+        <Route path="/profile" element={<Profile profile={profile} />} />
         <Route path="/users/*" element={<User />} />
         <Route path="/games" element={<Games />} />
         <Route path="/maps/*" element={<Maps isModerator={isModerator} />} />
