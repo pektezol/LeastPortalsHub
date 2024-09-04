@@ -9,6 +9,7 @@ import Profile from './pages/Profile';
 import Games from './pages/Games';
 import Maps from './pages/Maps';
 import User from './pages/User';
+import Homepage from './pages/Homepage';
 
 
 const App: React.FC = () => {
@@ -26,7 +27,7 @@ const App: React.FC = () => {
     <>
       <Sidebar setToken={setToken} profile={profile} setProfile={setProfile} />
       <Routes>
-        <Route path="/" element={<div>yo</div>} />
+        <Route path="/" element={<Homepage />} />
         <Route path="/profile" element={<Profile profile={profile} />} />
         <Route path="/users/*" element={<User />} />
         <Route path="/games" element={<Games />} />
