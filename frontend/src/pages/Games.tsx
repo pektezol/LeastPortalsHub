@@ -31,10 +31,6 @@ const Games: React.FC = () => {
 
     return (
         <div className='games-page'>
-            <section className='games-page-header'>
-                <span><b>Games list</b></span>
-            </section>
-
             <section>
                 <div className='games-page-content'>
                     <div className='games-page-item-content'>

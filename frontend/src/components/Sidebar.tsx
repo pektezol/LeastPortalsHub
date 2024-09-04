@@ -90,13 +90,13 @@ const Sidebar: React.FC<SidebarProps> = ({ setToken, profile, setProfile }) => {
 
   React.useEffect(() => {
     if (path === "/") { handle_sidebar_click(1) }
-    else if (path.includes("news")) { handle_sidebar_click(2) }
-    else if (path.includes("games")) { handle_sidebar_click(3) }
-    else if (path.includes("leaderboards")) { handle_sidebar_click(4) }
-    else if (path.includes("scorelog")) { handle_sidebar_click(5) }
-    else if (path.includes("profile")) { handle_sidebar_click(6) }
-    else if (path.includes("rules")) { handle_sidebar_click(8) }
-    else if (path.includes("about")) { handle_sidebar_click(9) }
+    else if (path.includes("games")) { handle_sidebar_click(2) }
+    else if (path.includes("rankings")) { handle_sidebar_click(3) }
+    // else if (path.includes("news")) { handle_sidebar_click(4) }
+    // else if (path.includes("scorelog")) { handle_sidebar_click(5) }
+    else if (path.includes("profile")) { handle_sidebar_click(4) }
+    else if (path.includes("rules")) { handle_sidebar_click(5) }
+    else if (path.includes("about")) { handle_sidebar_click(6) }
   }, [path]);
 
   return (
@@ -121,21 +121,21 @@ const Sidebar: React.FC<SidebarProps> = ({ setToken, profile, setProfile }) => {
             <button className='sidebar-button'><img src={HomeIcon} alt="homepage" /><span>Home&nbsp;Page</span></button>
           </Link>
 
-          <Link to="/news" tabIndex={-1}>
-            <button className='sidebar-button'><img src={NewsIcon} alt="news" /><span>News</span></button>
-          </Link>
-
           <Link to="/games" tabIndex={-1}>
             <button className='sidebar-button'><img src={PortalIcon} alt="games" /><span>Games</span></button>
           </Link>
 
-          <Link to="/leaderboards" tabIndex={-1}>
-            <button className='sidebar-button'><img src={FlagIcon} alt="leaderboards" /><span>Leaderboards</span></button>
+          <Link to="/rankings" tabIndex={-1}>
+            <button className='sidebar-button'><img src={FlagIcon} alt="rankings" /><span>Rankings</span></button>
           </Link>
 
-          <Link to="/scorelog" tabIndex={-1}>
+          {/* <Link to="/news" tabIndex={-1}>
+            <button className='sidebar-button'><img src={NewsIcon} alt="news" /><span>News</span></button>
+          </Link> */}
+
+          {/* <Link to="/scorelog" tabIndex={-1}>
             <button className='sidebar-button'><img src={TableIcon} alt="scorelogs" /><span>Score&nbsp;Logs</span></button>
-          </Link>
+          </Link> */}
         </div>
         <div id='sidebar-bottomlist'>
           <span></span>

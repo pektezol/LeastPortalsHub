@@ -15,7 +15,7 @@ interface ModMenuProps {
 const ModMenu: React.FC<ModMenuProps> = ({ data, selectedRun, mapID }) => {
 
   const [menu, setMenu] = React.useState<number>(0);
-  const [showButton, setShowButton] = React.useState(1)
+  const [showButton, setShowButton] = React.useState<boolean>(true);
 
   const [routeContent, setRouteContent] = React.useState<ModMenuContent>({
     id: 0,
@@ -120,13 +120,13 @@ const ModMenu: React.FC<ModMenuProps> = ({ data, selectedRun, mapID }) => {
 
     const modview_block = document.querySelector("#modview_block") as HTMLElement
     if (modview_block) {
-      showButton === 1 ? modview_block.style.display = "none" : modview_block.style.display = "block"// eslint-disable-next-line 
+      showButton ? modview_block.style.display = "none" : modview_block.style.display = "block"
     }
   }, [showButton])
 
   return (
-    <div id="modview_bdlock">
-
+    <>
+      <div id="modview_block" />
       <div id='modview'>
         <div>
           <button onClick={() => setMenu(1)}>Edit Image</button>
@@ -136,15 +136,13 @@ const ModMenu: React.FC<ModMenuProps> = ({ data, selectedRun, mapID }) => {
         </div>
         <div>
           {showButton ? (
-            <button onClick={() => setShowButton(0)}>Show</button>
+            <button onClick={() => setShowButton(false)}>Show</button>
           ) : (
-            <button onClick={() => { setShowButton(1); setMenu(0) }}>Hide</button>
+            <button onClick={() => { setShowButton(true); setMenu(0); }}>Hide</button>
           )}
         </div>
-      </div>
-
-      <div id='modview-menu'>
-        { // Edit Image
+      </div><div id='modview-menu'>
+        {// Edit Image
           menu === 1 && (
             <div id='modview-menu-image'>
               <div>
@@ -157,19 +155,17 @@ const ModMenu: React.FC<ModMenuProps> = ({ data, selectedRun, mapID }) => {
                   <input type="file" accept='image/*' onChange={e => {
                     if (e.target.files) {
                       compressImage(e.target.files[0])
-                        .then(d => setImage(d))
+                        .then(d => setImage(d));
                     }
-                  }
-                  } /></span>
+                  }} /></span>
                 {image ? (<button onClick={() => _edit_map_summary_image()}>upload</button>) : <span></span>}
                 <img src={image} alt="" id='modview-menu-image-file' />
 
               </div>
             </div>
-          )
-        }
+          )}
 
-        { // Edit Route
+        {// Edit Route
           menu === 2 && (
             <div id='modview-menu-edit'>
               <div id='modview-route-id'>
@@ -234,10 +230,9 @@ const ModMenu: React.FC<ModMenuProps> = ({ data, selectedRun, mapID }) => {
                 </p>
               </div>
             </div>
-          )
-        }
+          )}
 
-        { // Add Route
+        {// Add Route
           menu === 3 && (
             <div id='modview-menu-add'>
               <div id='modview-route-category'>
@@ -313,11 +308,9 @@ const ModMenu: React.FC<ModMenuProps> = ({ data, selectedRun, mapID }) => {
                 </p>
               </div>
             </div>
-          )
-        }
+          )}
       </div>
-
-    </div>
+    </>
   );
 };
 
