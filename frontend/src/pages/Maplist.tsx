@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 
 import "../css/Maplist.css";
 import { API } from "../api/Api";
@@ -23,9 +23,11 @@ const Maplist: React.FC = () => {
 
   const params = useParams<{ id: string }>();
   const location = useLocation();
+  const navigate = useNavigate();
 
   function _update_currently_selected(catNum2: number) {
       setCurrentlySelected(catNum2);
+      navigate("/games/" + game?.id + "?cat=" + catNum2);
       setHasClicked(true);
   }
 
