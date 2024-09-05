@@ -15,17 +15,17 @@ const Summary: React.FC<SummaryProps> = ({ selectedRun, setSelectedRun, data }) 
   const [selectedCategory, setSelectedCategory] = React.useState<number>(1);
   const [historySelected, setHistorySelected] = React.useState<boolean>(false);
 
-  function _select_run(x: number, y: number) {
+  function _select_run(idx: number, category_id: number) {
     let r = document.querySelectorAll("button.record");
     r.forEach(e => (e as HTMLElement).style.backgroundColor = "#2b2e46");
-    (r[x] as HTMLElement).style.backgroundColor = "#161723"
+    (r[idx] as HTMLElement).style.backgroundColor = "#161723"
 
 
     if (data && data.summary.routes.length !== 0 && data.summary.routes.length !== 0) {
-      if (y === 2) { x += data.summary.routes.filter(e => e.category.id < 2).length }
-      if (y === 3) { x += data.summary.routes.filter(e => e.category.id < 3).length }
-      if (y === 4) { x += data.summary.routes.filter(e => e.category.id < 4).length }
-      setSelectedRun(x);
+      if (category_id === 2) { idx += data.summary.routes.filter(e => e.category.id < 2).length }
+      if (category_id === 3) { idx += data.summary.routes.filter(e => e.category.id < 3).length }
+      if (category_id === 4) { idx += data.summary.routes.filter(e => e.category.id < 4).length }
+      setSelectedRun(idx);
     }
   }
 
@@ -52,6 +52,7 @@ const Summary: React.FC<SummaryProps> = ({ selectedRun, setSelectedRun, data }) 
 
   React.useEffect(() => {
     _category_change();
+    _select_run(0, selectedCategory);
   }, [selectedCategory]);
 
   React.useEffect(() => {
@@ -84,7 +85,7 @@ const Summary: React.FC<SummaryProps> = ({ selectedRun, setSelectedRun, data }) 
                 <div className='record-top'>
                   <span>Date</span>
                   <span>Record</span>
-                  <span>First completion</span>
+                  <span>First Completion</span>
                 </div>
                 <hr />
                 <div id='records'>
@@ -143,8 +144,8 @@ const Summary: React.FC<SummaryProps> = ({ selectedRun, setSelectedRun, data }) 
           </div>
         </div>
         <div id='count'>
-          <span>Completion count</span>
-          <div>{selectedCategory === 1 ? data.summary.routes[selectedRun].completion_count : "N/A"}</div>
+          <span>Completion Count</span>
+          <div>{data.summary.routes[selectedRun].completion_count}</div>
         </div>
       </section>
 
@@ -153,7 +154,7 @@ const Summary: React.FC<SummaryProps> = ({ selectedRun, setSelectedRun, data }) 
           {data.summary.routes.sort((a, b) => a.category.id - b.category.id)[selectedRun].showcase !== "" ?
             <iframe title='Showcase video' src={"https://www.youtube.com/embed/" + _get_youtube_id(data.summary.routes[selectedRun].showcase)}> </iframe>
             : ""}
-          <h3>Route description</h3>
+          <h3>Route Description</h3>
           <span id='description-text'>
             <ReactMarkdown>
               {data.summary.routes.sort((a, b) => a.category.id - b.category.id)[selectedRun].description}
