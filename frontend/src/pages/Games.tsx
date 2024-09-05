@@ -18,13 +18,9 @@ const Games: React.FC = () => {
       loaders.forEach((loader) => {
           (loader as HTMLElement).style.display = "none";
       });
-  }
+    }
 
     React.useEffect(() => {
-        document.querySelectorAll(".games-page-item-body").forEach((game, index) => {
-            game.innerHTML = "";
-        });
-
         _fetch_games();
         _page_load();
     }, []);
