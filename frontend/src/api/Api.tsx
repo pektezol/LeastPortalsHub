@@ -6,6 +6,7 @@ import { MapDiscussion, MapDiscussions, MapLeaderboard, MapSummary, Map } from '
 import { MapDiscussionCommentContent, MapDiscussionContent, ModMenuContent } from '../types/Content';
 import { Search } from '../types/Search';
 import { UserProfile } from '../types/Profile';
+import { Ranking } from '../types/Ranking';
 
 // add new api call function entries here
 // example usage: API.get_games();
@@ -17,6 +18,7 @@ export const API = {
   get_chapters: (chapter_id: string) => get_chapters(chapter_id),
   get_games_chapters: (game_id: string) => get_games_chapters(game_id),
   get_games_maps: (game_id: string) => get_games_maps(game_id),
+  get_rankings: () => get_rankings(),
   get_search: (q: string) => get_search(q),
   get_map_summary: (map_id: string) => get_map_summary(map_id),
   get_map_leaderboard: (map_id: string) => get_map_leaderboard(map_id),
@@ -71,6 +73,12 @@ const get_games_chapters = async (game_id: string): Promise<GamesChapters> => {
 
 const get_games_maps = async (game_id: string): Promise<Map> => {
   const response = await axios.get(url(`games/${game_id}/maps`))
+  return response.data.data;
+}
+
+// RANKINGS
+const get_rankings = async (): Promise<Ranking> => {
+  const response = await axios.get(url(`rankings`));
   return response.data.data;
 }
 

@@ -11,6 +11,7 @@ import Maps from './pages/Maps';
 import User from './pages/User';
 import Homepage from './pages/Homepage';
 import Maplist from './pages/Maplist';
+import Rankings from './pages/Rankings';
 
 const App: React.FC = () => {
   const [token, setToken] = React.useState<string | undefined>(undefined);
@@ -33,6 +34,7 @@ const App: React.FC = () => {
         <Route path="/games" element={<Games />} />
         <Route path="/maps/*" element={<Maps isModerator={isModerator} />} />
         <Route path='/games/:id' element={<Maplist></Maplist>}></Route>
+        <Route path='/rankings' element={<Rankings></Rankings>}></Route>
         <Route path="*" element={"404"} />
       </Routes>
     </>
