@@ -19,6 +19,7 @@ import img16 from './png/16.png';
 import img17 from './png/17.png';
 import img18 from './png/18.png';
 import img19 from './png/19.png';
+import img20 from './png/20.png';
 
 export const LogoIcon = logo;
 export const LoginIcon = login;
@@ -42,3 +43,4 @@ export const YouTubeIcon = img16;
 export const SteamIcon = img17;
 export const HistoryIcon = img18;
 export const SortIcon = img19;
+export const UploadIcon = img20;

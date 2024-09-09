@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
-import { BookIcon, FlagIcon, HelpIcon, HomeIcon, LogoIcon, NewsIcon, PortalIcon, SearchIcon, TableIcon } from '../images/Images';
+import { BookIcon, FlagIcon, HelpIcon, HomeIcon, LogoIcon, PortalIcon, SearchIcon, UploadIcon } from '../images/Images';
 import Login from './Login';
 import { UserProfile } from '../types/Profile';
 import { Search } from '../types/Search';
@@ -12,9 +12,10 @@ interface SidebarProps {
   setToken: React.Dispatch<React.SetStateAction<string | undefined>>;
   profile?: UserProfile;
   setProfile: React.Dispatch<React.SetStateAction<UserProfile | undefined>>;
+  onUploadRun: () => void;
 };
 
-const Sidebar: React.FC<SidebarProps> = ({ setToken, profile, setProfile }) => {
+const Sidebar: React.FC<SidebarProps> = ({ setToken, profile, setProfile, onUploadRun }) => {
 
   const [searchData, setSearchData] = React.useState<Search | undefined>(undefined);
   const [isSidebarLocked, setIsSidebarLocked] = React.useState<boolean>(false);
@@ -40,11 +41,19 @@ const Sidebar: React.FC<SidebarProps> = ({ setToken, profile, setProfile }) => {
     const span = document.querySelectorAll("button.sidebar-button>span") as NodeListOf<HTMLElement>
     const side = document.querySelector("#sidebar-list") as HTMLElement;
     const searchbar = document.querySelector("#searchbar") as HTMLInputElement;
+    const uploadRunBtn = document.querySelector("#upload-run") as HTMLInputElement;
+    const uploadRunSpan = document.querySelector("#upload-run>span") as HTMLInputElement;
 
     if (isSidebarOpen) {
       if (profile) {
         const login = document.querySelectorAll(".login>button")[1] as HTMLElement;
         login.style.opacity = "1"
+        uploadRunBtn.style.width = "310px"
+        uploadRunBtn.style.padding = "0.4em 0 0 11px"
+        uploadRunSpan.style.opacity = "0"
+        setTimeout(() => {
+          uploadRunSpan.style.opacity = "1"
+        }, 100)
       }
       setSidebarOpen(false);
       side.style.width = "320px"
@@ -54,14 +63,17 @@ const Sidebar: React.FC<SidebarProps> = ({ setToken, profile, setProfile }) => {
         setTimeout(() => {
           span[i].style.opacity = "1"
         }, 100)
-      })
+      });
       side.style.zIndex = "2"
     } else {
       if (profile) {
         const login = document.querySelectorAll(".login>button")[1] as HTMLElement;
         login.style.opacity = "0"
+        uploadRunBtn.style.width = "40px"
+        uploadRunBtn.style.padding = "0.4em 0 0 5px"
+        uploadRunSpan.style.opacity = "0"
       }
-      setSidebarOpen(true)
+      setSidebarOpen(true);
       side.style.width = "40px";
       searchbar.focus();
       btn.forEach((e, i) => {
@@ -106,7 +118,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setToken, profile, setProfile }) => {
           <img src={LogoIcon} alt="" height={"80px"} />
           <div id='logo-text'>
             <span><b>PORTAL 2</b></span><br />
-            <span>Least Portals</span>
+            <span>Least Portals Hub</span>
           </div>
         </div>
       </Link>
@@ -140,14 +152,21 @@ const Sidebar: React.FC<SidebarProps> = ({ setToken, profile, setProfile }) => {
         <div id='sidebar-bottomlist'>
           <span></span>
 
+          {
+            profile ?
+              <button id='upload-run' className='submit-run-button' onClick={() => onUploadRun()}><img src={UploadIcon} alt="upload" /><span>Submit&nbsp;a&nbsp;Run</span></button>
+              : 
+              <span></span>
+          }
+
           <Login setToken={setToken} profile={profile} setProfile={setProfile} />
 
           <Link to="/rules" tabIndex={-1}>
-            <button className='sidebar-button'><img src={BookIcon} alt="leaderboardrules" /><span>Leaderboard&nbsp;Rules</span></button>
+            <button className='sidebar-button'><img src={BookIcon} alt="rules" /><span>Leaderboard&nbsp;Rules</span></button>
           </Link>
 
           <Link to="/about" tabIndex={-1}>
-            <button className='sidebar-button'><img src={HelpIcon} alt="aboutp2lp" /><span>About&nbsp;P2LP</span></button>
+            <button className='sidebar-button'><img src={HelpIcon} alt="about" /><span>About&nbsp;LPHUB</span></button>
           </Link>
         </div>
       </div>

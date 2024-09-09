@@ -7,21 +7,24 @@ import Leaderboards from '../components/Leaderboards';
 import Discussions from '../components/Discussions';
 import ModMenu from '../components/ModMenu';
 import { MapDiscussions, MapLeaderboard, MapSummary } from '../types/Map';
+import { UserProfile } from '../types/Profile';
 import { API } from '../api/Api';
 import "../css/Maps.css";
+import Loading from '../components/Loading';
 
 interface MapProps {
+  profile?: UserProfile;
   isModerator: boolean;
+  onUploadRun: (mapID: number) => void;
 };
 
-const Maps: React.FC<MapProps> = ({ isModerator }) => {
+const Maps: React.FC<MapProps> = ({ profile, isModerator, onUploadRun }) => {
 
   const [selectedRun, setSelectedRun] = React.useState<number>(0);
 
   const [mapSummaryData, setMapSummaryData] = React.useState<MapSummary | undefined>(undefined);
   const [mapLeaderboardData, setMapLeaderboardData] = React.useState<MapLeaderboard | undefined>(undefined);
-  const [mapDiscussionsData, setMapDiscussionsData] = React.useState<MapDiscussions | undefined>(undefined)
-
+  const [mapDiscussionsData, setMapDiscussionsData] = React.useState<MapDiscussions | undefined>(undefined);
 
   const [navState, setNavState] = React.useState<number>(0);
 
@@ -51,8 +54,23 @@ const Maps: React.FC<MapProps> = ({ isModerator }) => {
   }, []);
 
   if (!mapSummaryData) {
+    // loading placeholder
     return (
-      <></>
+      <main>
+        <section id='section1' className='summary1'>
+          <div>
+            <Link to="/games"><button className='nav-button' style={{ borderRadius: "20px 20px 20px 20px" }}><i className='triangle'></i><span>Games List</span></button></Link>
+          </div>
+        </section>
+
+        <section id='section2' className='summary1'>
+          <button className='nav-button'><img src={PortalIcon} alt="" /><span>Summary</span></button>
+          <button className='nav-button'><img src={FlagIcon} alt="" /><span>Leaderboards</span></button>
+          <button className='nav-button'><img src={ChatIcon} alt="" /><span>Discussions</span></button>
+        </section>
+
+        <Loading />
+      </main>
     );
   }
 
@@ -66,12 +84,11 @@ const Maps: React.FC<MapProps> = ({ isModerator }) => {
       <main>
         <section id='section1' className='summary1'>
           <div>
-            <Link to="/games"><button className='nav-button' style={{ borderRadius: "20px 0px 0px 20px" }}><i className='triangle'></i><span>Games list</span></button></Link>
-            <Link to={`/games/${!mapSummaryData.map.is_coop ? "1" : "2"}?chapter=${mapSummaryData.map.chapter_name}`}><button className='nav-button' style={{ borderRadius: "0px 20px 20px 0px", marginLeft: "2px" }}><i className='triangle'></i><span>{mapSummaryData.map.chapter_name}</span></button></Link>
+            <Link to="/games"><button className='nav-button' style={{ borderRadius: "20px 0px 0px 20px" }}><i className='triangle'></i><span>Games List</span></button></Link>
+            <Link to={`/games/${!mapSummaryData.map.is_coop ? "1" : "2"}?chapter=${mapSummaryData.map.chapter_name.split(" ")[1]}`}><button className='nav-button' style={{ borderRadius: "0px 20px 20px 0px", marginLeft: "2px" }}><i className='triangle'></i><span>{mapSummaryData.map.chapter_name}</span></button></Link>
             <br /><span><b>{mapSummaryData.map.map_name}</b></span>
+            {profile && <button onClick={() => onUploadRun(mapSummaryData.map.id)}>Submit a Run</button>}
           </div>
-
-
         </section>
 
         <section id='section2' className='summary1'>

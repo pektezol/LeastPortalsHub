@@ -2,16 +2,13 @@ import React from 'react';
 
 import GameEntry from '../components/GameEntry';
 import { Game } from '../types/Game';
-import { API } from '../api/Api';
 import "../css/Maps.css"
 
-const Games: React.FC = () => {
-    const [games, setGames] = React.useState<Game[]>([]);
+interface GamesProps {
+    games: Game[];
+}
 
-    const _fetch_games = async () => {
-      const games = await API.get_games();
-      setGames(games);
-    };
+const Games: React.FC<GamesProps> = ({ games }) => {
 
     const _page_load = () => {
       const loaders = document.querySelectorAll(".loader");
@@ -21,7 +18,9 @@ const Games: React.FC = () => {
     }
 
     React.useEffect(() => {
-        _fetch_games();
+        document.querySelectorAll(".games-page-item-body").forEach((game, index) => {
+            game.innerHTML = "";
+        });
         _page_load();
     }, []);
 

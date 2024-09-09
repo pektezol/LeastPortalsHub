@@ -35,7 +35,7 @@ const Login: React.FC<LoginProps> = ({ token, setToken, profile, setProfile }) =
                 <img src={profile.avatar_link} alt="" />
                 <span>{profile.user_name}</span>
               </button>
-              <button className='sidebar-button' onClick={_logout}>
+              <button className='logout-button' onClick={_logout}>
                 <img src={ExitIcon} alt="" /><span></span>
               </button>
             </Link>

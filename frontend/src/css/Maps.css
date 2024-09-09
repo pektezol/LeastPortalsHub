@@ -299,7 +299,7 @@ p>span.portal-count{font-weight: bold;font-size: 100px;vertical-align: -15%;}
 
 
 #description>iframe{
-    margin: 4px;
+    margin: 20px;
     float:right; 
     border: 0;
     border-radius: 24px;
@@ -311,6 +311,7 @@ p>span.portal-count{font-weight: bold;font-size: 100px;vertical-align: -15%;}
     display: block;
     font-size: 21px;
     word-wrap: break-word;
+    text-align: justify;
 }
 #description-text>b{font-size: inherit;}
 #description-text>a{font-size: inherit;color: #3c91e6;}

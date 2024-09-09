@@ -1,0 +1,16 @@
+#about {
+    overflow: auto;
+    overflow-x: hidden;
+    position: relative;
+
+    width: calc(100% - 380px); 
+    height: 100vh;
+    left: 350px;
+
+    padding-right: 30px;
+
+    font-size: 24px;
+    font-family: BarlowSemiCondensed-Regular;
+    color: #cdcfdf;
+
+}

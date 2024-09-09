@@ -10,22 +10,22 @@
  /* logo */
 #logo{
     display: grid;
-    grid-template-columns: 60px 200px;
+    grid-template-columns: 60px 220px;
 
 
     height:  80px;
-    padding: 20px 0 20px 30px;
+    padding: 20px 0 20px 20px;
     cursor: pointer;
     user-select: none;
 } 
 
 #logo-text{
     font-family: BarlowCondensed-Regular;
-    font-size: 42px;
+    font-size: 36px;
     color: #FFF;
     line-height: 38px;
 }
-span>b{
+#logo-text>span>b{
     font-family: BarlowCondensed-Bold;
     font-size: 56px;
 }
@@ -55,7 +55,7 @@ span>b{
 
     margin: 0 5px 0 5px;
     justify-items: left;
-    grid-template-rows: calc(100vh - 670px) 50px 50px 50px;
+    grid-template-rows: calc(100vh - 720px) 50px 50px 50px;
 }
 .sidebar-button>span{
     font-family: BarlowSemiCondensed-Regular;
@@ -83,6 +83,61 @@ span>b{
     width .3s,
     background-color .15s,
     padding .3s;
+}
+
+.logout-button{
+    display: grid;
+    grid-template-columns: 50px auto;
+    place-items: left;
+    text-align: left;
+    
+    background-color: inherit;
+    cursor: pointer;
+    border: none;
+    width: 310px;
+    height: 40px;
+    border-radius: 20px;
+    padding: 0.4em 0 0 11px;
+
+    transition: 
+    width .3s,
+    background-color .15s,
+    padding .3s;
+}
+
+.submit-run-button {
+    display: grid;
+    grid-template-columns: 50px auto;
+    place-items: left;
+    text-align: left;
+    
+    background-color: inherit;
+    cursor: pointer;
+    border: none;
+    width: 310px;
+    height: 40px;
+    border-radius: 20px;
+    padding: 0.4em 0 0 11px;
+
+    transition: 
+    width .3s,
+    background-color .15s,
+    padding .3s;
+    background-color: #202232aa;
+}
+
+.submit-run-button:hover {
+    background-color: #202232;
+}
+
+
+.submit-run-button>span{
+    font-family: BarlowSemiCondensed-Regular;
+    font-size: 18px;
+    color: #CDCFDF;
+    height: 32px;
+    line-height: 28px;
+    transition: opacity .1s;
 }
 
 .sidebar-button-selected {

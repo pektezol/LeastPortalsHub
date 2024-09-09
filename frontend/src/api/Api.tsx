@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-import { Game, GameChapters } from '../types/Game';
 import { GameChapter, GamesChapters } from '../types/Chapters';
-import { MapDiscussion, MapDiscussions, MapLeaderboard, MapSummary, Map } from '../types/Map';
+import { Game } from '../types/Game';
+import { Map, MapDiscussion, MapDiscussions, MapLeaderboard, MapSummary } from '../types/Map';
 import { MapDiscussionCommentContent, MapDiscussionContent, ModMenuContent } from '../types/Content';
 import { Search } from '../types/Search';
 import { UserProfile } from '../types/Profile';
@@ -15,11 +15,13 @@ export const API = {
 
   get_user: (user_id: string) => get_user(user_id),
   get_games: () => get_games(),
+
   get_chapters: (chapter_id: string) => get_chapters(chapter_id),
   get_games_chapters: (game_id: string) => get_games_chapters(game_id),
-  get_games_maps: (game_id: string) => get_games_maps(game_id),
+  get_game_maps: (game_id: string) => get_game_maps(game_id),
   get_rankings: () => get_rankings(),
   get_search: (q: string) => get_search(q),
+
   get_map_summary: (map_id: string) => get_map_summary(map_id),
   get_map_leaderboard: (map_id: string) => get_map_leaderboard(map_id),
   get_map_discussions: (map_id: string) => get_map_discussions(map_id),
@@ -71,10 +73,11 @@ const get_games_chapters = async (game_id: string): Promise<GamesChapters> => {
   return response.data.data;
 };
 
-const get_games_maps = async (game_id: string): Promise<Map> => {
+const get_game_maps = async (game_id: string): Promise<Map[]> => {
   const response = await axios.get(url(`games/${game_id}/maps`))
-  return response.data.data;
-}
+  return response.data.data.maps;
+};
+
 
 // RANKINGS
 const get_rankings = async (): Promise<Ranking> => {

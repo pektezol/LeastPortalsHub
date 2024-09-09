@@ -107,7 +107,7 @@ h3 {
 
 .difficulty-bar {
     display: flex;
-    margin: 0px 10px;
+    margin: 15px 10px;
 }
 
 .difficulty-bar span {

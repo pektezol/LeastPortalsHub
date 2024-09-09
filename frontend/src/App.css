@@ -15,6 +15,11 @@ main {
 
 }
 
+a {
+    color: inherit;
+    width: fit-content;
+}
+
 body {
     overflow: hidden;
     background-color: #141520;

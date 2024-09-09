@@ -1,0 +1,47 @@
+div#upload-run{
+    position: absolute;
+    left: 50%;
+    z-index: 20;
+    width: 320px; height: auto;
+    /* background-color: red; */
+
+    transform: translateY(-68%);
+}
+
+
+#upload-run-menu{
+    position: absolute;
+    left: calc(50% + 160px); top: 130px;
+    transform: translateX(-50%);
+    background-color: #2b2e46;
+    z-index: 2; color: white;
+}
+
+#upload-run-menu-add,
+#upload-run-menu-edit{
+    box-shadow: 0 0 40px 16px black;
+    outline: 8px solid #2b2e46;
+    border-radius: 20px;
+    font-size: 40px;
+    display: grid;
+    grid-template-columns: 20% 20% 20% 20% 20%;
+}
+
+#upload-run-menu-add>div,
+#upload-run-menu-edit>div{
+    display: grid;
+    margin: 20px;
+    width: 200px;
+    font-size: 20px;
+}
+
+#upload-run-block{
+    position: absolute;
+    background-color: black;
+    opacity: .3;
+    left: 320px;
+    width: calc(100% - 320px);
+    height: 100%;
+    z-index: 2;
+    cursor: no-drop;
+}

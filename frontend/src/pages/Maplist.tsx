@@ -73,14 +73,9 @@ const Maplist: React.FC = () => {
       setNumChapters(games_chapters.chapters.length);
     }
 
-    const _fetch_maps = async () => {
-      const maps = await API.get_games_maps(gameId.toString());
-      setLoad(true);
-    }
-
     _fetch_game();
     _fetch_game_chapters();
-    _fetch_maps();
+    setLoad(true);
   }, []);
 
   useEffect(() => {
@@ -97,7 +92,7 @@ const Maplist: React.FC = () => {
         <Link to="/games">
           <button className="nav-button" style={{ borderRadius: "20px" }}>
             <i className="triangle"></i>
-            <span>Games list</span>
+            <span>Games List</span>
           </button>
         </Link>
       </section>
@@ -162,7 +157,7 @@ const Maplist: React.FC = () => {
                       </div>
                     </div>
                     <div className="difficulty-bar">
-                      <span>Difficulty:</span>
+                      {/* <span>Difficulty:</span> */}
                       <div className={map.difficulty == 0 ? "one" : map.difficulty == 1 ? "two" : map.difficulty == 2 ? "three" : map.difficulty == 3 ? "four" : map.difficulty == 4 ? "five" : "one"}>
                         <div className="difficulty-point"></div>
                         <div className="difficulty-point"></div>
