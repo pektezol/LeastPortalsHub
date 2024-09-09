@@ -10,16 +10,25 @@ In addition, we host a leaderboard section for each map where users can compare 
 
 ## Project Team
 
-* [@pektezol](https://github.com/pektezol) - Project Lead & Backend
+* [@pektezol](https://github.com/pektezol) - Project Lead
 * [@Krzyhau](https://github.com/Krzyhau) - Visual Design
 * [@Nidboj132](https://github.com/Nidboj132) - Frontend & Subject Expert
 * [@Oryn](https://github.com/Oryn-Goia) - Subject Expert
 * [@Wolfboy248](https://github.com/Wolfboy248) - Frontend
 
+## Content Contributors
+
+* Black_Semka
+* Feliser
+* Jaio
+* Jess3n
+* Robotwars1
+* Thearus
+
 ## Special Thanks
 
-* [@UncraftedName](https://github.com/UncraftedName) - For providing the parser that retrieves total portal count and elapsed time from the CM counter found [here](https://github.com/UncraftedName/UntitledParser).
-* [@NeKz](https://github.com/NeKzor) - For being the inspiration of this project and developer of the current/former least portals site found [here](https://lp.nekz.me/). 
+* [@UncraftedName](https://github.com/UncraftedName) - For providing the (former) parser that retrieves total portal count and elapsed time from the CM counter found [here](https://github.com/UncraftedName/UntitledParser).
+* [@NeKz](https://github.com/NeKzor) - For being the inspiration of this project and the developer of the former least portals site found [here](https://lp.nekz.me/). 
 
 ## Documentation
 
@@ -43,7 +52,7 @@ If you want to support the creator, you can do it via using GitHub sponsorships 
 * We collect and store your publicly available id, username, avatar link, and country code from Steam during your first login to LPHUB. The exact date and time of your LPHUB account creation is also stored.
 * In a case of profile update, newly changed values replaces the old data, and the update time is also stored.
 * All of the demo proof submitted by users are stored in a publicly accessible Google Drive folder. By submitting demo as a proof, you agree that your demo proof becomes available to the public.
-* Any information, ideas, or solutions shared on LPHUB are intended to be openly accessible and available for collaborative purposes. Users should understand that the content they contribute might be viewed and used by others for the purpose of generating insights and solutions. Sharing content on this platform does not transfer ownership of intellectual property rights to the platform owner or other users. Contributors retain their rights to their own content while granting others the opportunity to engage and collaborate. We do not place emphasis on determining ownership of individual contributions.
+* Any information, ideas, or solutions shared on LPHUB are intended to be openly accessible and available for collaborative purposes. Users should understand that the content they contribute might be viewed and used by others for the purpose of generating insights and solutions.
 * At any time, Privacy Policy may get updated to reflect changes in LPHUB. The effective date at the bottom of the README indicates when the most recent changes were made.
 
 ## Disclaimer
@@ -62,4 +71,4 @@ By using LPHUB, you acknowledge that you have read and understood this disclaime
 
 ## Last Update
 
-2023-08-30
+2024-09-09
