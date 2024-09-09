@@ -32,11 +32,11 @@
 }
 
 .nav-1 div {
-    width: 65%;
+    width: 60%;
 }
 
 .nav-2 div {
-    width: 80%;
+    width: 75%;
 }
 
 .rankings-leaderboard {
@@ -73,12 +73,12 @@
     text-align: left;
 }
 
-.leaderboard-entry div {
+.leaderboard-entry div a {
     display: flex;
     align-items: center;
 }
 
-.leaderboard-entry div span {
+.leaderboard-entry div a span {
     margin-left: 5px;
 }
 

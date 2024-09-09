@@ -145,7 +145,17 @@ const get_map_leaderboard = async (map_id: string): Promise<MapLeaderboard | und
   if (!response.data.success) {
     return undefined;
   }
-  return response.data.data;
+  const data = response.data.data;
+  // map the kind of leaderboard
+  data.records = data.records.map((record: any) => {
+    if (record.host && record.partner) {
+      return { ...record, kind: 'multiplayer' };
+    } else {
+      return { ...record, kind: 'singleplayer' };
+    }
+  });
+  // should be unreachable
+  return undefined;
 };
 
 // MAP DISCUSSIONS

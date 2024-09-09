@@ -79,7 +79,7 @@ const User: React.FC = () => {
 
   React.useEffect(() => {
     _fetch_user();
-  }, []);
+  }, [user]);
 
   React.useEffect(() => {
     if (game !== "0") {

@@ -39,6 +39,7 @@ const Maps: React.FC<MapProps> = ({ profile, isModerator, onUploadRun }) => {
 
   const _fetch_map_leaderboards = async () => {
     const mapLeaderboards = await API.get_map_leaderboard(mapID);
+    console.log(mapLeaderboards?.records[0]);
     setMapLeaderboardData(mapLeaderboards);
   };
 

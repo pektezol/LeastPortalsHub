@@ -5,6 +5,7 @@ import { MapDiscussionCommentContent, MapDiscussionContent } from '../types/Cont
 import { time_ago } from '../utils/Time';
 import { API } from '../api/Api';
 import "../css/Maps.css"
+import { Link } from 'react-router-dom';
 
 interface DiscussionsProps {
   data?: MapDiscussions;
@@ -88,7 +89,9 @@ const Discussions: React.FC<DiscussionsProps> = ({ data, isModerator, mapID, onR
                 </div>
 
                 <div>
-                  <img src={discussionThread.discussion.creator.avatar_link} alt="" />
+                  <Link to={`/users/${discussionThread.discussion.creator.steam_id}`}>
+                    <img src={discussionThread.discussion.creator.avatar_link} alt="" />
+                  </Link>
                   <div>
                     <span>{discussionThread.discussion.creator.user_name}</span>
                     <span>{time_ago(new Date(discussionThread.discussion.created_at.replace("T", " ").replace("Z", "")))}</span>
@@ -98,7 +101,9 @@ const Discussions: React.FC<DiscussionsProps> = ({ data, isModerator, mapID, onR
                     discussionThread.discussion.comments.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
                       .map(e => (
                         <>
-                          <img src={e.user.avatar_link} alt="" />
+                          <Link to={`/users/${e.user.steam_id}`}>
+                            <img src={e.user.avatar_link} alt="" />
+                          </Link>
                           <div>
                             <span>{e.user.user_name}</span>
                             <span>{time_ago(new Date(e.date.replace("T", " ").replace("Z", "")))}</span>

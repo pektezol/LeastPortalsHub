@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 import { DownloadIcon, ThreedotIcon } from '../images/Images';
 import { MapLeaderboard } from '../types/Map';
@@ -70,11 +71,13 @@ const Leaderboards: React.FC<LeaderboardsProps> = ({ data }) => {
             <span> </span>
             {r.kind === "multiplayer" ? (
               <div>
-                <span><img src={r.host.avatar_link} alt='' /> &nbsp; {r.host.user_name}</span>
-                <span><img src={r.partner.avatar_link} alt='' /> &nbsp; {r.partner.user_name}</span>
+                  <Link to={`/users/${r.host.steam_id}`}><span><img src={r.host.avatar_link} alt='' /> &nbsp; {r.host.user_name}</span></Link>
+                  <Link to={`/users/${r.partner.steam_id}`}><span><img src={r.partner.avatar_link} alt='' /> &nbsp; {r.partner.user_name}</span></Link>
               </div>
-            ) : (
-              <div><span><img src={r.user.avatar_link} alt='' /> &nbsp; {r.user.user_name}</span></div>
+            ) : r.kind === "singleplayer" && (
+              <div>
+                  <Link to={`/users/${r.user.steam_id}`}><span><img src={r.user.avatar_link} alt='' /> &nbsp; {r.user.user_name}</span></Link>
+              </div>
             )}
 
             <span>{r.score_count}</span>
@@ -88,7 +91,7 @@ const Leaderboards: React.FC<LeaderboardsProps> = ({ data }) => {
                 <button onClick={() => window.location.href = `https://lp.ardapektezol.com/api/v1/demos?uuid=${r.partner_demo_id}`}><img src={DownloadIcon} alt="download" style={{ filter: "hue-rotate(160deg) contrast(60%) saturate(1000%)" }} /></button>
                 <button onClick={() => window.location.href = `https://lp.ardapektezol.com/api/v1/demos?uuid=${r.host_demo_id}`}><img src={DownloadIcon} alt="download" style={{ filter: "hue-rotate(300deg) contrast(60%) saturate(1000%)" }} /></button>
               </span>
-            ) : (
+            ) : r.kind === "singleplayer" && (
 
               <span>
                 <button onClick={() => { window.alert(`Demo ID: ${r.demo_id}`) }}><img src={ThreedotIcon} alt="demo_id" /></button>

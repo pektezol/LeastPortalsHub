@@ -399,7 +399,7 @@ text-align: center;
     height: 44px;
 }
 
-.leaderboard-record>div>span>img{
+.leaderboard-record>div>a>span>img{
     height: 36px;
     border-radius: 50px;
     padding: 0;
@@ -410,7 +410,7 @@ text-align: center;
     grid-template-columns: 50% 50%;
     place-items: left;
 }
-.leaderboard-record>div>span{
+.leaderboard-record>div>a>span{
     display: flex;
     place-items: center;
     height: 44px;
@@ -611,7 +611,7 @@ text-align: center;
 }
 
 
-#discussion-thread>div:nth-child(2)>img{
+#discussion-thread>div:nth-child(2)>a>img{
     width: 60px; height: 60px;
     border-radius: 100px;
     margin: 20px 0 0 0;
