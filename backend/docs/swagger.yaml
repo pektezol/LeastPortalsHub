@@ -514,8 +514,8 @@ info:
   contact: {}
   description: Backend API endpoints for the Least Portals Database.
   license:
-    name: GNU General Public License, Version 2
-    url: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+    name: GNU Affero General Public License, Version 3
+    url: https://www.gnu.org/licenses/agpl-3.0.html
   title: Least Portals Database API
   version: "1.0"
 paths:

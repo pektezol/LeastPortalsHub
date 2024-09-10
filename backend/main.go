@@ -5,22 +5,23 @@ import (
 	"log"
 	"os"
 
+	"lphub/api"
+	"lphub/database"
+	_ "lphub/docs"
+
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"github.com/pektezol/leastportalshub/backend/api"
-	"github.com/pektezol/leastportalshub/backend/database"
-	_ "github.com/pektezol/leastportalshub/docs"
 )
 
 //	@title			Least Portals Database API
 //	@version		1.0
 //	@description	Backend API endpoints for the Least Portals Database.
 
-//	@license.name	GNU General Public License, Version 2
-//	@license.url	https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+//	@license.name	GNU Affero General Public License, Version 3
+//	@license.url	https://www.gnu.org/licenses/agpl-3.0.html
 
-//	@host		lp.ardapektezol.com
-//	@BasePath	/api/v1
+// @host		lp.ardapektezol.com
+// @BasePath	/api/v1
 func main() {
 	err := godotenv.Load()
 	if err != nil {

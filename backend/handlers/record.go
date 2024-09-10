@@ -12,11 +12,12 @@ import (
 	"strconv"
 	"strings"
 
+	"lphub/database"
+	"lphub/models"
+	"lphub/parser"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/pektezol/leastportalshub/backend/database"
-	"github.com/pektezol/leastportalshub/backend/models"
-	"github.com/pektezol/leastportalshub/backend/parser"
 	"golang.org/x/oauth2/google"
 	"golang.org/x/oauth2/jwt"
 	"google.golang.org/api/drive/v3"

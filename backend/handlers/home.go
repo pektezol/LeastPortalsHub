@@ -6,9 +6,10 @@ import (
 	"sort"
 	"strings"
 
+	"lphub/database"
+	"lphub/models"
+
 	"github.com/gin-gonic/gin"
-	"github.com/pektezol/leastportalshub/backend/database"
-	"github.com/pektezol/leastportalshub/backend/models"
 )
 
 type SearchResponse struct {

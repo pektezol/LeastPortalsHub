@@ -1,8 +1,9 @@
 package api
 
 import (
+	"lphub/handlers"
+
 	"github.com/gin-gonic/gin"
-	"github.com/pektezol/leastportalshub/backend/handlers"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )

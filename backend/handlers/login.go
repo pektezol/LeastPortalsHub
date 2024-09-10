@@ -8,10 +8,11 @@ import (
 	"os"
 	"time"
 
+	"lphub/database"
+	"lphub/models"
+
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/pektezol/leastportalshub/backend/database"
-	"github.com/pektezol/leastportalshub/backend/models"
 	"github.com/pektezol/steam_go"
 )
 
