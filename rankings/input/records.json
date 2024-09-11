@@ -1,0 +1,604 @@
+[
+	{
+		"id": 47459,
+		"name": "Portal Gun",
+		"mode": 1,
+		"wr": 0
+	},
+	{
+		"id": 47454,
+		"name": "Smooth Jazz",
+		"mode": 1,
+		"wr": 0,
+		"limit": 1
+	},
+	{
+		"id": 47451,
+		"name": "Cube Momentum",
+		"mode": 1,
+		"wr": 1
+	},
+	{
+		"id": 47107,
+		"name": "Future Starter",
+		"mode": 1,
+		"wr": 2
+	},
+	{
+		"id": 47734,
+		"name": "Incinerator",
+		"mode": 1,
+		"wr": 0
+	},
+	{
+		"id": 47737,
+		"name": "Laser Stairs",
+		"mode": 1,
+		"wr": 0
+	},
+	{
+		"id": 47739,
+		"name": "Dual Lasers",
+		"mode": 1,
+		"wr": 2
+	},
+	{
+		"id": 47743,
+		"name": "Laser Over Goo",
+		"mode": 1,
+		"wr": 0
+	},
+	{
+		"id": 47745,
+		"name": "Trust Fling",
+		"mode": 1,
+		"wr": 0,
+		"limit": 2
+	},
+	{
+		"id": 47466,
+		"name": "Pit Flings",
+		"mode": 1,
+		"wr": 0
+	},
+	{
+		"id": 47747,
+		"name": "Fizzler Intro",
+		"mode": 1,
+		"wr": 0,
+		"limit": 2
+	},
+	{
+		"id": 47749,
+		"name": "Ceiling Catapult",
+		"mode": 1,
+		"wr": 0
+	},
+	{
+		"id": 47750,
+		"name": "Ricochet",
+		"mode": 1,
+		"wr": 0
+	},
+	{
+		"id": 47753,
+		"name": "Bridge Intro",
+		"mode": 1,
+		"wr": 2
+	},
+	{
+		"id": 47754,
+		"name": "Bridge the Gap",
+		"mode": 1,
+		"wr": 0
+	},
+	{
+		"id": 47757,
+		"name": "Turret Intro",
+		"mode": 1,
+		"wr": 0
+	},
+	{
+		"id": 47758,
+		"name": "Laser Relays",
+		"mode": 1,
+		"wr": 0,
+		"limit": 2
+	},
+	{
+		"id": 47761,
+		"name": "Turret Blocker",
+		"mode": 1,
+		"wr": 0
+	},
+	{
+		"id": 47762,
+		"name": "Laser vs Turret",
+		"mode": 1,
+		"wr": 0
+	},
+	{
+		"id": 47765,
+		"name": "Pull the Rug",
+		"mode": 1,
+		"wr": 0,
+		"limit": 3
+	},
+	{
+		"id": 47767,
+		"name": "Column Blocker",
+		"mode": 1,
+		"wr": 0,
+		"limit": 2
+	},
+	{
+		"id": 47769,
+		"name": "Laser Chaining",
+		"mode": 1,
+		"wr": 0
+	},
+	{
+		"id": 47771,
+		"name": "Triple Laser",
+		"mode": 1,
+		"wr": 0
+	},
+	{
+		"id": 47772,
+		"name": "Jail Break",
+		"mode": 1,
+		"wr": 2
+	},
+	{
+		"id": 47775,
+		"name": "Escape",
+		"mode": 1,
+		"wr": 0
+	},
+	{
+		"id": 47777,
+		"name": "Turret Factory",
+		"mode": 1,
+		"wr": 5
+	},
+	{
+		"id": 47778,
+		"name": "Turret Sabotage",
+		"mode": 1,
+		"wr": 4
+	},
+	{
+		"id": 47781,
+		"name": "Neurotoxin Sabotage",
+		"mode": 1,
+		"wr": 0,
+		"limit": 3
+	},
+	{
+		"id": 47782,
+		"name": "Underground",
+		"mode": 1,
+		"wr": 2
+	},
+	{
+		"id": 47785,
+		"name": "Cave Johnson",
+		"mode": 1,
+		"wr": 4
+	},
+	{
+		"id": 47786,
+		"name": "Repulsion Intro",
+		"mode": 1,
+		"wr": 0
+	},
+	{
+		"id": 47467,
+		"name": "Bomb Flings",
+		"mode": 1,
+		"wr": 3
+	},
+	{
+		"id": 47470,
+		"name": "Crazy Box",
+		"mode": 1,
+		"wr": 0
+	},
+	{
+		"id": 47471,
+		"name": "PotatOS",
+		"mode": 1,
+		"wr": 5
+	},
+	{
+		"id": 47792,
+		"name": "Propulsion Intro",
+		"mode": 1,
+		"wr": 2
+	},
+	{
+		"id": 47794,
+		"name": "Propulsion Flings",
+		"mode": 1,
+		"wr": 0
+	},
+	{
+		"id": 47796,
+		"name": "Conversion Intro",
+		"mode": 1,
+		"wr": 8
+	},
+	{
+		"id": 47799,
+		"name": "Three Gels",
+		"mode": 1,
+		"wr": 4
+	},
+	{
+		"id": 47801,
+		"name": "Funnel Intro",
+		"mode": 1,
+		"wr": 0
+	},
+	{
+		"id": 47803,
+		"name": "Ceiling Button",
+		"mode": 1,
+		"wr": 0
+	},
+	{
+		"id": 47805,
+		"name": "Wall Button",
+		"mode": 1,
+		"wr": 0
+	},
+	{
+		"id": 47807,
+		"name": "Polarity",
+		"mode": 1,
+		"wr": 0
+	},
+	{
+		"id": 47809,
+		"name": "Funnel Catch",
+		"mode": 1,
+		"wr": 2
+	},
+	{
+		"id": 47812,
+		"name": "Stop the Box",
+		"mode": 1,
+		"wr": 0
+	},
+	{
+		"id": 47814,
+		"name": "Laser Catapult",
+		"mode": 1,
+		"wr": 0
+	},
+	{
+		"id": 47816,
+		"name": "Laser Platform",
+		"mode": 1,
+		"wr": 3
+	},
+	{
+		"id": 47818,
+		"name": "Propulsion Catch",
+		"mode": 1,
+		"wr": 0
+	},
+	{
+		"id": 47820,
+		"name": "Repulsion Polarity",
+		"mode": 1,
+		"wr": 2
+	},
+	{
+		"id": 47822,
+		"name": "Finale 2",
+		"mode": 1,
+		"wr": 2
+	},
+	{
+		"id": 47823,
+		"name": "Finale 3",
+		"mode": 1,
+		"wr": 6
+	},
+	{
+		"id": 47457,
+		"name": "Finale 4",
+		"mode": 1,
+		"wr": 4
+	},
+	{
+		"id": 47740,
+		"name": "Doors",
+		"mode": 2,
+		"wr": 0,
+		"limit": 2
+	},
+	{
+		"id": 47826,
+		"name": "Buttons",
+		"mode": 2,
+		"wr": 2
+	},
+	{
+		"id": 47827,
+		"name": "Lasers",
+		"mode": 2,
+		"wr": 2
+	},
+	{
+		"id": 47830,
+		"name": "Rat Maze",
+		"mode": 2,
+		"wr": 2
+	},
+	{
+		"id": 45466,
+		"name": "Laser Crusher",
+		"mode": 2,
+		"wr": 0
+	},
+	{
+		"id": 46361,
+		"name": "Behind The Scenes",
+		"mode": 2,
+		"wr": 0
+	},
+	{
+		"id": 47832,
+		"name": "Flings",
+		"mode": 2,
+		"wr": 4
+	},
+	{
+		"id": 47834,
+		"name": "Infinifling",
+		"mode": 2,
+		"wr": 0
+	},
+	{
+		"id": 47836,
+		"name": "Team Retrieval",
+		"mode": 2,
+		"wr": 0
+	},
+	{
+		"id": 47838,
+		"name": "Vertical Flings",
+		"mode": 2,
+		"wr": 2
+	},
+	{
+		"id": 47839,
+		"name": "Catapults",
+		"mode": 2,
+		"wr": 4
+	},
+	{
+		"id": 47842,
+		"name": "Multifling",
+		"mode": 2,
+		"wr": 2
+	},
+	{
+		"id": 47843,
+		"name": "Fling Crushers",
+		"mode": 2,
+		"wr": 0
+	},
+	{
+		"id": 47846,
+		"name": "Industrial Fan",
+		"mode": 2,
+		"wr": 0
+	},
+	{
+		"id": 47847,
+		"name": "Cooperative Bridges",
+		"mode": 2,
+		"wr": 3
+	},
+	{
+		"id": 47850,
+		"name": "Bridge Swap",
+		"mode": 2,
+		"wr": 2
+	},
+	{
+		"id": 47855,
+		"name": "Fling Block",
+		"mode": 2,
+		"wr": 0
+	},
+	{
+		"id": 47857,
+		"name": "Catapult Block",
+		"mode": 2,
+		"wr": 4
+	},
+	{
+		"id": 47859,
+		"name": "Bridge Fling",
+		"mode": 2,
+		"wr": 2
+	},
+	{
+		"id": 47860,
+		"name": "Turret Walls",
+		"mode": 2,
+		"wr": 4
+	},
+	{
+		"id": 52641,
+		"name": "Turret Assassin",
+		"mode": 2,
+		"wr": 0
+	},
+	{
+		"id": 52659,
+		"name": "Bridge Testing",
+		"mode": 2,
+		"wr": 0
+	},
+	{
+		"id": 52661,
+		"name": "Cooperative Funnels",
+		"mode": 2,
+		"wr": 0
+	},
+	{
+		"id": 52664,
+		"name": "Funnel Drill",
+		"mode": 2,
+		"wr": 0
+	},
+	{
+		"id": 52666,
+		"name": "Funnel Catch",
+		"mode": 2,
+		"wr": 0
+	},
+	{
+		"id": 52668,
+		"name": "Funnel Laser",
+		"mode": 2,
+		"wr": 0
+	},
+	{
+		"id": 52672,
+		"name": "Cooperative Polarity",
+		"mode": 2,
+		"wr": 0
+	},
+	{
+		"id": 52688,
+		"name": "Funnel Hop",
+		"mode": 2,
+		"wr": 0
+	},
+	{
+		"id": 52690,
+		"name": "Advanced Polarity",
+		"mode": 2,
+		"wr": 0
+	},
+	{
+		"id": 52692,
+		"name": "Funnel Maze",
+		"mode": 2,
+		"wr": 0
+	},
+	{
+		"id": 52778,
+		"name": "Turret Warehouse",
+		"mode": 2,
+		"wr": 0
+	},
+	{
+		"id": 52693,
+		"name": "Repulsion Jumps",
+		"mode": 2,
+		"wr": 0
+	},
+	{
+		"id": 52712,
+		"name": "Double Bounce",
+		"mode": 2,
+		"wr": 2
+	},
+	{
+		"id": 52713,
+		"name": "Bridge Repulsion",
+		"mode": 2,
+		"wr": 2
+	},
+	{
+		"id": 52716,
+		"name": "Wall Repulsion",
+		"mode": 2,
+		"wr": 2
+	},
+	{
+		"id": 52718,
+		"name": "Propulsion Crushers",
+		"mode": 2,
+		"wr": 0
+	},
+	{
+		"id": 52736,
+		"name": "Turret Ninja",
+		"mode": 2,
+		"wr": 0
+	},
+	{
+		"id": 52737,
+		"name": "Propulsion Retrieval",
+		"mode": 2,
+		"wr": 0
+	},
+	{
+		"id": 52739,
+		"name": "Vault Entrance",
+		"mode": 2,
+		"wr": 0
+	},
+	{
+		"id": 49342,
+		"name": "Separation",
+		"mode": 2,
+		"wr": 0
+	},
+	{
+		"id": 49344,
+		"name": "Triple Axis",
+		"mode": 2,
+		"wr": 0
+	},
+	{
+		"id": 49346,
+		"name": "Catapult Catch",
+		"mode": 2,
+		"wr": 0
+	},
+	{
+		"id": 49348,
+		"name": "Bridge Gels",
+		"mode": 2,
+		"wr": 2
+	},
+	{
+		"id": 49350,
+		"name": "Maintenance",
+		"mode": 2,
+		"wr": 0
+	},
+	{
+		"id": 49352,
+		"name": "Bridge Catch",
+		"mode": 2,
+		"wr": 0
+	},
+	{
+		"id": 52758,
+		"name": "Double Lift",
+		"mode": 2,
+		"wr": 0
+	},
+	{
+		"id": 52760,
+		"name": "Gel Maze",
+		"mode": 2,
+		"wr": 0
+	},
+	{
+		"id": 48288,
+		"name": "Crazier Box",
+		"mode": 2,
+		"wr": 0
+	}
+]

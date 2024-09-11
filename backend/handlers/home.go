@@ -1,8 +1,11 @@
 package handlers
 
 import (
+	"encoding/json"
+	"io"
 	"log"
 	"net/http"
+	"os"
 	"sort"
 	"strings"
 
@@ -18,9 +21,26 @@ type SearchResponse struct {
 }
 
 type RankingsResponse struct {
-	Overall      []models.UserRanking `json:"rankings_overall"`
 	Singleplayer []models.UserRanking `json:"rankings_singleplayer"`
 	Multiplayer  []models.UserRanking `json:"rankings_multiplayer"`
+	Overall      []models.UserRanking `json:"rankings_overall"`
+}
+
+type SteamUserRanking struct {
+	UserName     string `json:"user_name"`
+	AvatarLink   string `json:"avatar_link"`
+	SteamID      string `json:"steam_id"`
+	SpScore      int    `json:"sp_score"`
+	MpScore      int    `json:"mp_score"`
+	OverallScore int    `json:"overall_score"`
+	SpRank       int    `json:"sp_rank"`
+	MpRank       int    `json:"mp_rank"`
+	OverallRank  int    `json:"overall_rank"`
+}
+type RankingsSteamResponse struct {
+	Singleplayer []SteamUserRanking `json:"rankings_singleplayer"`
+	Multiplayer  []SteamUserRanking `json:"rankings_multiplayer"`
+	Overall      []SteamUserRanking `json:"rankings_overall"`
 }
 
 type MapShortWithGame struct {
@@ -30,18 +50,18 @@ type MapShortWithGame struct {
 	Map     string `json:"map"`
 }
 
-// GET Rankings
+// GET Rankings LPHUB
 //
-//	@Description	Get rankings of every player.
+//	@Description	Get rankings of every player from LPHUB.
 //	@Tags			rankings
 //	@Produce		json
 //	@Success		200	{object}	models.Response{data=RankingsResponse}
-//	@Router			/rankings [get]
-func Rankings(c *gin.Context) {
+//	@Router			/rankings/lphub [get]
+func RankingsLPHUB(c *gin.Context) {
 	response := RankingsResponse{
-		Overall:      []models.UserRanking{},
 		Singleplayer: []models.UserRanking{},
 		Multiplayer:  []models.UserRanking{},
+		Overall:      []models.UserRanking{},
 	}
 	// Singleplayer rankings
 	sql := `SELECT u.steam_id, u.user_name, u.avatar_link, COUNT(DISTINCT map_id), 
@@ -163,6 +183,74 @@ func Rankings(c *gin.Context) {
 			response.Overall[index].Placement = placement
 		}
 		placement++
+	}
+	c.JSON(http.StatusOK, models.Response{
+		Success: true,
+		Message: "Successfully retrieved rankings.",
+		Data:    response,
+	})
+}
+
+// GET Rankings Steam
+//
+//	@Description	Get rankings of every player from Steam.
+//	@Tags			rankings
+//	@Produce		json
+//	@Success		200	{object}	models.Response{data=RankingsSteamResponse}
+//	@Router			/rankings/steam [get]
+func RankingsSteam(c *gin.Context) {
+	response := RankingsSteamResponse{
+		Singleplayer: []SteamUserRanking{},
+		Multiplayer:  []SteamUserRanking{},
+		Overall:      []SteamUserRanking{},
+	}
+	spJson, err := os.Open("../rankings/output/sp.json")
+	if err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+		return
+	}
+	defer spJson.Close()
+	spJsonBytes, err := io.ReadAll(spJson)
+	if err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+		return
+	}
+	err = json.Unmarshal(spJsonBytes, &response.Singleplayer)
+	if err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+		return
+	}
+	mpJson, err := os.Open("../rankings/output/mp.json")
+	if err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+		return
+	}
+	defer mpJson.Close()
+	mpJsonBytes, err := io.ReadAll(mpJson)
+	if err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+		return
+	}
+	err = json.Unmarshal(mpJsonBytes, &response.Multiplayer)
+	if err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+		return
+	}
+	overallJson, err := os.Open("../rankings/output/overall.json")
+	if err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+		return
+	}
+	defer overallJson.Close()
+	overallJsonBytes, err := io.ReadAll(overallJson)
+	if err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+		return
+	}
+	err = json.Unmarshal(overallJsonBytes, &response.Overall)
+	if err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+		return
 	}
 	c.JSON(http.StatusOK, models.Response{
 		Success: true,

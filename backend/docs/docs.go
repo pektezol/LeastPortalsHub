@@ -1171,9 +1171,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/rankings": {
+        "/rankings/lphub": {
             "get": {
-                "description": "Get rankings of every player.",
+                "description": "Get rankings of every player from LPHUB.",
                 "produces": [
                     "application/json"
                 ],
@@ -1193,6 +1193,37 @@ const docTemplate = `{
                                     "properties": {
                                         "data": {
                                             "$ref": "#/definitions/handlers.RankingsResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/rankings/steam": {
+            "get": {
+                "description": "Get rankings of every player from Steam.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rankings"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/models.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/handlers.RankingsSteamResponse"
                                         }
                                     }
                                 }
@@ -1789,6 +1820,29 @@ const docTemplate = `{
                 }
             }
         },
+        "handlers.RankingsSteamResponse": {
+            "type": "object",
+            "properties": {
+                "rankings_multiplayer": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handlers.SteamUserRanking"
+                    }
+                },
+                "rankings_overall": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handlers.SteamUserRanking"
+                    }
+                },
+                "rankings_singleplayer": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/handlers.SteamUserRanking"
+                    }
+                }
+            }
+        },
         "handlers.RecordResponse": {
             "type": "object",
             "properties": {
@@ -1851,6 +1905,38 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/models.UserShortWithAvatar"
                     }
+                }
+            }
+        },
+        "handlers.SteamUserRanking": {
+            "type": "object",
+            "properties": {
+                "avatar_link": {
+                    "type": "string"
+                },
+                "mp_rank": {
+                    "type": "integer"
+                },
+                "mp_score": {
+                    "type": "integer"
+                },
+                "overall_rank": {
+                    "type": "integer"
+                },
+                "overall_score": {
+                    "type": "integer"
+                },
+                "sp_rank": {
+                    "type": "integer"
+                },
+                "sp_score": {
+                    "type": "integer"
+                },
+                "steam_id": {
+                    "type": "string"
+                },
+                "user_name": {
+                    "type": "string"
                 }
             }
         },

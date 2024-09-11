@@ -283,6 +283,21 @@ definitions:
           $ref: '#/definitions/models.UserRanking'
         type: array
     type: object
+  handlers.RankingsSteamResponse:
+    properties:
+      rankings_multiplayer:
+        items:
+          $ref: '#/definitions/handlers.SteamUserRanking'
+        type: array
+      rankings_overall:
+        items:
+          $ref: '#/definitions/handlers.SteamUserRanking'
+        type: array
+      rankings_singleplayer:
+        items:
+          $ref: '#/definitions/handlers.SteamUserRanking'
+        type: array
+    type: object
   handlers.RecordResponse:
     properties:
       score_count:
@@ -324,6 +339,27 @@ definitions:
         items:
           $ref: '#/definitions/models.UserShortWithAvatar'
         type: array
+    type: object
+  handlers.SteamUserRanking:
+    properties:
+      avatar_link:
+        type: string
+      mp_rank:
+        type: integer
+      mp_score:
+        type: integer
+      overall_rank:
+        type: integer
+      overall_score:
+        type: integer
+      sp_rank:
+        type: integer
+      sp_score:
+        type: integer
+      steam_id:
+        type: string
+      user_name:
+        type: string
     type: object
   models.Category:
     properties:
@@ -1216,9 +1252,9 @@ paths:
             $ref: '#/definitions/models.Response'
       tags:
       - users
-  /rankings:
+  /rankings/lphub:
     get:
-      description: Get rankings of every player.
+      description: Get rankings of every player from LPHUB.
       produces:
       - application/json
       responses:
@@ -1230,6 +1266,23 @@ paths:
             - properties:
                 data:
                   $ref: '#/definitions/handlers.RankingsResponse'
+              type: object
+      tags:
+      - rankings
+  /rankings/steam:
+    get:
+      description: Get rankings of every player from Steam.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/handlers.RankingsSteamResponse'
               type: object
       tags:
       - rankings
