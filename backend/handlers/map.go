@@ -328,7 +328,7 @@ func FetchMapLeaderboards(c *gin.Context) {
 //	@Failure		400	{object}	models.Response
 //	@Router			/games [get]
 func FetchGames(c *gin.Context) {
-	rows, err := database.DB.Query(`SELECT id, name, is_coop, image FROM games`)
+	rows, err := database.DB.Query(`SELECT id, name, is_coop, image FROM games ORDER BY id;`)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
@@ -340,7 +340,7 @@ func FetchGames(c *gin.Context) {
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
-		categoryPortalRows, err := database.DB.Query(`SELECT c.id, c.name FROM game_categories gc JOIN categories c ON gc.category_id = c.id WHERE gc.game_id = $1`, game.ID)
+		categoryPortalRows, err := database.DB.Query(`SELECT c.id, c.name FROM game_categories gc JOIN categories c ON gc.category_id = c.id WHERE gc.game_id = $1 ORDER BY c.id;`, game.ID)
 		if err != nil {
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
@@ -403,7 +403,7 @@ func FetchChapters(c *gin.Context) {
 		return
 	}
 	var response ChaptersResponse
-	rows, err := database.DB.Query(`SELECT c.id, c.name, g.name, c.is_disabled, c.image FROM chapters c INNER JOIN games g ON c.game_id = g.id WHERE game_id = $1`, gameID)
+	rows, err := database.DB.Query(`SELECT c.id, c.name, g.name, c.is_disabled, c.image FROM chapters c INNER JOIN games g ON c.game_id = g.id WHERE game_id = $1 ORDER BY c.id;`, gameID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
@@ -448,7 +448,7 @@ func FetchMaps(c *gin.Context) {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
-	categoryPortalRows, err := database.DB.Query(`SELECT c.id, c.name FROM game_categories gc JOIN categories c ON gc.category_id = c.id WHERE gc.game_id = $1`, gameID)
+	categoryPortalRows, err := database.DB.Query(`SELECT c.id, c.name FROM game_categories gc JOIN categories c ON gc.category_id = c.id WHERE gc.game_id = $1 ORDER BY c.id;`, gameID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
