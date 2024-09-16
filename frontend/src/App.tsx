@@ -11,6 +11,7 @@ import Maps from './pages/Maps';
 import User from './pages/User';
 import Homepage from './pages/Homepage';
 import UploadRunDialog from './components/UploadRunDialog';
+import Rules from './pages/Rules';
 import About from './pages/About';
 import { Game } from './types/Game';
 import { API } from './api/Api';
@@ -59,6 +60,7 @@ const App: React.FC = () => {
         <Route path="/games" element={<Games games={games} />} />
         <Route path='/games/:id' element={<Maplist />}></Route>
         <Route path="/maps/*" element={<Maps profile={profile} isModerator={isModerator} onUploadRun={(mapID) => {setUploadRunDialog(true);setUploadRunDialogMapID(mapID)}} />}/>
+        <Route path="/rules" element={<Rules />} />
         <Route path="/about" element={<About />} />
         <Route path='/rankings' element={<Rankings></Rankings>}></Route>
         <Route path="*" element={"404"} />
