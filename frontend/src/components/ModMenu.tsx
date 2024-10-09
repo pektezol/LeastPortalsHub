@@ -5,14 +5,16 @@ import { MapSummary } from '../types/Map';
 import { ModMenuContent } from '../types/Content';
 import { API } from '../api/Api';
 import "../css/ModMenu.css"
+import { useNavigate } from 'react-router-dom';
 
 interface ModMenuProps {
+  token?: string;
   data: MapSummary;
   selectedRun: number;
   mapID: string;
 }
 
-const ModMenu: React.FC<ModMenuProps> = ({ data, selectedRun, mapID }) => {
+const ModMenu: React.FC<ModMenuProps> = ({ token, data, selectedRun, mapID }) => {
 
   const [menu, setMenu] = React.useState<number>(0);
   const [showButton, setShowButton] = React.useState<boolean>(true);
@@ -29,6 +31,8 @@ const ModMenu: React.FC<ModMenuProps> = ({ data, selectedRun, mapID }) => {
 
   const [image, setImage] = React.useState<string>("");
   const [md, setMd] = React.useState<string>("");
+
+  const navigate = useNavigate();
 
   function compressImage(file: File): Promise<string> {
     const reader = new FileReader();
@@ -61,26 +65,56 @@ const ModMenu: React.FC<ModMenuProps> = ({ data, selectedRun, mapID }) => {
 
   const _edit_map_summary_image = async () => {
     if (window.confirm("Are you sure you want to submit this to the database?")) {
-      await API.put_map_image(mapID, image);
+      if (token) {
+        const success = await API.put_map_image(token, mapID, image);
+        if (success) {
+          navigate(0);
+        } else {
+          alert("Error. Check logs.")
+        }
+      }
     }
   };
 
   const _edit_map_summary_route = async () => {
     if (window.confirm("Are you sure you want to submit this to the database?")) {
-      await API.put_map_summary(mapID, routeContent);
+      if (token) {
+        routeContent.date += "T00:00:00Z";
+        const success = await API.put_map_summary(token, mapID, routeContent);
+        if (success) {
+          navigate(0);
+        } else {
+          alert("Error. Check logs.")
+        }
+      }
     }
   };
 
   const _create_map_summary_route = async () => {
     if (window.confirm("Are you sure you want to submit this to the database?")) {
-      await API.post_map_summary(mapID, routeContent);
+      if (token) {
+        routeContent.date += "T00:00:00Z";
+        const success = await API.post_map_summary(token, mapID, routeContent);
+        if (success) {
+          navigate(0);
+        } else {
+          alert("Error. Check logs.")
+        }
+      }
     }
   };
 
   const _delete_map_summary_route = async () => {
     if (window.confirm(`Are you sure you want to delete this run from the database?
       ${data.summary.routes[selectedRun].category.name}    ${data.summary.routes[selectedRun].history.score_count} portals    ${data.summary.routes[selectedRun].history.runner_name}`)) {
-      await API.delete_map_summary(mapID, data.summary.routes[selectedRun].route_id);
+      if (token) {
+        const success = await API.delete_map_summary(token, mapID, data.summary.routes[selectedRun].route_id);
+        if (success) {
+          navigate(0);
+        } else {
+          alert("Error. Check logs.")
+        }
+      }
     }
   };
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import { SteamIcon, TwitchIcon, YouTubeIcon, PortalIcon, FlagIcon, StatisticsIcon, SortIcon, ThreedotIcon, DownloadIcon, HistoryIcon } from '../images/Images';
 import { UserProfile } from '../types/Profile';
@@ -9,8 +9,13 @@ import { API } from '../api/Api';
 import { ticks_to_time } from '../utils/Time';
 import "../css/Profile.css";
 
-const User: React.FC = () => {
-  const location = useLocation();
+interface UserProps {
+  profile?: UserProfile;
+  token?: string;
+  gameData: Game[];
+}
+
+const User: React.FC<UserProps> = ({ token, profile, gameData }) => {
 
   const [user, setUser] = React.useState<UserProfile | undefined>(undefined);
 
@@ -18,91 +23,63 @@ const User: React.FC = () => {
   const [pageNumber, setPageNumber] = React.useState(1);
   const [pageMax, setPageMax] = React.useState(0);
 
-  const [game, setGame] = React.useState("0")
-  const [gameData, setGameData] = React.useState<Game[]>([]);
-  const [chapter, setChapter] = React.useState("0")
+  const [game, setGame] = React.useState("0");
+  const [chapter, setChapter] = React.useState("0");
   const [chapterData, setChapterData] = React.useState<GameChapters | null>(null);
   const [maps, setMaps] = React.useState<Map[]>([]);
 
-  function NavClick() {
-    if (user) {
-      const btn = document.querySelectorAll("#section2 button");
-      btn.forEach((e) => { (e as HTMLElement).style.backgroundColor = "#2b2e46" });
-      (btn[navState] as HTMLElement).style.backgroundColor = "#202232";
-
-      document.querySelectorAll("section").forEach((e, i) => i >= 2 ? e.style.display = "none" : "")
-      if (navState === 0) { document.querySelectorAll(".profile1").forEach((e) => { (e as HTMLElement).style.display = "block" }); }
-      if (navState === 1) { document.querySelectorAll(".profile2").forEach((e) => { (e as HTMLElement).style.display = "block" }); }
-    }
-  }
-
-  function UpdateProfile() {
-    fetch(`https://lp.ardapektezol.com/api/v1/profile`, {
-      method: 'POST',
-      headers: { Authorization: "" }
-    }).then(r => r.json())
-      .then(d => d.success ? window.alert("profile updated") : window.alert(`Error: ${d.message}`))
-  }
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const _fetch_user = async () => {
-    const userData = await API.get_user(location.pathname.split("/")[2]);
+    const userID = location.pathname.split("/")[2];
+    if (token && profile && profile.profile && profile.steam_id === userID) {
+      navigate("/profile");
+      return;
+    }
+    const userData = await API.get_user(userID);
     setUser(userData);
   };
 
-  React.useEffect(() => {
-    fetch("https://lp.ardapektezol.com/api/v1/games")
-      .then(r => r.json())
-      .then(d => {
-        setGameData(d.data)
-        setGame("0")
-      })
+  const _get_game_chapters = async () => {
+    if (game !== "0") {
+      const gameChapters = await API.get_games_chapters(game);
+      setChapterData(gameChapters);
+    } else {
+      setPageMax(Math.ceil(user!.records.length / 20));
+      setPageNumber(1);
+    }
+  };
 
+  const _get_game_maps = async () => {
+    if (chapter === "0") {
+      const gameMaps = await API.get_game_maps(game);
+      setMaps(gameMaps);
+      setPageMax(Math.ceil(gameMaps.length / 20));
+      setPageNumber(1);
+    } else {
+      const gameChapters = await API.get_chapters(chapter);
+      setMaps(gameChapters.maps);
+      setPageMax(Math.ceil(gameChapters.maps.length / 20));
+      setPageNumber(1);
+    }
+  };
+
+  React.useEffect(() => {
+    _fetch_user();
   }, [location]);
 
   React.useEffect(() => {
     if (user) {
-      if (game && game !== "0") {
-        fetch(`https://lp.ardapektezol.com/api/v1/games/${game}`)
-          .then(r => r.json())
-          .then(d => {
-            setChapterData(d.data)
-            setChapter("0");
-            // (document.querySelector('#select-chapter') as HTMLInputElement).value = "0"
-          })
-  
-      } else if (game && game === "0") {
-        setPageMax(Math.ceil(user.records.length / 20))
-        setPageNumber(1)
-      }
+      _get_game_chapters();
     }
   }, [user, game, location]);
 
   React.useEffect(() => {
-    _fetch_user();
-  }, [user]);
-
-  React.useEffect(() => {
-    if (game !== "0") {
-      if (chapter === "0") {
-        fetch(`https://lp.ardapektezol.com/api/v1/games/${game}/maps`)
-          .then(r => r.json())
-          .then(d => {
-            setMaps(d.data.maps);
-            setPageMax(Math.ceil(d.data.maps.length / 20))
-            setPageNumber(1)
-          })
-      } else {
-        fetch(`https://lp.ardapektezol.com/api/v1/chapters/${chapter}`)
-          .then(r => r.json())
-          .then(d => {
-            setMaps(d.data.maps);
-            setPageMax(Math.ceil(d.data.maps.length / 20))
-            setPageNumber(1)
-          })
-
-      }
+    if (user && game !== "0") {
+      _get_game_maps();
     }
-  }, [game, chapter, chapterData])
+  }, [user, game, chapter, location])
 
   if (!user) {
     return (
@@ -113,19 +90,9 @@ const User: React.FC = () => {
   return (
     <main>
       <section id='section1' className='profile'>
-
-        {user.profile
-          ? (
-            <div id='profile-image' onClick={() => UpdateProfile()}>
-              <img src={user.avatar_link} alt="profile-image"></img>
-              <span>Refresh</span>
-            </div>
-          ) : (
-            <div>
-              <img src={user.avatar_link} alt="profile-image"></img>
-            </div>
-          )}
-
+        <div>
+          <img src={user.avatar_link} alt="profile-image"></img>
+        </div>
         <div id='profile-top'>
           <div>
             <div>{user.user_name}</div>
@@ -185,7 +152,14 @@ const User: React.FC = () => {
           {gameData === null ? <select>error</select> :
 
             <select id='select-game'
-              onChange={() => setGame((document.querySelector('#select-game') as HTMLInputElement).value)}>
+              onChange={() => {
+                setGame((document.querySelector('#select-game') as HTMLInputElement).value);
+                setChapter("0");
+                const chapterSelect = document.querySelector('#select-chapter') as HTMLSelectElement;
+                if (chapterSelect) {
+                  chapterSelect.value = "0";
+                }
+              }}>
               <option value={0} key={0}>All Scores</option>
               {gameData.map((e, i) => (
                 <option value={e.id} key={i + 1}>{e.name}</option>
@@ -238,7 +212,7 @@ const User: React.FC = () => {
                       {r.scores.map((e, i) => (<>
                         {i !== 0 ? <hr style={{ gridColumn: "1 / span 8" }} /> : ""}
 
-                        <span>{r.map_name}</span>
+                        <Link to={`/maps/${r.map_id}`}><span>{r.map_name}</span></Link>
 
                         <span style={{ display: "grid" }}>{e.score_count}</span>
 
@@ -250,7 +224,7 @@ const User: React.FC = () => {
                         <span style={{ flexDirection: "row-reverse" }}>
 
                           <button onClick={() => { window.alert(`Demo ID: ${e.demo_id}`) }}><img src={ThreedotIcon} alt="demo_id" /></button>
-                          <button onClick={() => window.location.href = `https://lp.ardapektezol.com/api/v1/demos?uuid=${e.demo_id}`}><img src={DownloadIcon} alt="download" /></button>
+                          <button onClick={() => window.location.href = `/api/v1/demos?uuid=${e.demo_id}`}><img src={DownloadIcon} alt="download" /></button>
                           {i === 0 && r.scores.length > 1 ? <button onClick={() => {
                             (document.querySelectorAll(".profileboard-record")[index % 20] as HTMLInputElement).style.height === "44px" ||
                               (document.querySelectorAll(".profileboard-record")[index % 20] as HTMLInputElement).style.height === "" ?
@@ -295,7 +269,7 @@ const User: React.FC = () => {
                           <span style={{ flexDirection: "row-reverse" }}>
 
                             <button onClick={() => { window.alert(`Demo ID: ${e.demo_id}`) }}><img src={ThreedotIcon} alt="demo_id" /></button>
-                            <button onClick={() => window.location.href = `https://lp.ardapektezol.com/api/v1/demos?uuid=${e.demo_id}`}><img src={DownloadIcon} alt="download" /></button>
+                            <button onClick={() => window.location.href = `/api/v1/demos?uuid=${e.demo_id}`}><img src={DownloadIcon} alt="download" /></button>
                             {i === 0 && record!.scores.length > 1 ? <button onClick={() => {
                               (document.querySelectorAll(".profileboard-record")[index % 20] as HTMLInputElement).style.height === "44px" ||
                                 (document.querySelectorAll(".profileboard-record")[index % 20] as HTMLInputElement).style.height === "" ?

@@ -8,13 +8,14 @@ import "../css/Maps.css"
 import { Link } from 'react-router-dom';
 
 interface DiscussionsProps {
+  token?: string
   data?: MapDiscussions;
   isModerator: boolean;
   mapID: string;
   onRefresh: () => void;
 }
 
-const Discussions: React.FC<DiscussionsProps> = ({ data, isModerator, mapID, onRefresh }) => {
+const Discussions: React.FC<DiscussionsProps> = ({ token, data, isModerator, mapID, onRefresh }) => {
 
   const [discussionThread, setDiscussionThread] = React.useState<MapDiscussion | undefined>(undefined);
   const [discussionSearch, setDiscussionSearch] = React.useState<string>("");
@@ -24,9 +25,7 @@ const Discussions: React.FC<DiscussionsProps> = ({ data, isModerator, mapID, onR
     title: "",
     content: "",
   });
-  const [createDiscussionCommentContent, setCreateDiscussionCommentContent] = React.useState<MapDiscussionCommentContent>({
-    comment: "",
-  });
+  const [createDiscussionCommentContent, setCreateDiscussionCommentContent] = React.useState<string>("");
 
   const _open_map_discussion = async (discussion_id: number) => {
     const mapDiscussion = await API.get_map_discussion(mapID, discussion_id);
@@ -34,20 +33,26 @@ const Discussions: React.FC<DiscussionsProps> = ({ data, isModerator, mapID, onR
   };
 
   const _create_map_discussion = async () => {
-    await API.post_map_discussion(mapID, createDiscussionContent);
-    setCreateDiscussion(false);
-    onRefresh();
+    if (token) {
+      await API.post_map_discussion(token, mapID, createDiscussionContent);
+      setCreateDiscussion(false);
+      onRefresh();
+    }
   };
 
   const _create_map_discussion_comment = async (discussion_id: number) => {
-    await API.post_map_discussion_comment(mapID, discussion_id, createDiscussionCommentContent);
-    await _open_map_discussion(discussion_id);
+    if (token) {
+      await API.post_map_discussion_comment(token, mapID, discussion_id, createDiscussionCommentContent);
+      await _open_map_discussion(discussion_id);
+    }
   };
 
   const _delete_map_discussion = async (discussion: MapDiscussionsDetail) => {
     if (window.confirm(`Are you sure you want to remove post: ${discussion.title}?`)) {
-      await API.delete_map_discussion(mapID, discussion.id);
-      onRefresh();
+      if (token) {
+        await API.delete_map_discussion(token, mapID, discussion.id);
+        onRefresh();
+      }
     }
   };
 
@@ -69,9 +74,9 @@ const Discussions: React.FC<DiscussionsProps> = ({ data, isModerator, mapID, onR
                   ...createDiscussionContent,
                   title: e.target.value,
                 })} />
-                <input id='discussion-create-content' placeholder='Enter the comment...' onChange={(e) => setCreateDiscussionContent({
+                <input id='discussion-create-content' placeholder='Enter the content...' onChange={(e) => setCreateDiscussionContent({
                   ...createDiscussionContent,
-                  title: e.target.value,
+                  content: e.target.value,
                 })} />
               </div>
               <div style={{ placeItems: "end", gridColumn: "1 / span 2" }}>
@@ -114,11 +119,15 @@ const Discussions: React.FC<DiscussionsProps> = ({ data, isModerator, mapID, onR
                   }
                 </div>
                 <div id='discussion-send'>
-                  <input type="text" placeholder={"Message"} onKeyDown={(e) => e.key === "Enter" && _create_map_discussion_comment(discussionThread.discussion.id)} onChange={(e) => setCreateDiscussionCommentContent({
-                    ...createDiscussionContent,
-                    comment: e.target.value,
-                  })} />
-                  <div><button onClick={() => _create_map_discussion_comment(discussionThread.discussion.id)}>Send</button></div>
+                  <input type="text" value={createDiscussionCommentContent} placeholder={"Message"} 
+                  onKeyDown={(e) => e.key === "Enter" && _create_map_discussion_comment(discussionThread.discussion.id)} 
+                  onChange={(e) => setCreateDiscussionCommentContent(e.target.value)} />
+                  <div><button onClick={() => {
+                    if (createDiscussionCommentContent !== "") {
+                      _create_map_discussion_comment(discussionThread.discussion.id);
+                      setCreateDiscussionCommentContent("");
+                    }
+                  }}>Send</button></div>
                 </div>
 
               </div>

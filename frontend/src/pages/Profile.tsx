@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import { SteamIcon, TwitchIcon, YouTubeIcon, PortalIcon, FlagIcon, StatisticsIcon, SortIcon, ThreedotIcon, DownloadIcon, HistoryIcon } from '../images/Images';
 import { UserProfile } from '../types/Profile';
@@ -7,16 +7,56 @@ import { Game, GameChapters } from '../types/Game';
 import { Map } from '../types/Map';
 import { ticks_to_time } from '../utils/Time';
 import "../css/Profile.css";
+import { API } from '../api/Api';
 
 interface ProfileProps {
   profile?: UserProfile;
+  token?: string;
+  gameData: Game[];
 }
 
-const Profile: React.FC<ProfileProps> = ({ profile }) => {
+const Profile: React.FC<ProfileProps> = ({ profile, token, gameData }) => {
 
+  const [navState, setNavState] = React.useState(0);
+  const [pageNumber, setPageNumber] = React.useState(1);
+  const [pageMax, setPageMax] = React.useState(0);
 
-  const location = useLocation();
+  const [game, setGame] = React.useState("0")
+  const [chapter, setChapter] = React.useState("0")
+  const [chapterData, setChapterData] = React.useState<GameChapters | null>(null);
+  const [maps, setMaps] = React.useState<Map[]>([]);
+
   const navigate = useNavigate();
+
+  const _update_profile = () => {
+    if (token) {
+      API.post_profile(token).then(() => navigate(0));
+    }
+  };
+
+  const _get_game_chapters = async () => {
+    if (game && game !== "0") {
+      const gameChapters = await API.get_games_chapters(game);
+      setChapterData(gameChapters);
+    } else if (game && game === "0") {
+      setPageMax(Math.ceil(profile!.records.length / 20));
+      setPageNumber(1);
+    }
+  };
+
+  const _get_game_maps = async () => {
+    if (chapter === "0") {
+      const gameMaps = await API.get_game_maps(game);
+      setMaps(gameMaps);
+      setPageMax(Math.ceil(gameMaps.length / 20));
+      setPageNumber(1);
+    } else {
+      const gameChapters = await API.get_chapters(chapter);
+      setMaps(gameChapters.maps);
+      setPageMax(Math.ceil(gameChapters.maps.length / 20));
+      setPageNumber(1);
+    }
+  };
 
   React.useEffect(() => {
     if (!profile) {
@@ -24,87 +64,17 @@ const Profile: React.FC<ProfileProps> = ({ profile }) => {
     };
   }, [profile]);
 
-  const [navState, setNavState] = React.useState(0);
-  const [pageNumber, setPageNumber] = React.useState(1);
-  const [pageMax, setPageMax] = React.useState(0);
-
-  const [game, setGame] = React.useState("0")
-  const [gameData, setGameData] = React.useState<Game[]>([]);
-  const [chapter, setChapter] = React.useState("0")
-  const [chapterData, setChapterData] = React.useState<GameChapters | null>(null);
-  const [maps, setMaps] = React.useState<Map[]>([]);
-
-  function NavClick() {
-    if (profile) {
-      const btn = document.querySelectorAll("#section2 button");
-      btn.forEach((e) => { (e as HTMLElement).style.backgroundColor = "#2b2e46" });
-      (btn[navState] as HTMLElement).style.backgroundColor = "#202232";
-
-      document.querySelectorAll("section").forEach((e, i) => i >= 2 ? e.style.display = "none" : "")
-      if (navState === 0) { document.querySelectorAll(".profile1").forEach((e) => { (e as HTMLElement).style.display = "block" }); }
-      if (navState === 1) { document.querySelectorAll(".profile2").forEach((e) => { (e as HTMLElement).style.display = "block" }); }
-    }
-  }
-
-  function UpdateProfile() {
-    fetch(`https://lp.ardapektezol.com/api/v1/profile`, {
-      method: 'POST',
-      headers: { Authorization: "" }
-    }).then(r => r.json())
-      .then(d => d.success ? window.alert("profile updated") : window.alert(`Error: ${d.message}`))
-  }
-
   React.useEffect(() => {
     if (profile) {
-      fetch("https://lp.ardapektezol.com/api/v1/games")
-        .then(r => r.json())
-        .then(d => {
-          setGameData(d.data)
-          setGame("0")
-        })
+      _get_game_chapters();
     }
-  }, [profile, location]);
+  }, [profile, game]);
 
   React.useEffect(() => {
-    if (profile) {
-      if (game && game !== "0") {
-        fetch(`https://lp.ardapektezol.com/api/v1/games/${game}`)
-          .then(r => r.json())
-          .then(d => {
-            setChapterData(d.data)
-            setChapter("0");
-            // (document.querySelector('#select-chapter') as HTMLInputElement).value = "0"
-          })
-  
-      } else if (game && game === "0") {
-        setPageMax(Math.ceil(profile.records.length / 20))
-        setPageNumber(1)
-      }
+    if (profile && game !== "0") {
+      _get_game_maps();
     }
-  }, [profile, game, location]);
-
-  React.useEffect(() => {
-    if (game !== "0") {
-      if (chapter === "0") {
-        fetch(`https://lp.ardapektezol.com/api/v1/games/${game}/maps`)
-          .then(r => r.json())
-          .then(d => {
-            setMaps(d.data.maps);
-            setPageMax(Math.ceil(d.data.maps.length / 20))
-            setPageNumber(1)
-          })
-      } else {
-        fetch(`https://lp.ardapektezol.com/api/v1/chapters/${chapter}`)
-          .then(r => r.json())
-          .then(d => {
-            setMaps(d.data.maps);
-            setPageMax(Math.ceil(d.data.maps.length / 20))
-            setPageNumber(1)
-          })
-
-      }
-    }
-  }, [game, chapter, chapterData])
+  }, [profile, game, chapter, chapterData])
 
   if (!profile) {
     return (
@@ -118,7 +88,7 @@ const Profile: React.FC<ProfileProps> = ({ profile }) => {
 
         {profile.profile
           ? (
-            <div id='profile-image' onClick={() => UpdateProfile()}>
+            <div id='profile-image' onClick={_update_profile}>
               <img src={profile.avatar_link} alt="profile-image"></img>
               <span>Refresh</span>
             </div>
@@ -187,7 +157,14 @@ const Profile: React.FC<ProfileProps> = ({ profile }) => {
           {gameData === null ? <select>error</select> :
 
             <select id='select-game'
-              onChange={() => setGame((document.querySelector('#select-game') as HTMLInputElement).value)}>
+              onChange={() => {
+                setGame((document.querySelector('#select-game') as HTMLInputElement).value);
+                setChapter("0");
+                const chapterSelect = document.querySelector('#select-chapter') as HTMLSelectElement;
+                if (chapterSelect) {
+                  chapterSelect.value = "0";
+                }
+              }}>
               <option value={0} key={0}>All Scores</option>
               {gameData.map((e, i) => (
                 <option value={e.id} key={i + 1}>{e.name}</option>
@@ -240,7 +217,7 @@ const Profile: React.FC<ProfileProps> = ({ profile }) => {
                       {r.scores.map((e, i) => (<>
                         {i !== 0 ? <hr style={{ gridColumn: "1 / span 8" }} /> : ""}
 
-                        <span>{r.map_name}</span>
+                        <Link to={`/maps/${r.map_id}`}><span>{r.map_name}</span></Link>
 
                         <span style={{ display: "grid" }}>{e.score_count}</span>
 
@@ -252,7 +229,7 @@ const Profile: React.FC<ProfileProps> = ({ profile }) => {
                         <span style={{ flexDirection: "row-reverse" }}>
 
                           <button onClick={() => { window.alert(`Demo ID: ${e.demo_id}`) }}><img src={ThreedotIcon} alt="demo_id" /></button>
-                          <button onClick={() => window.location.href = `https://lp.ardapektezol.com/api/v1/demos?uuid=${e.demo_id}`}><img src={DownloadIcon} alt="download" /></button>
+                          <button onClick={() => window.location.href = `/api/v1/demos?uuid=${e.demo_id}`}><img src={DownloadIcon} alt="download" /></button>
                           {i === 0 && r.scores.length > 1 ? <button onClick={() => {
                             (document.querySelectorAll(".profileboard-record")[index % 20] as HTMLInputElement).style.height === "44px" ||
                               (document.querySelectorAll(".profileboard-record")[index % 20] as HTMLInputElement).style.height === "" ?
@@ -297,7 +274,7 @@ const Profile: React.FC<ProfileProps> = ({ profile }) => {
                           <span style={{ flexDirection: "row-reverse" }}>
 
                             <button onClick={() => { window.alert(`Demo ID: ${e.demo_id}`) }}><img src={ThreedotIcon} alt="demo_id" /></button>
-                            <button onClick={() => window.location.href = `https://lp.ardapektezol.com/api/v1/demos?uuid=${e.demo_id}`}><img src={DownloadIcon} alt="download" /></button>
+                            <button onClick={() => window.location.href = `/api/v1/demos?uuid=${e.demo_id}`}><img src={DownloadIcon} alt="download" /></button>
                             {i === 0 && record!.scores.length > 1 ? <button onClick={() => {
                               (document.querySelectorAll(".profileboard-record")[index % 20] as HTMLInputElement).style.height === "44px" ||
                                 (document.querySelectorAll(".profileboard-record")[index % 20] as HTMLInputElement).style.height === "" ?

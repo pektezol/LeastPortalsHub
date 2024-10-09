@@ -22,14 +22,8 @@ const Rankings: React.FC = () => {
     const [currentLeaderboardType, setCurrentLeaderboardType] = React.useState<RankingCategories>(RankingCategories.rankings_singleplayer);
     const [load, setLoad] = React.useState<boolean>(false);
 
-    interface ResponseSTUPID {
-        success: boolean;
-        message: string;
-        data: SteamRanking;
-    }
-
     const _fetch_rankings = async () => {
-        const rankings = await API.get_rankings();
+        const rankings = await API.get_official_rankings();
         setLeaderboardData(rankings);
         if (currentLeaderboardType == RankingCategories.rankings_singleplayer) {
             setCurrentLeaderboard(rankings.rankings_singleplayer)
@@ -43,20 +37,15 @@ const Rankings: React.FC = () => {
 
     const __dev_fetch_unofficial_rankings = async () => {
         try {
-            const response = await fetch("/response.json");
-            const result: ResponseSTUPID = await response.json();
-
-            if (result.success) {
-                const unofficialRanking: SteamRanking = result.data;
-                setLeaderboardData(unofficialRanking);
-                if (currentLeaderboardType == RankingCategories.rankings_singleplayer) {
-                    // console.log(_sort_rankings_steam(unofficialRanking.rankings_singleplayer))
-                    setCurrentLeaderboard(unofficialRanking.rankings_singleplayer)
-                } else if (currentLeaderboardType == RankingCategories.rankings_multiplayer) {
-                    setCurrentLeaderboard(unofficialRanking.rankings_multiplayer)
-                } else {
-                    setCurrentLeaderboard(unofficialRanking.rankings_overall)
-                }
+            const rankings = await API.get_unofficial_rankings();
+            setLeaderboardData(rankings);
+            if (currentLeaderboardType == RankingCategories.rankings_singleplayer) {
+                // console.log(_sort_rankings_steam(unofficialRanking.rankings_singleplayer))
+                setCurrentLeaderboard(rankings.rankings_singleplayer)
+            } else if (currentLeaderboardType == RankingCategories.rankings_multiplayer) {
+                setCurrentLeaderboard(rankings.rankings_multiplayer)
+            } else {
+                setCurrentLeaderboard(rankings.rankings_overall)
             }
         } catch (e) {
             console.log(e)
@@ -79,7 +68,7 @@ const Rankings: React.FC = () => {
         if (leaderboard_type == LeaderboardTypes.official) {
             _fetch_rankings();
         } else {
-            
+
         }
     }
 
@@ -117,23 +106,23 @@ const Rankings: React.FC = () => {
             </section>
 
             {load ?
-            <section className="rankings-leaderboard">
-                <div className="ranks-container">
-                    <div className="leaderboard-entry header">
-                        <span>Rank</span>
-                        <span>Player</span>
-                        <span>Portals</span>
+                <section className="rankings-leaderboard">
+                    <div className="ranks-container">
+                        <div className="leaderboard-entry header">
+                            <span>Rank</span>
+                            <span>Player</span>
+                            <span>Portals</span>
+                        </div>
+
+                        <div className="splitter"></div>
+
+                        {currentLeaderboard?.map((curRankingData, i) => {
+                            return <RankingEntry currentLeaderboardType={currentLeaderboardType} curRankingData={curRankingData} key={i}></RankingEntry>
+                        })
+                        }
                     </div>
-
-                    <div className="splitter"></div>
-
-                    {currentLeaderboard?.map((curRankingData, i) => {
-                        return <RankingEntry currentLeaderboardType={currentLeaderboardType} curRankingData={curRankingData} key={i}></RankingEntry>
-                    })
-                    }
-                </div>
-            </section>
-            : null}
+                </section>
+                : null}
         </main>
     )
 }

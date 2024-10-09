@@ -11,7 +11,7 @@ const Rules: React.FC = () => {
         const fetchRules = async () => {
             try {
                 const response = await fetch(
-                    'https://raw.githubusercontent.com/pektezol/leastportalshub/main/README.md'
+                    'https://raw.githubusercontent.com/pektezol/leastportalshub/typescript/RULES.md'
                 );
                 if (!response.ok) {
                     throw new Error('Failed to fetch README');
@@ -21,7 +21,7 @@ const Rules: React.FC = () => {
             } catch (error) {
                 console.error('Error fetching Rules:', error);
             }
-            setRulesText(rulesText)
+            // setRulesText(rulesText)
         };
         fetchRules();
     }, []);

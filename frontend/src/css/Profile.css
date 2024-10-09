@@ -232,6 +232,12 @@ span.titles{
     place-items: center;
     height: 44px;
 }
+.profileboard-record>a>span{
+
+    display: flex;
+    place-items: center;
+    height: 44px;
+}
 .profileboard-record>span>button{
     background-color: #0000;
     border: 0;

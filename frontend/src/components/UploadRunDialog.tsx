@@ -42,8 +42,10 @@ const UploadRunDialog: React.FC<UploadRunDialogProps> = ({ open, onClose, mapID,
   };
 
   React.useEffect(() => {
-    _handle_game_select("1"); // a different approach?
-  }, []);
+    if (open) {
+    _handle_game_select("1"); // a different approach?.
+    }
+  }, [open]);
 
   if (open) {
     return (

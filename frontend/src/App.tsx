@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 
 import { UserProfile } from './types/Profile';
 import Sidebar from './components/Sidebar';
@@ -17,29 +17,53 @@ import { Game } from './types/Game';
 import { API } from './api/Api';
 import Maplist from './pages/Maplist';
 import Rankings from './pages/Rankings';
+import { get_user_id_from_token, get_user_mod_from_token } from './utils/Jwt';
 
 const App: React.FC = () => {
   const [token, setToken] = React.useState<string | undefined>(undefined);
   const [profile, setProfile] = React.useState<UserProfile | undefined>(undefined);
-  const [isModerator, setIsModerator] = React.useState<boolean>(true);
+  const [isModerator, setIsModerator] = React.useState<boolean>(false);
 
   const [games, setGames] = React.useState<Game[]>([]);
 
   const [uploadRunDialog, setUploadRunDialog] = React.useState<boolean>(false);
   const [uploadRunDialogMapID, setUploadRunDialogMapID] = React.useState<number | undefined>(undefined);
 
-  // React.useEffect(() => {
-  //   if (token) {
-  //     setIsModerator(JSON.parse(atob(token.split(".")[1])).mod)
-  //   }
-  // }, [token]);
+  const _fetch_token = async () => {
+    const token = await API.get_token();
+    setToken(token);
+  };
 
   const _fetch_games = async () => {
     const games = await API.get_games();
     setGames(games);
   };
 
+  const _set_profile = async (user_id: string | undefined) => {
+    if (user_id) {
+      setProfile({} as UserProfile); // placeholder before we call actual user profile
+      const user = await API.get_profile(token!);
+      setProfile(user);
+    }
+  };
+
   React.useEffect(() => {
+    if (token === undefined) {
+      setProfile(undefined);
+      setIsModerator(false);
+    } else {
+      _set_profile(get_user_id_from_token(token))
+      const modStatus = get_user_mod_from_token(token)
+      if (modStatus) {
+        setIsModerator(true);
+      } else {
+        setIsModerator(false);
+      }
+    }
+  }, [token]);
+
+  React.useEffect(() => {
+    _fetch_token();
     _fetch_games();
   }, []);
 
@@ -55,14 +79,14 @@ const App: React.FC = () => {
       <Sidebar setToken={setToken} profile={profile} setProfile={setProfile} onUploadRun={() => setUploadRunDialog(true)} />
       <Routes>
         <Route path="/" element={<Homepage />} />
-        <Route path="/profile" element={<Profile profile={profile} />} />
-        <Route path="/users/*" element={<User />} />
+        <Route path="/profile" element={<Profile profile={profile} token={token} gameData={games} />} />
+        <Route path="/users/*" element={<User profile={profile} token={token} gameData={games} />} />
         <Route path="/games" element={<Games games={games} />} />
         <Route path='/games/:id' element={<Maplist />}></Route>
-        <Route path="/maps/*" element={<Maps profile={profile} isModerator={isModerator} onUploadRun={(mapID) => {setUploadRunDialog(true);setUploadRunDialogMapID(mapID)}} />}/>
+        <Route path="/maps/*" element={<Maps token={token} isModerator={isModerator} />}/>
         <Route path="/rules" element={<Rules />} />
         <Route path="/about" element={<About />} />
-        <Route path='/rankings' element={<Rankings></Rankings>}></Route>
+        <Route path='/rankings' element={<Rankings />}></Route>
         <Route path="*" element={"404"} />
       </Routes>
     </>

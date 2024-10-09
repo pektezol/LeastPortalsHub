@@ -64,6 +64,7 @@ const Maplist: React.FC = () => {
       // console.log(foundGame)
       if (foundGame) {
         setGame(foundGame);
+        setLoad(false);
       }
     };
     
@@ -73,9 +74,9 @@ const Maplist: React.FC = () => {
       setNumChapters(games_chapters.chapters.length);
     }
 
+    setLoad(true);
     _fetch_game();
     _fetch_game_chapters();
-    setLoad(true);
   }, []);
 
   useEffect(() => {
@@ -96,7 +97,7 @@ const Maplist: React.FC = () => {
           </button>
         </Link>
       </section>
-      {!load ? (
+      {load ? (
         <div></div>
       ) : (
         <section>

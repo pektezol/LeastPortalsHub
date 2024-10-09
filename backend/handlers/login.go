@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -29,6 +30,7 @@ type LoginResponse struct {
 //	@Success		200	{object}	models.Response{data=LoginResponse}
 //	@Router			/login [get]
 func Login(c *gin.Context) {
+	log.Println(c.Request.Host)
 	openID := steam_go.NewOpenID(c.Request, true)
 	switch openID.Mode() {
 	case "":

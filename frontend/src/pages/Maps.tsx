@@ -7,18 +7,16 @@ import Leaderboards from '../components/Leaderboards';
 import Discussions from '../components/Discussions';
 import ModMenu from '../components/ModMenu';
 import { MapDiscussions, MapLeaderboard, MapSummary } from '../types/Map';
-import { UserProfile } from '../types/Profile';
 import { API } from '../api/Api';
 import "../css/Maps.css";
 import Loading from '../components/Loading';
 
 interface MapProps {
-  profile?: UserProfile;
+  token?: string;
   isModerator: boolean;
-  onUploadRun: (mapID: number) => void;
 };
 
-const Maps: React.FC<MapProps> = ({ profile, isModerator, onUploadRun }) => {
+const Maps: React.FC<MapProps> = ({ token, isModerator }) => {
 
   const [selectedRun, setSelectedRun] = React.useState<number>(0);
 
@@ -39,7 +37,8 @@ const Maps: React.FC<MapProps> = ({ profile, isModerator, onUploadRun }) => {
 
   const _fetch_map_leaderboards = async () => {
     const mapLeaderboards = await API.get_map_leaderboard(mapID);
-    console.log(mapLeaderboards?.records[0]);
+    console.log("lbs:")
+    console.log(mapLeaderboards);
     setMapLeaderboardData(mapLeaderboards);
   };
 
@@ -77,7 +76,7 @@ const Maps: React.FC<MapProps> = ({ profile, isModerator, onUploadRun }) => {
 
   return (
     <>
-      {isModerator && <ModMenu data={mapSummaryData} selectedRun={selectedRun} mapID={mapID} />}
+      {isModerator && <ModMenu token={token} data={mapSummaryData} selectedRun={selectedRun} mapID={mapID} />}
 
       <div id='background-image'>
         <img src={mapSummaryData.map.image} alt="" />
@@ -88,7 +87,6 @@ const Maps: React.FC<MapProps> = ({ profile, isModerator, onUploadRun }) => {
             <Link to="/games"><button className='nav-button' style={{ borderRadius: "20px 0px 0px 20px" }}><i className='triangle'></i><span>Games List</span></button></Link>
             <Link to={`/games/${!mapSummaryData.map.is_coop ? "1" : "2"}?chapter=${mapSummaryData.map.chapter_name.split(" ")[1]}`}><button className='nav-button' style={{ borderRadius: "0px 20px 20px 0px", marginLeft: "2px" }}><i className='triangle'></i><span>{mapSummaryData.map.chapter_name}</span></button></Link>
             <br /><span><b>{mapSummaryData.map.map_name}</b></span>
-            {profile && <button onClick={() => onUploadRun(mapSummaryData.map.id)}>Submit a Run</button>}
           </div>
         </section>
 
@@ -100,7 +98,7 @@ const Maps: React.FC<MapProps> = ({ profile, isModerator, onUploadRun }) => {
 
         {navState === 0 && <Summary selectedRun={selectedRun} setSelectedRun={setSelectedRun} data={mapSummaryData} />}
         {navState === 1 && <Leaderboards data={mapLeaderboardData} />}
-        {navState === 2 && <Discussions data={mapDiscussionsData} isModerator={isModerator} mapID={mapID} onRefresh={() => _fetch_map_discussions()} />}
+        {navState === 2 && <Discussions data={mapDiscussionsData} token={token} isModerator={isModerator} mapID={mapID} onRefresh={() => _fetch_map_discussions()} />}
       </main>
     </>
   );

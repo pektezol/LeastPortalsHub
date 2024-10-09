@@ -335,7 +335,7 @@
 		"id": 47830,
 		"name": "Rat Maze",
 		"mode": 2,
-		"wr": 2
+		"wr": 0
 	},
 	{
 		"id": 45466,
@@ -401,7 +401,7 @@
 		"id": 47847,
 		"name": "Cooperative Bridges",
 		"mode": 2,
-		"wr": 3
+		"wr": 2
 	},
 	{
 		"id": 47850,
@@ -431,7 +431,7 @@
 		"id": 47860,
 		"name": "Turret Walls",
 		"mode": 2,
-		"wr": 4
+		"wr": 2
 	},
 	{
 		"id": 52641,
@@ -509,7 +509,7 @@
 		"id": 52712,
 		"name": "Double Bounce",
 		"mode": 2,
-		"wr": 2
+		"wr": 0
 	},
 	{
 		"id": 52713,

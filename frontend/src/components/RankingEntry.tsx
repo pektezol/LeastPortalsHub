@@ -37,7 +37,7 @@ const RankingEntry: React.FC<RankingEntryProps> = (prop) => {
                     <span>{prop.curRankingData.user_name}</span>
                 </Link>
                 </div>
-                <span>{prop.curRankingData.overall_score}</span>
+                <span>{prop.currentLeaderboardType == RankingCategories.rankings_singleplayer ? prop.curRankingData.sp_score : prop.currentLeaderboardType == RankingCategories.rankings_multiplayer ? prop.curRankingData.mp_score : prop.curRankingData.overall_score}</span>
             </div>
         )
     }
