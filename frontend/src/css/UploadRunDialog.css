@@ -8,13 +8,13 @@ div#upload-run{
     transform: translateY(-68%);
 }
 
-
 #upload-run-menu{
     position: absolute;
     left: calc(50% + 160px); top: 130px;
     transform: translateX(-50%);
     background-color: #2b2e46;
     z-index: 2; color: white;
+    font-family: BarlowSemicondensed-SemiBold;
 }
 
 #upload-run-menu-add,
@@ -23,16 +23,13 @@ div#upload-run{
     outline: 8px solid #2b2e46;
     border-radius: 20px;
     font-size: 40px;
-    display: grid;
-    grid-template-columns: 20% 20% 20% 20% 20%;
 }
 
 #upload-run-menu-add>div,
 #upload-run-menu-edit>div{
     display: grid;
-    margin: 20px;
-    width: 200px;
     font-size: 20px;
+    padding: 0px 15px;
 }
 
 #upload-run-block{
@@ -45,3 +42,74 @@ div#upload-run{
     z-index: 2;
     cursor: no-drop;
 }
+
+.upload-run-dropdown-container .dropdown-cur {
+    user-select: none;
+    cursor: pointer;
+}
+
+.upload-run-dropdown {
+    position: absolute;
+    user-select: none;
+    cursor: pointer;
+    z-index: 1000;
+    background-color: #222538;
+    border-radius: 10px;
+    overflow: hidden;
+    animation: dropdown-in 0.2s ease;
+    max-height: 300px;
+    overflow-y: scroll;
+    width: calc(100% - 30px);
+}
+
+.upload-run-dropdown div {
+    padding: 8px;
+}
+
+.upload-run-dropdown div:hover {
+    background-color: #414669;
+}
+
+.upload-run-dropdown.hidden {
+    display: none;
+}
+
+@keyframes dropdown-in {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+button, input {
+    background-color: #2b2e46;
+    border: none;
+    font-family: BarlowSemiCondensed-Regular;
+    color: #CDCFDF;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 5px 0px;
+    transition: all 0.2s ease;
+}
+
+button:hover {
+    background-color: #222538;
+    border-radius: 32px;
+}
+
+.upload-run-map-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.upload-run-buttons-container {
+    display: flex;
+    margin-top: 10px;
+}
+.upload-run-buttons-container button {
+    width: 100%;
+}
+
