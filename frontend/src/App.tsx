@@ -75,7 +75,7 @@ const App: React.FC = () => {
 
   return (
     <>
-      <UploadRunDialog open={uploadRunDialog} onClose={() => setUploadRunDialog(false)} mapID={uploadRunDialogMapID} games={games} />
+      <UploadRunDialog token={token} open={uploadRunDialog} onClose={() => setUploadRunDialog(false)} games={games} />
       <Sidebar setToken={setToken} profile={profile} setProfile={setProfile} onUploadRun={() => setUploadRunDialog(true)} />
       <Routes>
         <Route path="/" element={<Homepage />} />

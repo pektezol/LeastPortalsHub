@@ -3,25 +3,26 @@ import { UploadRunContent } from '../types/Content';
 
 import '../css/UploadRunDialog.css';
 import { Game } from '../types/Game';
-import Games from '../pages/Games';
 import { Map } from '../types/Map';
 import { API } from '../api/Api';
+import { useNavigate } from 'react-router-dom';
 
 interface UploadRunDialogProps {
+  token?: string;
   open: boolean;
   onClose: () => void;
-  mapID?: number;
   games: Game[];
 }
 
-const UploadRunDialog: React.FC<UploadRunDialogProps> = ({ open, onClose, mapID, games }) => {
+const UploadRunDialog: React.FC<UploadRunDialogProps> = ({ token, open, onClose, games }) => {
+
+  const navigate = useNavigate();
 
   const [uploadRunContent, setUploadRunContent] = React.useState<UploadRunContent>({
     map_id: 0,
     host_demo: null,
     partner_demo: null,
     partner_id: undefined,
-    is_partner_orange: undefined,
   });
 
   const [currentMap, setCurrentMap] = React.useState<string>("");
@@ -56,13 +57,59 @@ const UploadRunDialog: React.FC<UploadRunDialogProps> = ({ open, onClose, mapID,
     const gameMaps = await API.get_game_maps(game_id);
     setSelectedGameMaps(gameMaps);
     setUploadRunContent({
-      ...uploadRunContent,
       map_id: gameMaps[0].id,
+      host_demo: null,
+      partner_demo: null,
+      partner_id: undefined,
     });
     _set_current_map(gameMaps[0].name);
     setSelectedGameID(parseInt(game_id) - 1);
     setSelectedGameName(game_name);
     setLoading(false);
+  };
+
+  const _handle_file_change = async (e: React.ChangeEvent<HTMLInputElement>, host: boolean) => {
+    if (e.target.files) {
+      if (host) {
+        setUploadRunContent({
+          ...uploadRunContent,
+          host_demo: e.target.files[0],
+        });
+      } else {
+        setUploadRunContent({
+          ...uploadRunContent,
+          partner_demo: e.target.files[0],
+        });
+      }
+    }
+  };
+
+  const _upload_run = async () => {
+    if (token) {
+      if (games[selectedGameID].is_coop) {
+        if (uploadRunContent.host_demo === null) {
+          alert("You must select a host demo to upload.")
+          return
+        } else if (uploadRunContent.partner_demo === null) {
+          alert("You must select a partner demo to upload.")
+          return
+        } else if (uploadRunContent.partner_id === undefined) {
+          alert("You must specify your partner.")
+          return
+        }
+      } else {
+        if (uploadRunContent.host_demo === null) {
+          alert("You must select a demo to upload.")
+          return
+        }
+      }
+      if (window.confirm("Are you sure you want to submit this run to LPHUB?")) {
+        const message = await API.post_record(token, uploadRunContent);
+        alert(message);
+        navigate(0);
+        onClose();
+      }
+    }
   };
 
   React.useEffect(() => {
@@ -105,23 +152,28 @@ const UploadRunDialog: React.FC<UploadRunDialogProps> = ({ open, onClose, mapID,
                     <div>
                       <div id='dropdown2' className={dropdown2Vis ? "upload-run-dropdown" : "upload-run-dropdown hidden"}>
                         {selectedGameMaps && selectedGameMaps.map((gameMap) => (
-                          <div onClick={() => { setUploadRunContent({...uploadRunContent, map_id: parseInt(gameMap.name)}); _set_current_map(gameMap.name); _handle_dropdowns(2); }} key={gameMap.id}>{gameMap.name}</div>
+                          <div onClick={() => { setUploadRunContent({...uploadRunContent, map_id: gameMap.id}); _set_current_map(gameMap.name); _handle_dropdowns(2); }} key={gameMap.id}>{gameMap.name}</div>
                         ))}
                       </div>
                     </div>
                     <span>Host Demo</span>
-                    <input type="file" name="host_demo" id="host_demo" accept=".dem" />
+                    <input type="file" name="host_demo" id="host_demo" accept=".dem" onChange={(e) => _handle_file_change(e, true)} />
                     {
                       games[selectedGameID].is_coop &&
                       (
                         <>
                           <span>Partner Demo</span>
-                          <input type="file" name="partner_demo" id="partner_demo" accept=".dem" />
+                          <input type="file" name="partner_demo" id="partner_demo" accept=".dem" onChange={(e) => _handle_file_change(e, false)} />
+                          <span>Partner ID</span>
+                          <input type="text" name="partner_id" id="partner_id" onChange={(e) => setUploadRunContent({
+                            ...uploadRunContent,
+                            partner_id: e.target.value,
+                          })} />
                         </>
                       )
                     }
                     <div className='upload-run-buttons-container'>
-                      <button onClick={() => onClose()}>Submit</button>
+                      <button onClick={_upload_run}>Submit</button>
                       <button onClick={() => onClose()}>Cancel</button>
                     </div>
                   </div>

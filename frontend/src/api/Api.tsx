@@ -3,8 +3,9 @@ import { delete_token, get_token } from './Auth';
 import { get_user, get_profile, post_profile } from './User';
 import { get_games, get_chapters, get_games_chapters, get_game_maps, get_search } from './Games';
 import { get_official_rankings, get_unofficial_rankings } from './Rankings';
-import { get_map_summary, get_map_leaderboard, get_map_discussions, get_map_discussion, post_map_discussion, post_map_discussion_comment, delete_map_discussion } from './Maps';
+import { get_map_summary, get_map_leaderboard, get_map_discussions, get_map_discussion, post_map_discussion, post_map_discussion_comment, delete_map_discussion, post_record } from './Maps';
 import { delete_map_summary, post_map_summary, put_map_image, put_map_summary } from './Mod';
+import { UploadRunContent } from '../types/Content';
 
 // add new api call function entries here
 // example usage: API.get_games();
@@ -34,6 +35,7 @@ export const API = {
 
   post_map_discussion: (token: string, map_id: string, content: MapDiscussionContent) => post_map_discussion(token, map_id, content),
   post_map_discussion_comment: (token: string, map_id: string, discussion_id: number, comment: string) => post_map_discussion_comment(token, map_id, discussion_id, comment),
+  post_record: (token: string, run: UploadRunContent) => post_record(token, run),
 
   delete_map_discussion: (token: string, map_id: string, discussion_id: number) => delete_map_discussion(token, map_id, discussion_id),
   // Mod

@@ -1,6 +1,6 @@
 import axios from "axios";
 import { url } from "./Api";
-import { MapDiscussionContent } from "../types/Content";
+import { MapDiscussionContent, UploadRunContent } from "../types/Content";
 import { MapSummary, MapLeaderboard, MapDiscussions, MapDiscussion } from "../types/Map";
 
 export const get_map_summary = async (map_id: string): Promise<MapSummary> => {
@@ -73,4 +73,28 @@ export const delete_map_discussion = async (token: string, map_id: string, discu
     }
   });
   return response.data.success;
+};
+
+export const post_record = async (token: string, run: UploadRunContent): Promise<[string]> => {
+  if (run.partner_demo && run.partner_id) {
+    const response = await axios.postForm(url(`maps/${run.map_id}/record`), {
+      "host_demo": run.host_demo,
+      "partner_demo": run.partner_demo,
+      "partner_id": run.partner_id,
+    }, {
+      headers: {
+        "Authorization": token,
+      }
+    });
+    return response.data.message;
+  } else {
+    const response = await axios.postForm(url(`maps/${run.map_id}/record`), {
+      "host_demo": run.host_demo,
+    }, {
+      headers: {
+        "Authorization": token,
+      }
+    });
+    return response.data.message;
+  }
 };

@@ -24,10 +24,9 @@ import (
 )
 
 type RecordRequest struct {
-	HostDemo        *multipart.FileHeader `json:"host_demo" form:"host_demo" binding:"required" swaggerignore:"true"`
-	PartnerDemo     *multipart.FileHeader `json:"partner_demo" form:"partner_demo" swaggerignore:"true"`
-	IsPartnerOrange bool                  `json:"is_partner_orange" form:"is_partner_orange"`
-	PartnerID       string                `json:"partner_id" form:"partner_id"`
+	HostDemo    *multipart.FileHeader `json:"host_demo" form:"host_demo" binding:"required" swaggerignore:"true"`
+	PartnerDemo *multipart.FileHeader `json:"partner_demo" form:"partner_demo" swaggerignore:"true"`
+	PartnerID   string                `json:"partner_id" form:"partner_id"`
 }
 
 type RecordResponse struct {
@@ -50,7 +49,12 @@ type RecordResponse struct {
 //	@Success		200					{object}	models.Response{data=RecordResponse}
 //	@Router			/maps/{mapid}/record [post]
 func CreateRecordWithDemo(c *gin.Context) {
-	mapId := c.Param("mapid")
+	id := c.Param("mapid")
+	mapID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+		return
+	}
 	// Check if user exists
 	user, exists := c.Get("user")
 	if !exists {
@@ -62,7 +66,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 	var isCoop bool
 	var isDisabled bool
 	sql := `SELECT g.name, m.is_disabled FROM maps m INNER JOIN games g ON m.game_id=g.id WHERE m.id = $1`
-	err := database.DB.QueryRow(sql, mapId).Scan(&gameName, &isDisabled)
+	err = database.DB.QueryRow(sql, mapID).Scan(&gameName, &isDisabled)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
@@ -94,8 +98,8 @@ func CreateRecordWithDemo(c *gin.Context) {
 	var hostDemoUUID, hostDemoFileID, partnerDemoUUID, partnerDemoFileID string
 	var hostDemoScoreCount, hostDemoScoreTime int
 	var hostSteamID, partnerSteamID string
-	client := serviceAccount()
-	srv, err := drive.New(client)
+	var hostDemoServerNumber, partnerDemoServerNumber int
+	srv, err := drive.New(serviceAccount())
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
@@ -131,13 +135,22 @@ func CreateRecordWithDemo(c *gin.Context) {
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
-		hostDemoScoreCount, hostDemoScoreTime, hostSteamID, partnerSteamID, err = parser.ProcessDemo("backend/parser/" + uuid + ".dem")
+		parserResult, err := parser.ProcessDemo("backend/parser/" + uuid + ".dem")
 		if err != nil {
 			deleteFile(srv, file.Id)
 			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionCreateRecordProcessDemoFail, err.Error())
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
+		if mapID != parserResult.MapID {
+			deleteFile(srv, file.Id)
+			c.JSON(http.StatusOK, models.ErrorResponse("demo map does not match uploaded map id"))
+			return
+		}
+		hostDemoScoreCount = parserResult.PortalCount
+		hostDemoScoreTime = parserResult.TickCount
+		hostSteamID = parserResult.HostSteamID
+		partnerSteamID = parserResult.PartnerSteamID
 		if hostDemoScoreCount == 0 && hostDemoScoreTime == 0 {
 			deleteFile(srv, file.Id)
 			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionCreateRecordProcessDemoFail, err.Error())
@@ -145,30 +158,32 @@ func CreateRecordWithDemo(c *gin.Context) {
 			return
 		}
 		if !isCoop {
-			hostSplit := strings.Split(hostSteamID, ":")
-			if hostSplit[len(hostSplit)-1] != user.(models.User).SteamID {
-				c.JSON(http.StatusOK, models.ErrorResponse(fmt.Sprintf("Host SteamID from demo and request does not match! Check your submission and try again.\nDemo Host SteamID: %s\nRequest Host SteamID: %s", hostSplit[len(hostSplit)-1], user.(models.User).SteamID)))
+			convertedSteamID := strconv.FormatInt(convertSteamID64(hostSteamID), 10)
+			if convertedSteamID != user.(models.User).SteamID {
+				deleteFile(srv, file.Id)
+				c.JSON(http.StatusOK, models.ErrorResponse(fmt.Sprintf("Host SteamID from demo and request does not match! Check your submission and try again.\nDemo Host SteamID: %s\nRequest Host SteamID: %s", convertedSteamID, user.(models.User).SteamID)))
 				return
 			}
 		} else {
-			partnerSplit := strings.Split(partnerSteamID, ":")
-			if partnerSplit[len(partnerSplit)-1] != record.PartnerID {
-				c.JSON(http.StatusOK, models.ErrorResponse(fmt.Sprintf("Partner SteamID from demo and request does not match! Check your submission and try again.\nDemo Partner SteamID: %s\nRequest Partner SteamID: %s", partnerSplit[len(partnerSplit)-1], record.PartnerID)))
+			if parserResult.IsHost && i != 0 {
+				deleteFile(srv, file.Id)
+				c.JSON(http.StatusOK, models.ErrorResponse("Given partner demo is a host demo."))
 				return
 			}
-			var verifyCoopSteamID string
-			database.DB.QueryRow("SELECT steam_id FROM users WHERE steam_id = $1", record.PartnerID).Scan(&verifyCoopSteamID)
-			if verifyCoopSteamID != record.PartnerID {
-				c.JSON(http.StatusOK, models.ErrorResponse("Given partner SteamID does not match an account on LPHUB."))
+			if !parserResult.IsHost && i == 0 {
+				deleteFile(srv, file.Id)
+				c.JSON(http.StatusOK, models.ErrorResponse("Given host demo is a partner demo."))
 				return
 			}
 		}
 		if i == 0 {
 			hostDemoFileID = file.Id
 			hostDemoUUID = uuid
+			hostDemoServerNumber = parserResult.ServerNumber
 		} else if i == 1 {
 			partnerDemoFileID = file.Id
 			partnerDemoUUID = uuid
+			partnerDemoServerNumber = parserResult.ServerNumber
 		}
 		_, err = tx.Exec(`INSERT INTO demos (id,location_id) VALUES ($1,$2)`, uuid, file.Id)
 		if err != nil {
@@ -180,18 +195,37 @@ func CreateRecordWithDemo(c *gin.Context) {
 	}
 	// Insert into records
 	if isCoop {
+		if hostDemoServerNumber != partnerDemoServerNumber {
+			deleteFile(srv, hostDemoFileID)
+			deleteFile(srv, partnerDemoFileID)
+			c.JSON(http.StatusOK, models.ErrorResponse(fmt.Sprintf("Host and partner demo server numbers (%d & %d) does not match!", hostDemoServerNumber, partnerDemoServerNumber)))
+			return
+		}
+		convertedHostSteamID := strconv.FormatInt(convertSteamID64(hostSteamID), 10)
+		if convertedHostSteamID != user.(models.User).SteamID && convertedHostSteamID != record.PartnerID {
+			deleteFile(srv, hostDemoFileID)
+			deleteFile(srv, partnerDemoFileID)
+			c.JSON(http.StatusOK, models.ErrorResponse(fmt.Sprintf("Host SteamID from demo and request does not match! Check your submission and try again.\nDemo Host SteamID: %s\nRequest Host SteamID: %s", convertedHostSteamID, user.(models.User).SteamID)))
+			return
+		}
+		convertedPartnerSteamID := strconv.FormatInt(convertSteamID64(partnerSteamID), 10)
+		if convertedPartnerSteamID != record.PartnerID && convertedPartnerSteamID != user.(models.User).SteamID {
+			deleteFile(srv, hostDemoFileID)
+			deleteFile(srv, partnerDemoFileID)
+			c.JSON(http.StatusOK, models.ErrorResponse(fmt.Sprintf("Partner SteamID from demo and request does not match! Check your submission and try again.\nDemo Partner SteamID: %s\nRequest Partner SteamID: %s", convertedPartnerSteamID, record.PartnerID)))
+			return
+		}
+		var verifyPartnerSteamID string
+		database.DB.QueryRow("SELECT steam_id FROM users WHERE steam_id = $1", record.PartnerID).Scan(&verifyPartnerSteamID)
+		if verifyPartnerSteamID != record.PartnerID {
+			deleteFile(srv, hostDemoFileID)
+			deleteFile(srv, partnerDemoFileID)
+			c.JSON(http.StatusOK, models.ErrorResponse("Given partner SteamID does not match an account on LPHUB."))
+			return
+		}
 		sql := `INSERT INTO records_mp(map_id,score_count,score_time,host_id,partner_id,host_demo_id,partner_demo_id) 
 		VALUES($1, $2, $3, $4, $5, $6, $7)`
-		var hostID string
-		var partnerID string
-		if record.IsPartnerOrange {
-			hostID = user.(models.User).SteamID
-			partnerID = record.PartnerID
-		} else {
-			partnerID = user.(models.User).SteamID
-			hostID = record.PartnerID
-		}
-		_, err := tx.Exec(sql, mapId, hostDemoScoreCount, hostDemoScoreTime, hostID, partnerID, hostDemoUUID, partnerDemoUUID)
+		_, err := tx.Exec(sql, mapID, hostDemoScoreCount, hostDemoScoreTime, strconv.FormatInt(convertSteamID64(hostSteamID), 10), strconv.FormatInt(convertSteamID64(partnerSteamID), 10), hostDemoUUID, partnerDemoUUID)
 		if err != nil {
 			deleteFile(srv, hostDemoFileID)
 			deleteFile(srv, partnerDemoFileID)
@@ -202,7 +236,7 @@ func CreateRecordWithDemo(c *gin.Context) {
 	} else {
 		sql := `INSERT INTO records_sp(map_id,score_count,score_time,user_id,demo_id) 
 		VALUES($1, $2, $3, $4, $5)`
-		_, err := tx.Exec(sql, mapId, hostDemoScoreCount, hostDemoScoreTime, user.(models.User).SteamID, hostDemoUUID)
+		_, err := tx.Exec(sql, mapID, hostDemoScoreCount, hostDemoScoreTime, user.(models.User).SteamID, hostDemoUUID)
 		if err != nil {
 			deleteFile(srv, hostDemoFileID)
 			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionCreateRecordInsertRecordFail, err.Error())

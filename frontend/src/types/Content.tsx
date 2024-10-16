@@ -22,5 +22,4 @@ export interface UploadRunContent {
   host_demo: File | null;
   partner_demo: File | null;
   partner_id?: string;
-  is_partner_orange?: boolean;
 };
