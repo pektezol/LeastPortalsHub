@@ -294,7 +294,7 @@ func Profile(c *gin.Context) {
 	}
 	records := []ProfileRecords{}
 	// Get singleplayer records
-	sql = `SELECT sp.id, m.game_id, m.chapter_id, sp.map_id, m."name", (SELECT mh.score_count FROM map_history mh WHERE mh.map_id = sp.map_id ORDER BY mh.score_count ASC LIMIT 1) AS wr_count, sp.score_count, sp.score_time, sp.demo_id, sp.record_date
+	sql = `SELECT sp.id, m.game_id, m.chapter_id, sp.map_id, m."name", (SELECT mh.score_count FROM map_history mh WHERE mh.map_id = sp.map_id AND mh.category_id = 1 ORDER BY mh.score_count ASC LIMIT 1) AS wr_count, sp.score_count, sp.score_time, sp.demo_id, sp.record_date
 	FROM records_sp sp INNER JOIN maps m ON sp.map_id = m.id WHERE sp.user_id = $1 AND sp.is_deleted = false ORDER BY sp.map_id, sp.score_count, sp.score_time`
 	rows, err = database.DB.Query(sql, user.(models.User).SteamID)
 	if err != nil {
