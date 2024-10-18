@@ -460,7 +460,7 @@ var mapDict = map[string]int{
 	"mp_coop_paint_redirect":       95,
 	"mp_coop_paint_bridge":         96,
 	"mp_coop_paint_walljumps":      97,
-	"mp_coop_paint_speed_flings":   98,
+	"mp_coop_paint_speed_fling":    98,
 	"mp_coop_paint_red_racer":      99,
 	"mp_coop_paint_speed_catch":    100,
 	"mp_coop_paint_longjump_intro": 101,
