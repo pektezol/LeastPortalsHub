@@ -97,4 +97,13 @@ export const post_record = async (token: string, run: UploadRunContent): Promise
     });
     return response.data.message;
   }
+}
+
+export const delete_map_record = async (token: string, map_id: number, record_id: number): Promise<boolean> => {
+  const response = await axios.delete(url(`maps/${map_id}/record/${record_id}`), {
+    headers: {
+      "Authorization": token,
+    }
+  });
+  return response.data.success;
 };

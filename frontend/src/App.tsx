@@ -11,6 +11,7 @@ import Maps from './pages/Maps';
 import User from './pages/User';
 import Homepage from './pages/Homepage';
 import UploadRunDialog from './components/UploadRunDialog';
+import MapDeleteConfirmDialog from './components/MapDeleteConfirmDialog';
 import Rules from './pages/Rules';
 import About from './pages/About';
 import { Game } from './types/Game';
@@ -18,6 +19,7 @@ import { API } from './api/Api';
 import Maplist from './pages/Maplist';
 import Rankings from './pages/Rankings';
 import { get_user_id_from_token, get_user_mod_from_token } from './utils/Jwt';
+import { MapDeleteEndpoint } from './types/Map';
 
 const App: React.FC = () => {
   const [token, setToken] = React.useState<string | undefined>(undefined);
@@ -28,6 +30,9 @@ const App: React.FC = () => {
 
   const [uploadRunDialog, setUploadRunDialog] = React.useState<boolean>(false);
   const [uploadRunDialogMapID, setUploadRunDialogMapID] = React.useState<number | undefined>(undefined);
+
+  const [confirmDialogOpen, setConfirmDialogOpen] = React.useState<boolean>(false);
+  const [currDeleteMapInfo, setCurrDeleteMapInfo] = React.useState<MapDeleteEndpoint>();
 
   const _fetch_token = async () => {
     const token = await API.get_token();
@@ -79,7 +84,7 @@ const App: React.FC = () => {
       <Sidebar setToken={setToken} profile={profile} setProfile={setProfile} onUploadRun={() => setUploadRunDialog(true)} />
       <Routes>
         <Route path="/" element={<Homepage />} />
-        <Route path="/profile" element={<Profile profile={profile} token={token} gameData={games} />} />
+        <Route path="/profile" element={<Profile profile={profile} token={token} gameData={games} onDeleteRecord={() => setConfirmDialogOpen(true)} />} />
         <Route path="/users/*" element={<User profile={profile} token={token} gameData={games} />} />
         <Route path="/games" element={<Games games={games} />} />
         <Route path='/games/:id' element={<Maplist />}></Route>

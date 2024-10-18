@@ -3,7 +3,7 @@ import { delete_token, get_token } from './Auth';
 import { get_user, get_profile, post_profile } from './User';
 import { get_games, get_chapters, get_games_chapters, get_game_maps, get_search } from './Games';
 import { get_official_rankings, get_unofficial_rankings } from './Rankings';
-import { get_map_summary, get_map_leaderboard, get_map_discussions, get_map_discussion, post_map_discussion, post_map_discussion_comment, delete_map_discussion, post_record } from './Maps';
+import { get_map_summary, get_map_leaderboard, get_map_discussions, get_map_discussion, post_map_discussion, post_map_discussion_comment, delete_map_discussion, post_record, delete_map_record } from './Maps';
 import { delete_map_summary, post_map_summary, put_map_image, put_map_summary } from './Mod';
 import { UploadRunContent } from '../types/Content';
 
@@ -38,6 +38,8 @@ export const API = {
   post_record: (token: string, run: UploadRunContent) => post_record(token, run),
 
   delete_map_discussion: (token: string, map_id: string, discussion_id: number) => delete_map_discussion(token, map_id, discussion_id),
+
+  delete_map_record: (token: string, map_id: number, record_id: number) => delete_map_record(token, map_id, record_id),
   // Mod
   post_map_summary: (token: string, map_id: string, content: ModMenuContent) => post_map_summary(token, map_id, content),
   
@@ -47,7 +49,7 @@ export const API = {
   delete_map_summary: (token: string, map_id: string, route_id: number) => delete_map_summary(token, map_id, route_id),
 };
 
-const BASE_API_URL: string = "/api/v1/"
+const BASE_API_URL: string = "https://lp.ardapektezol.com/api/v1/"
 
 export function url(path: string): string {
   return BASE_API_URL + path;

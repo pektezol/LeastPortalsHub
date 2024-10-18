@@ -101,3 +101,8 @@ interface MapSummaryDetailsRouteHistory {
   date: string;
 };
 
+export interface MapDeleteEndpoint {
+  map_id: number;
+  record_id: number;
+}
+

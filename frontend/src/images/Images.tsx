@@ -20,6 +20,7 @@ import img17 from './png/17.png';
 import img18 from './png/18.png';
 import img19 from './png/19.png';
 import img20 from './png/20.png';
+import img21 from "./png/21.png";
 
 export const LogoIcon = logo;
 export const LoginIcon = login;
@@ -44,3 +45,4 @@ export const SteamIcon = img17;
 export const HistoryIcon = img18;
 export const SortIcon = img19;
 export const UploadIcon = img20;
+export const DeleteIcon = img21;

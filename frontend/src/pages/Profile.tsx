@@ -1,21 +1,23 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
-import { SteamIcon, TwitchIcon, YouTubeIcon, PortalIcon, FlagIcon, StatisticsIcon, SortIcon, ThreedotIcon, DownloadIcon, HistoryIcon } from '../images/Images';
+import { SteamIcon, TwitchIcon, YouTubeIcon, PortalIcon, FlagIcon, StatisticsIcon, SortIcon, ThreedotIcon, DownloadIcon, HistoryIcon, DeleteIcon } from '../images/Images';
 import { UserProfile } from '../types/Profile';
 import { Game, GameChapters } from '../types/Game';
 import { Map } from '../types/Map';
 import { ticks_to_time } from '../utils/Time';
 import "../css/Profile.css";
 import { API } from '../api/Api';
+import MapDeleteConfirmDialog from '../components/MapDeleteConfirmDialog';
 
 interface ProfileProps {
   profile?: UserProfile;
   token?: string;
   gameData: Game[];
+  onDeleteRecord: () => void; 
 }
 
-const Profile: React.FC<ProfileProps> = ({ profile, token, gameData }) => {
+const Profile: React.FC<ProfileProps> = ({ profile, token, gameData, onDeleteRecord }) => {
 
   const [navState, setNavState] = React.useState(0);
   const [pageNumber, setPageNumber] = React.useState(1);
@@ -55,6 +57,16 @@ const Profile: React.FC<ProfileProps> = ({ profile, token, gameData }) => {
       setMaps(gameChapters.maps);
       setPageMax(Math.ceil(gameChapters.maps.length / 20));
       setPageNumber(1);
+    }
+  };
+
+  const _delete_submission = async (map_id: number, record_id: number) => {
+    onDeleteRecord();
+    const api_success = await API.delete_map_record(token!, map_id, record_id);
+    if (api_success) {
+      window.alert("Successfully deleted record");
+    } else {
+      window.alert("Error: Could not delete record");
     }
   };
 
@@ -228,7 +240,8 @@ const Profile: React.FC<ProfileProps> = ({ profile, token, gameData }) => {
                         <span>{e.date.split("T")[0]}</span>
                         <span style={{ flexDirection: "row-reverse" }}>
 
-                          <button onClick={() => { window.alert(`Demo ID: ${e.demo_id}`) }}><img src={ThreedotIcon} alt="demo_id" /></button>
+                          <button style={{marginRight: "10px"}} onClick={() => { window.alert(`Demo ID: ${e.demo_id}`) }}><img src={ThreedotIcon} alt="demo_id" /></button>
+                          <button onClick={() => { _delete_submission(r.map_id, e.record_id) }}><img src={DeleteIcon}></img></button>
                           <button onClick={() => window.location.href = `/api/v1/demos?uuid=${e.demo_id}`}><img src={DownloadIcon} alt="download" /></button>
                           {i === 0 && r.scores.length > 1 ? <button onClick={() => {
                             (document.querySelectorAll(".profileboard-record")[index % 20] as HTMLInputElement).style.height === "44px" ||
