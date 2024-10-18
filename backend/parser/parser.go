@@ -410,7 +410,7 @@ var mapDict = map[string]int{
 	"sp_a4_stop_the_box":   52,
 	"sp_a4_laser_catapult": 53,
 	"sp_a4_laser_platform": 54,
-	"sp_a4_speed_catch":    55,
+	"sp_a4_speed_tb_catch": 55,
 	"sp_a4_jump_polarity":  56,
 
 	"sp_a4_finale1": 57,
