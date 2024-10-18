@@ -38,16 +38,16 @@ func ProcessDemo(filePath string) (Result, error) {
 	mapName := reader.TryReadStringLength(260)
 	reader.SkipBytes(276)
 	if demoFileStamp != "HL2DEMO" {
-		return Result{}, errors.New("invalid demo file stamp")
+		return Result{}, errors.New("Invalid demo file stamp.")
 	}
 	if demoProtocol != 4 {
-		return Result{}, errors.New("this parser only supports demos from new engine")
+		return Result{}, errors.New("Invalid demo protocol.")
 	}
 	if networkProtocol != 2001 {
-		return Result{}, errors.New("this parser only supports demos from portal 2")
+		return Result{}, errors.New("Invalid network protocol.")
 	}
 	if mapDict[mapName] == 0 {
-		return Result{}, errors.New("demo recorded on an invalid map")
+		return Result{}, errors.New("Invalid map.")
 	}
 	result.MapID = mapDict[mapName]
 	for {
@@ -419,7 +419,7 @@ var mapDict = map[string]int{
 	"sp_a4_finale4": 60,
 
 	"mp_coop_start":   61,
-	"mp_coop_lobby_2": 62,
+	"mp_coop_lobby_3": 62,
 
 	"mp_coop_doors":         63,
 	"mp_coop_race_2":        64,
@@ -465,7 +465,7 @@ var mapDict = map[string]int{
 	"mp_coop_paint_speed_catch":    100,
 	"mp_coop_paint_longjump_intro": 101,
 
-	"mp_coop_seperation_1":     102,
+	"mp_coop_separation_1":     102,
 	"mp_coop_tripleaxis":       103,
 	"mp_coop_catapult_catch":   104,
 	"mp_coop_2paints_1bridge":  105,

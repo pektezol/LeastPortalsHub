@@ -115,36 +115,28 @@ func CreateRecordWithDemo(c *gin.Context) {
 	for i, header := range demoFiles {
 		uuid := uuid.New().String()
 		// Upload & insert into demos
-		err = c.SaveUploadedFile(header, "backend/parser/"+uuid+".dem")
+		err = c.SaveUploadedFile(header, "parser/"+uuid+".dem")
 		if err != nil {
 			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionCreateRecordSaveDemoFail, err.Error())
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
-		defer os.Remove("backend/parser/" + uuid + ".dem")
-		f, err := os.Open("backend/parser/" + uuid + ".dem")
+		defer os.Remove("parser/" + uuid + ".dem")
+		f, err := os.Open("parser/" + uuid + ".dem")
 		if err != nil {
 			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionCreateRecordOpenDemoFail, err.Error())
 			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 			return
 		}
 		defer f.Close()
-		file, err := createFile(srv, uuid+".dem", "application/octet-stream", f, os.Getenv("GOOGLE_FOLDER_ID"))
+		parserResult, err := parser.ProcessDemo("parser/" + uuid + ".dem")
 		if err != nil {
-			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionCreateRecordCreateDemoFail, err.Error())
-			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
-			return
-		}
-		parserResult, err := parser.ProcessDemo("backend/parser/" + uuid + ".dem")
-		if err != nil {
-			deleteFile(srv, file.Id)
 			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionCreateRecordProcessDemoFail, err.Error())
-			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+			c.JSON(http.StatusOK, models.ErrorResponse("Error while processing demo: "+err.Error()))
 			return
 		}
 		if mapID != parserResult.MapID {
-			deleteFile(srv, file.Id)
-			c.JSON(http.StatusOK, models.ErrorResponse("demo map does not match uploaded map id"))
+			c.JSON(http.StatusOK, models.ErrorResponse("Demo map does not match selected map id."))
 			return
 		}
 		hostDemoScoreCount = parserResult.PortalCount
@@ -152,7 +144,6 @@ func CreateRecordWithDemo(c *gin.Context) {
 		hostSteamID = parserResult.HostSteamID
 		partnerSteamID = parserResult.PartnerSteamID
 		if hostDemoScoreCount == 0 && hostDemoScoreTime == 0 {
-			deleteFile(srv, file.Id)
 			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionCreateRecordProcessDemoFail, err.Error())
 			c.JSON(http.StatusOK, models.ErrorResponse("Processing demo went wrong. Please contact a web admin and provide the demo in question."))
 			return
@@ -160,21 +151,24 @@ func CreateRecordWithDemo(c *gin.Context) {
 		if !isCoop {
 			convertedSteamID := strconv.FormatInt(convertSteamID64(hostSteamID), 10)
 			if convertedSteamID != user.(models.User).SteamID {
-				deleteFile(srv, file.Id)
 				c.JSON(http.StatusOK, models.ErrorResponse(fmt.Sprintf("Host SteamID from demo and request does not match! Check your submission and try again.\nDemo Host SteamID: %s\nRequest Host SteamID: %s", convertedSteamID, user.(models.User).SteamID)))
 				return
 			}
 		} else {
 			if parserResult.IsHost && i != 0 {
-				deleteFile(srv, file.Id)
 				c.JSON(http.StatusOK, models.ErrorResponse("Given partner demo is a host demo."))
 				return
 			}
 			if !parserResult.IsHost && i == 0 {
-				deleteFile(srv, file.Id)
 				c.JSON(http.StatusOK, models.ErrorResponse("Given host demo is a partner demo."))
 				return
 			}
+		}
+		file, err := createFile(srv, uuid+".dem", "application/octet-stream", f, os.Getenv("GOOGLE_FOLDER_ID"))
+		if err != nil {
+			CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionCreateRecordCreateDemoFail, err.Error())
+			c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
+			return
 		}
 		if i == 0 {
 			hostDemoFileID = file.Id
