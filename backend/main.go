@@ -4,20 +4,18 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"time"
 
 	"lphub/api"
 	"lphub/database"
 	_ "lphub/docs"
 
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
 
-//	@title			Least Portals Database API
+//	@title			Least Portals Hub
 //	@version		1.0
-//	@description	Backend API endpoints for the Least Portals Database.
+//	@description	Backend API endpoints for Least Portals Hub.
 
 //	@license.name	GNU Affero General Public License, Version 3
 //	@license.url	https://www.gnu.org/licenses/agpl-3.0.html
@@ -33,24 +31,22 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 	router := gin.Default()
-	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"GET", "POST", "DELETE", "PUT", "PATCH"},
-		AllowHeaders:     []string{"Origin"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-		AllowOriginFunc: func(origin string) bool {
-			return origin == "https://github.com"
-		},
-		MaxAge: 12 * time.Hour,
-	}))
 	database.ConnectDB()
 	api.InitRoutes(router)
-	router.Static("/static", "../frontend/build/static")
-	router.StaticFile("/", "../frontend/build/index.html")
-	router.NoRoute(func(c *gin.Context) {
-		c.File("../frontend/build/index.html")
-	})
-	router.MaxMultipartMemory = 500 << 20 // 500 mb limit for demos
+	// for debugging
+	// router.Use(cors.New(cors.Config{
+	// 	AllowOrigins:     []string{"*"},
+	// 	AllowMethods:     []string{"GET", "POST", "DELETE", "PUT", "PATCH"},
+	// 	AllowHeaders:     []string{"Origin"},
+	// 	ExposeHeaders:    []string{"Content-Length"},
+	// 	AllowCredentials: true,
+	// 	MaxAge: 12 * time.Hour,
+	// }))
+	// router.Static("/static", "../frontend/build/static")
+	// router.StaticFile("/", "../frontend/build/index.html")
+	// router.NoRoute(func(c *gin.Context) {
+	// 	c.File("../frontend/build/index.html")
+	// })
+	router.MaxMultipartMemory = 200 << 20 // 200 mb limit for demos
 	router.Run(fmt.Sprintf(":%s", os.Getenv("PORT")))
 }
