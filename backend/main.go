@@ -51,5 +51,6 @@ func main() {
 	router.NoRoute(func(c *gin.Context) {
 		c.File("../frontend/build/index.html")
 	})
+	router.MaxMultipartMemory = 500 << 20 // 500 mb limit for demos
 	router.Run(fmt.Sprintf(":%s", os.Getenv("PORT")))
 }
