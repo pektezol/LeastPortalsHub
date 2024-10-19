@@ -185,7 +185,7 @@ const Profile: React.FC<ProfileProps> = ({ profile, token, gameData, onDeleteRec
 
           {game === "0" ?
             <select disabled>
-              <option>All Scores</option>
+              <option>All Chapters</option>
             </select>
             : chapterData === null ? <select></select> :
 

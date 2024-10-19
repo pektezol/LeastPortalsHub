@@ -168,7 +168,7 @@ const User: React.FC<UserProps> = ({ token, profile, gameData }) => {
 
           {game === "0" ?
             <select disabled>
-              <option>All Scores</option>
+              <option>All Chapters</option>
             </select>
             : chapterData === null ? <select></select> :
 
