@@ -356,21 +356,30 @@ func DeleteRecord(c *gin.Context) {
 //	@Router			/demos [get]
 func DownloadDemoWithID(c *gin.Context) {
 	uuid := c.Query("uuid")
-	var locationID string
 	if uuid == "" {
 		c.JSON(http.StatusOK, models.ErrorResponse("Invalid id given."))
 		return
 	}
-	err := database.DB.QueryRow(`SELECT location_id FROM demos WHERE id = $1`, uuid).Scan(&locationID)
+	srv, err := drive.New(serviceAccount())
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
-	if locationID == "" {
-		c.JSON(http.StatusOK, models.ErrorResponse("Invalid id given."))
+
+	// Query drive instead of finding location id from db because SOMEONE reuploaded the demos.
+	// Tbf I had to reupload and will have to do time after time. Fuck you Google.
+	// I guess there's no need to store location id of demos anymore?
+	fileList, err := srv.Files.List().Q(fmt.Sprintf("name = '%s.dem'", uuid)).Do()
+	if err != nil {
+		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
-	url := "https://drive.google.com/uc?export=download&id=" + locationID
+	if len(fileList.Files) == 0 {
+		c.JSON(http.StatusOK, models.ErrorResponse("Demo not found."))
+		return
+	}
+
+	url := "https://drive.google.com/uc?export=download&id=" + fileList.Files[0].Id
 	fileName := uuid + ".dem"
 	output, err := os.Create(fileName)
 	if err != nil {
