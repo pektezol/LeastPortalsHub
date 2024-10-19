@@ -270,7 +270,6 @@ func RankingsSteam(c *gin.Context) {
 func SearchWithQuery(c *gin.Context) {
 	query := c.Query("q")
 	query = strings.ToLower(query)
-	log.Println(query)
 	var response SearchResponse
 	// Cache all maps for faster response
 	var maps = []MapShortWithGame{
