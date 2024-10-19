@@ -108,16 +108,16 @@ const UploadRunDialog: React.FC<UploadRunDialogProps> = ({ token, open, onClose,
           return
         }
       }
-      const demo = SourceDemoParser.default()
-        .setOptions({ packets: true })
-        .parse(await uploadRunContent.host_demo.arrayBuffer());
+      // const demo = SourceDemoParser.default()
+      //   .setOptions({ packets: true })
+      //   .parse(await uploadRunContent.host_demo.arrayBuffer());
 
-        const scoreboardPacket = demo.findPacket(ScoreboardTempUpdate)
-        if (scoreboardPacket) {
-          console.log(scoreboardPacket)
-        } else {
-          console.log("couldnt find scoreboard packet")
-        }
+      //   const scoreboardPacket = demo.findPacket(ScoreboardTempUpdate)
+      //   if (scoreboardPacket) {
+      //     console.log(scoreboardPacket)
+      //   } else {
+      //     console.log("couldnt find scoreboard packet")
+      //   }
       if (window.confirm("Are you sure you want to submit this run to LPHUB?")) {
         const message = await API.post_record(token, uploadRunContent);
         alert(message);
