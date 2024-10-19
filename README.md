@@ -1,4 +1,4 @@
-# Portal 2 Least Portals Hub
+# Least Portals Hub (LPHUB)
 
 ## About LPHUB
 
@@ -8,11 +8,13 @@ Our comprehensive map library contains detailed, wiki-style information for maps
 
 In addition, we host a leaderboard section for each map where users can compare their accomplishments and compete for having the lowest amount of portals possible. Users can upload their records, along with demo proof in order to get on to the leaderboards.
 
+There's also discussion tabs for each map to act like forum pages in order to talk about possible new routes, alternatives, and overall comments.
+
 ## Project Team
 
 * [@pektezol](https://github.com/pektezol) - Project Lead
 * [@Krzyhau](https://github.com/Krzyhau) - Visual Design
-* [@Nidboj132](https://github.com/Nidboj132) - Frontend & Subject Expert
+* [@Nidboj132](https://github.com/Nidboj132) - Subject Expert & Frontend
 * [@Oryn](https://github.com/Oryn-Goia) - Subject Expert
 * [@Wolfboy248](https://github.com/Wolfboy248) - Frontend
 
@@ -27,8 +29,8 @@ In addition, we host a leaderboard section for each map where users can compare 
 
 ## Special Thanks
 
-* [@UncraftedName](https://github.com/UncraftedName) - For providing the (former) parser that retrieves total portal count and elapsed time from the CM counter found [here](https://github.com/UncraftedName/UntitledParser).
-* [@NeKz](https://github.com/NeKzor) - For being the inspiration of this project and the developer of the former least portals site found [here](https://lp.nekz.me/). 
+* [@NeKz](https://github.com/NeKzor) - For being the inspiration of this project and the developer of the former least portals site found [here](https://github.com/NeKzor/lp). Also for creating the [@nekz/sdp](https://github.com/NeKzor/sdp) package for demo parsing in client-side for quick information.
+* [@UncraftedName](https://github.com/UncraftedName) - For being a guide to parsing demo files and helping with how to retrieve total portal count and elapsed time from the CM counter with their parser found [here](https://github.com/UncraftedName/UntitledParser).
 
 ## Documentation
 
@@ -71,4 +73,4 @@ By using LPHUB, you acknowledge that you have read and understood this disclaime
 
 ## Last Update
 
-2024-09-09
+2024-10-19

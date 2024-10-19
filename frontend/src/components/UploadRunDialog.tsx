@@ -1,16 +1,12 @@
 import React from 'react';
 import { UploadRunContent } from '../types/Content';
-import { DemoMessages, ScoreboardTempUpdate, SourceDemoParser, UserMessage } from '@nekz/sdp';
-import fs from 'fs';
-
-
+import { ScoreboardTempUpdate, SourceDemoParser, NetMessages } from '@nekz/sdp';
 
 import '../css/UploadRunDialog.css';
 import { Game } from '../types/Game';
 import { Map } from '../types/Map';
 import { API } from '../api/Api';
 import { useNavigate } from 'react-router-dom';
-import { SvcUserMessage } from '@nekz/sdp/script/src/types/NetMessages';
 
 interface UploadRunDialogProps {
   token?: string;
@@ -108,16 +104,19 @@ const UploadRunDialog: React.FC<UploadRunDialogProps> = ({ token, open, onClose,
           return
         }
       }
-      // const demo = SourceDemoParser.default()
-      //   .setOptions({ packets: true })
-      //   .parse(await uploadRunContent.host_demo.arrayBuffer());
+      const demo = SourceDemoParser.default()
+        .setOptions({ packets: true })
+        .parse(await uploadRunContent.host_demo.arrayBuffer());
+      const scoreboard = demo.findPacket<NetMessages.SvcUserMessage>((message) => {
+        return message instanceof NetMessages.SvcUserMessage && message.userMessage instanceof ScoreboardTempUpdate;
+      })
 
-      //   const scoreboardPacket = demo.findPacket(ScoreboardTempUpdate)
-      //   if (scoreboardPacket) {
-      //     console.log(scoreboardPacket)
-      //   } else {
-      //     console.log("couldnt find scoreboard packet")
-      //   }
+      if (!scoreboard) {
+        alert("Error while processing demo: Unable to get scoreboard result. Is this not a CM demo?")
+        return
+      }
+      const { portalScore, timeScore } = scoreboard.userMessage?.as<ScoreboardTempUpdate>() ?? {};
+      console.log(`Portal count: ${portalScore}. Ticks: ${timeScore}.`);
       if (window.confirm("Are you sure you want to submit this run to LPHUB?")) {
         const message = await API.post_record(token, uploadRunContent);
         alert(message);
