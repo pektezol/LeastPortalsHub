@@ -174,7 +174,7 @@ const User: React.FC<UserProps> = ({ token, profile, gameData }) => {
 
               <select id='select-chapter'
                 onChange={() => setChapter((document.querySelector('#select-chapter') as HTMLInputElement).value)}>
-                <option value="0" key="0">All</option>
+                <option value="0" key="0">All Chapters</option>
                 {chapterData.chapters.filter(e => e.is_disabled === false).map((e, i) => (
                   <option value={e.id} key={i + 1}>{e.name}</option>
                 ))}</select>
@@ -190,10 +190,26 @@ const User: React.FC<UserProps> = ({ token, profile, gameData }) => {
           <span><span>Date</span><img src={SortIcon} alt="" /></span>
           <div id='page-number'>
             <div>
-              <button onClick={() => pageNumber === 1 ? null : setPageNumber(prevPageNumber => prevPageNumber - 1)}
+            <button onClick={() => {
+                if (pageNumber !== 1) {
+                  setPageNumber(prevPageNumber => prevPageNumber - 1);
+                  const records = document.querySelectorAll(".profileboard-record");
+                  records.forEach((r) => {
+                    (r as HTMLInputElement).style.height = "44px";
+                  });
+                }
+              }}
               ><i className='triangle' style={{ position: 'relative', left: '-5px', }}></i> </button>
               <span>{pageNumber}/{pageMax}</span>
-              <button onClick={() => pageNumber === pageMax ? null : setPageNumber(prevPageNumber => prevPageNumber + 1)}
+              <button onClick={() => {
+                if (pageNumber !== pageMax) {
+                  setPageNumber(prevPageNumber => prevPageNumber + 1);
+                  const records = document.querySelectorAll(".profileboard-record");
+                  records.forEach((r) => {
+                    (r as HTMLInputElement).style.height = "44px";
+                  });
+                }
+              }}
               ><i className='triangle' style={{ position: 'relative', left: '5px', transform: 'rotate(180deg)' }}></i> </button>
             </div>
           </div>
@@ -246,7 +262,7 @@ const User: React.FC<UserProps> = ({ token, profile, gameData }) => {
                     let record = user.records.find((e) => e.map_id === r.id);
                     return record === undefined ? (
                       <button className="profileboard-record" key={index} style={{ backgroundColor: "#1b1b20" }}>
-                        <span>{r.name}</span>
+                        <Link to={`/maps/${r.id}`}><span>{r.name}</span></Link>
                         <span style={{ display: "grid" }}>N/A</span>
                         <span style={{ display: "grid" }}>N/A</span>
                         <span>N/A</span>
@@ -259,7 +275,7 @@ const User: React.FC<UserProps> = ({ token, profile, gameData }) => {
                       <button className="profileboard-record" key={index}>
                         {record.scores.map((e, i) => (<>
                           {i !== 0 ? <hr style={{ gridColumn: "1 / span 8" }} /> : ""}
-                          <span>{r.name}</span>
+                          <Link to={`/maps/${r.id}`}><span>{r.name}</span></Link>
                           <span style={{ display: "grid" }}>{record!.scores[i].score_count}</span>
                           <span style={{ display: "grid" }}>{record!.scores[i].score_count - record!.map_wr_count}</span>
                           <span style={{ display: "grid" }}>{ticks_to_time(record!.scores[i].score_time)}</span>

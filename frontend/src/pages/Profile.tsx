@@ -14,7 +14,7 @@ interface ProfileProps {
   profile?: UserProfile;
   token?: string;
   gameData: Game[];
-  onDeleteRecord: () => void; 
+  onDeleteRecord: () => void;
 }
 
 const Profile: React.FC<ProfileProps> = ({ profile, token, gameData, onDeleteRecord }) => {
@@ -191,7 +191,7 @@ const Profile: React.FC<ProfileProps> = ({ profile, token, gameData, onDeleteRec
 
               <select id='select-chapter'
                 onChange={() => setChapter((document.querySelector('#select-chapter') as HTMLInputElement).value)}>
-                <option value="0" key="0">All</option>
+                <option value="0" key="0">All Chapters</option>
                 {chapterData.chapters.filter(e => e.is_disabled === false).map((e, i) => (
                   <option value={e.id} key={i + 1}>{e.name}</option>
                 ))}</select>
@@ -207,10 +207,26 @@ const Profile: React.FC<ProfileProps> = ({ profile, token, gameData, onDeleteRec
           <span><span>Date</span><img src={SortIcon} alt="" /></span>
           <div id='page-number'>
             <div>
-              <button onClick={() => pageNumber === 1 ? null : setPageNumber(prevPageNumber => prevPageNumber - 1)}
+              <button onClick={() => {
+                if (pageNumber !== 1) {
+                  setPageNumber(prevPageNumber => prevPageNumber - 1);
+                  const records = document.querySelectorAll(".profileboard-record");
+                  records.forEach((r) => {
+                    (r as HTMLInputElement).style.height = "44px";
+                  });
+                }
+              }}
               ><i className='triangle' style={{ position: 'relative', left: '-5px', }}></i> </button>
               <span>{pageNumber}/{pageMax}</span>
-              <button onClick={() => pageNumber === pageMax ? null : setPageNumber(prevPageNumber => prevPageNumber + 1)}
+              <button onClick={() => {
+                if (pageNumber !== pageMax) {
+                  setPageNumber(prevPageNumber => prevPageNumber + 1);
+                  const records = document.querySelectorAll(".profileboard-record");
+                  records.forEach((r) => {
+                    (r as HTMLInputElement).style.height = "44px";
+                  });
+                }
+              }}
               ><i className='triangle' style={{ position: 'relative', left: '5px', transform: 'rotate(180deg)' }}></i> </button>
             </div>
           </div>
@@ -240,7 +256,7 @@ const Profile: React.FC<ProfileProps> = ({ profile, token, gameData, onDeleteRec
                         <span>{e.date.split("T")[0]}</span>
                         <span style={{ flexDirection: "row-reverse" }}>
 
-                          <button style={{marginRight: "10px"}} onClick={() => { window.alert(`Demo ID: ${e.demo_id}`) }}><img src={ThreedotIcon} alt="demo_id" /></button>
+                          <button style={{ marginRight: "10px" }} onClick={() => { window.alert(`Demo ID: ${e.demo_id}`) }}><img src={ThreedotIcon} alt="demo_id" /></button>
                           <button onClick={() => { _delete_submission(r.map_id, e.record_id) }}><img src={DeleteIcon}></img></button>
                           <button onClick={() => window.location.href = `/api/v1/demos?uuid=${e.demo_id}`}><img src={DownloadIcon} alt="download" /></button>
                           {i === 0 && r.scores.length > 1 ? <button onClick={() => {
@@ -264,7 +280,7 @@ const Profile: React.FC<ProfileProps> = ({ profile, token, gameData, onDeleteRec
                     let record = profile.records.find((e) => e.map_id === r.id);
                     return record === undefined ? (
                       <button className="profileboard-record" key={index} style={{ backgroundColor: "#1b1b20" }}>
-                        <span>{r.name}</span>
+                        <Link to={`/maps/${r.id}`}><span>{r.name}</span></Link>
                         <span style={{ display: "grid" }}>N/A</span>
                         <span style={{ display: "grid" }}>N/A</span>
                         <span>N/A</span>
@@ -277,7 +293,7 @@ const Profile: React.FC<ProfileProps> = ({ profile, token, gameData, onDeleteRec
                       <button className="profileboard-record" key={index}>
                         {record.scores.map((e, i) => (<>
                           {i !== 0 ? <hr style={{ gridColumn: "1 / span 8" }} /> : ""}
-                          <span>{r.name}</span>
+                          <Link to={`/maps/${r.id}`}><span>{r.name}</span></Link>
                           <span style={{ display: "grid" }}>{record!.scores[i].score_count}</span>
                           <span style={{ display: "grid" }}>{record!.scores[i].score_count - record!.map_wr_count}</span>
                           <span style={{ display: "grid" }}>{ticks_to_time(record!.scores[i].score_time)}</span>
@@ -287,6 +303,7 @@ const Profile: React.FC<ProfileProps> = ({ profile, token, gameData, onDeleteRec
                           <span style={{ flexDirection: "row-reverse" }}>
 
                             <button onClick={() => { window.alert(`Demo ID: ${e.demo_id}`) }}><img src={ThreedotIcon} alt="demo_id" /></button>
+                            <button onClick={() => { _delete_submission(r.id, e.record_id) }}><img src={DeleteIcon}></img></button>
                             <button onClick={() => window.location.href = `/api/v1/demos?uuid=${e.demo_id}`}><img src={DownloadIcon} alt="download" /></button>
                             {i === 0 && record!.scores.length > 1 ? <button onClick={() => {
                               (document.querySelectorAll(".profileboard-record")[index % 20] as HTMLInputElement).style.height === "44px" ||
