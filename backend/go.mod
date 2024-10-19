@@ -8,6 +8,7 @@ require (
 )
 
 require (
+	github.com/gin-contrib/cors v1.7.2
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/google/uuid v1.6.0
 	github.com/pektezol/steam_go v1.1.2

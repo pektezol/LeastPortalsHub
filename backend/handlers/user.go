@@ -301,10 +301,12 @@ func Profile(c *gin.Context) {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
-	sql = `WITH best_scores AS (SELECT sp.user_id, sp.map_id, MIN(sp.score_count) AS best_score_count, MIN(sp.score_time) AS best_score_time
-	FROM records_sp sp WHERE sp.is_deleted = false GROUP BY sp.user_id, sp.map_id)
-	SELECT (SELECT COUNT(*) + 1 FROM best_scores AS inner_scores WHERE inner_scores.map_id = bs.map_id AND (inner_scores.best_score_count < bs.best_score_count OR (inner_scores.best_score_count = bs.best_score_count AND inner_scores.best_score_time < bs.best_score_time))) AS placement
-	FROM best_scores AS bs WHERE bs.user_id = $1 ORDER BY map_id, placement`
+	sql = `WITH best_scores AS (WITH RankedScores AS (SELECT sp.user_id, sp.map_id, sp.score_count, sp.score_time, ROW_NUMBER() OVER (
+    PARTITION BY sp.user_id, sp.map_id ORDER BY sp.score_count ASC, sp.score_time ASC) AS rank FROM records_sp sp WHERE sp.is_deleted = false)
+	SELECT user_id, map_id, score_count AS best_score_count, score_time AS best_score_time FROM RankedScores WHERE rank = 1)
+	SELECT (SELECT COUNT(*) + 1 FROM best_scores AS inner_scores WHERE inner_scores.map_id = bs.map_id 
+	AND (inner_scores.best_score_count < bs.best_score_count OR (inner_scores.best_score_count = bs.best_score_count 
+	AND inner_scores.best_score_time < bs.best_score_time))) AS placement FROM best_scores AS bs WHERE bs.user_id = $1 ORDER BY map_id, placement`
 	placementsRows, err := database.DB.Query(sql, user.(models.User).SteamID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
@@ -355,10 +357,12 @@ func Profile(c *gin.Context) {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
-	sql = `WITH best_scores AS (SELECT mp.host_id, mp.partner_id, mp.map_id, MIN(mp.score_count) AS best_score_count, MIN(mp.score_time) AS best_score_time
-	FROM records_mp mp WHERE mp.is_deleted = false GROUP BY mp.host_id, mp.partner_id, mp.map_id)
-	SELECT (SELECT COUNT(*) + 1 FROM best_scores AS inner_scores WHERE inner_scores.map_id = bs.map_id AND (inner_scores.best_score_count < bs.best_score_count OR (inner_scores.best_score_count = bs.best_score_count AND inner_scores.best_score_time < bs.best_score_time))) AS placement
-	FROM best_scores AS bs WHERE bs.host_id = $1 or bs.partner_id = $1 ORDER BY map_id, placement`
+	sql = `WITH best_scores AS (WITH RankedScores AS (SELECT mp.host_id, mp.partner_id, mp.map_id, mp.score_count, mp.score_time, ROW_NUMBER() OVER (
+	PARTITION BY mp.host_id, mp.partner_id, mp.map_id ORDER BY mp.score_count ASC, mp.score_time ASC) AS rank FROM records_mp mp WHERE mp.is_deleted = false)
+	SELECT host_id, partner_id, map_id, score_count AS best_score_count, score_time AS best_score_time FROM RankedScores WHERE rank = 1)
+	SELECT (SELECT COUNT(*) + 1 FROM best_scores AS inner_scores WHERE inner_scores.map_id = bs.map_id 
+	AND (inner_scores.best_score_count < bs.best_score_count OR (inner_scores.best_score_count = bs.best_score_count 
+	AND inner_scores.best_score_time < bs.best_score_time))) AS placement FROM best_scores AS bs WHERE bs.host_id = $1 or bs.partner_id = $1 ORDER BY map_id, placement`
 	placementsRows, err = database.DB.Query(sql, user.(models.User).SteamID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
@@ -675,10 +679,12 @@ func FetchUser(c *gin.Context) {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
-	sql = `WITH best_scores AS (SELECT sp.user_id, sp.map_id, MIN(sp.score_count) AS best_score_count, MIN(sp.score_time) AS best_score_time
-	FROM records_sp sp WHERE sp.is_deleted = false GROUP BY sp.user_id, sp.map_id)
-	SELECT (SELECT COUNT(*) + 1 FROM best_scores AS inner_scores WHERE inner_scores.map_id = bs.map_id AND (inner_scores.best_score_count < bs.best_score_count OR (inner_scores.best_score_count = bs.best_score_count AND inner_scores.best_score_time < bs.best_score_time))) AS placement
-	FROM best_scores AS bs WHERE bs.user_id = $1 ORDER BY map_id, placement`
+	sql = `WITH best_scores AS (WITH RankedScores AS (SELECT sp.user_id, sp.map_id, sp.score_count, sp.score_time, ROW_NUMBER() OVER (
+	PARTITION BY sp.user_id, sp.map_id ORDER BY sp.score_count ASC, sp.score_time ASC) AS rank FROM records_sp sp WHERE sp.is_deleted = false)
+	SELECT user_id, map_id, score_count AS best_score_count, score_time AS best_score_time FROM RankedScores WHERE rank = 1)
+	SELECT (SELECT COUNT(*) + 1 FROM best_scores AS inner_scores WHERE inner_scores.map_id = bs.map_id 
+	AND (inner_scores.best_score_count < bs.best_score_count OR (inner_scores.best_score_count = bs.best_score_count 
+	AND inner_scores.best_score_time < bs.best_score_time))) AS placement FROM best_scores AS bs WHERE bs.user_id = $1 ORDER BY map_id, placement`
 	placementsRows, err := database.DB.Query(sql, user.SteamID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
@@ -729,10 +735,12 @@ func FetchUser(c *gin.Context) {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
-	sql = `WITH best_scores AS (SELECT mp.host_id, mp.partner_id, mp.map_id, MIN(mp.score_count) AS best_score_count, MIN(mp.score_time) AS best_score_time
-	FROM records_mp mp WHERE mp.is_deleted = false GROUP BY mp.host_id, mp.partner_id, mp.map_id)
-	SELECT (SELECT COUNT(*) + 1 FROM best_scores AS inner_scores WHERE inner_scores.map_id = bs.map_id AND (inner_scores.best_score_count < bs.best_score_count OR (inner_scores.best_score_count = bs.best_score_count AND inner_scores.best_score_time < bs.best_score_time))) AS placement
-	FROM best_scores AS bs WHERE bs.host_id = $1 or bs.partner_id = $1 ORDER BY map_id, placement`
+	sql = `WITH best_scores AS (WITH RankedScores AS (SELECT mp.host_id, mp.partner_id, mp.map_id, mp.score_count, mp.score_time, ROW_NUMBER() OVER (
+	PARTITION BY mp.host_id, mp.partner_id, mp.map_id ORDER BY mp.score_count ASC, mp.score_time ASC) AS rank FROM records_mp mp WHERE mp.is_deleted = false)
+	SELECT host_id, partner_id, map_id, score_count AS best_score_count, score_time AS best_score_time FROM RankedScores WHERE rank = 1)
+	SELECT (SELECT COUNT(*) + 1 FROM best_scores AS inner_scores WHERE inner_scores.map_id = bs.map_id 
+	AND (inner_scores.best_score_count < bs.best_score_count OR (inner_scores.best_score_count = bs.best_score_count 
+	AND inner_scores.best_score_time < bs.best_score_time))) AS placement FROM best_scores AS bs WHERE bs.host_id = $1 or bs.partner_id = $1 ORDER BY map_id, placement`
 	placementsRows, err = database.DB.Query(sql, user.SteamID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
