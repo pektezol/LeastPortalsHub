@@ -369,10 +369,16 @@ func DownloadDemoWithID(c *gin.Context) {
 	// Query drive instead of finding location id from db because SOMEONE reuploaded the demos.
 	// Tbf I had to reupload and will have to do time after time. Fuck you Google.
 	// I guess there's no need to store location id of demos anymore?
-	fileList, err := srv.Files.List().Q(fmt.Sprintf("name = '%s.dem'", uuid)).Do()
+	// ALSO ALSO, Google keeps track of old deleted files so sort by createdTime to get the latest demo.
+	fileList, err := srv.Files.List().Q(fmt.Sprintf("name = '%s.dem'", uuid)).
+		Fields("files(id, name, createdTime)").OrderBy("createdTime desc").PageSize(1).Do()
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
+	}
+	log.Printf("found %d files", len(fileList.Files))
+	for _, f := range fileList.Files {
+		log.Printf("%+v", f)
 	}
 	if len(fileList.Files) == 0 {
 		c.JSON(http.StatusOK, models.ErrorResponse("Demo not found."))
