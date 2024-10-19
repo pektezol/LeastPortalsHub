@@ -8,7 +8,8 @@ import { Map } from '../types/Map';
 import { ticks_to_time } from '../utils/Time';
 import "../css/Profile.css";
 import { API } from '../api/Api';
-import MapDeleteConfirmDialog from '../components/MapDeleteConfirmDialog';
+import useConfirm from '../components/UseConfirm';
+import useMessage from '../components/UseMessage';
 
 interface ProfileProps {
   profile?: UserProfile;
@@ -18,7 +19,8 @@ interface ProfileProps {
 }
 
 const Profile: React.FC<ProfileProps> = ({ profile, token, gameData, onDeleteRecord }) => {
-
+  const { confirm, ConfirmDialogComponent } = useConfirm("Delete record?", "This action cannot be undone");
+  const { message, MessageDialogComponent } = useMessage();
   const [navState, setNavState] = React.useState(0);
   const [pageNumber, setPageNumber] = React.useState(1);
   const [pageMax, setPageMax] = React.useState(0);
@@ -61,12 +63,17 @@ const Profile: React.FC<ProfileProps> = ({ profile, token, gameData, onDeleteRec
   };
 
   const _delete_submission = async (map_id: number, record_id: number) => {
-    onDeleteRecord();
+    const userConfirmed = await confirm();
+
+    if (!userConfirmed) {
+      return;
+    }
+
     const api_success = await API.delete_map_record(token!, map_id, record_id);
     if (api_success) {
-      window.alert("Successfully deleted record");
+      message("Success", "Successfully deleted record");
     } else {
-      window.alert("Error: Could not delete record");
+      message("Error", "Could not delete record");
     }
   };
 
@@ -96,6 +103,8 @@ const Profile: React.FC<ProfileProps> = ({ profile, token, gameData, onDeleteRec
 
   return (
     <main>
+      {ConfirmDialogComponent}
+      {MessageDialogComponent}
       <section id='section1' className='profile'>
 
         {profile.profile

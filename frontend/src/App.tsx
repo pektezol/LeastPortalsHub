@@ -11,7 +11,6 @@ import Maps from './pages/Maps';
 import User from './pages/User';
 import Homepage from './pages/Homepage';
 import UploadRunDialog from './components/UploadRunDialog';
-import MapDeleteConfirmDialog from './components/MapDeleteConfirmDialog';
 import Rules from './pages/Rules';
 import About from './pages/About';
 import { Game } from './types/Game';
