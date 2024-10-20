@@ -33,6 +33,7 @@ func filterRankings(spRankings, mpRankings, overallRankings *[]*Player, players 
 	})
 
 	rank := 1
+	offset := 0
 
 	for idx := 0; idx < len(*spRankings); idx++ {
 		if idx == 0 {
@@ -40,7 +41,10 @@ func filterRankings(spRankings, mpRankings, overallRankings *[]*Player, players 
 			continue
 		}
 		if (*spRankings)[idx-1].SpScoreCount != (*spRankings)[idx].SpScoreCount {
-			rank++
+			rank = rank + offset + 1
+			offset = 0
+		} else {
+			offset++
 		}
 		(*spRankings)[idx].SpRank = rank
 	}
@@ -50,6 +54,7 @@ func filterRankings(spRankings, mpRankings, overallRankings *[]*Player, players 
 	})
 
 	rank = 1
+	offset = 0
 
 	for idx := 0; idx < len(*mpRankings); idx++ {
 		if idx == 0 {
@@ -57,7 +62,10 @@ func filterRankings(spRankings, mpRankings, overallRankings *[]*Player, players 
 			continue
 		}
 		if (*mpRankings)[idx-1].MpScoreCount != (*mpRankings)[idx].MpScoreCount {
-			rank++
+			rank = rank + offset + 1
+			offset = 0
+		} else {
+			offset++
 		}
 		(*mpRankings)[idx].MpRank = rank
 	}
@@ -67,6 +75,7 @@ func filterRankings(spRankings, mpRankings, overallRankings *[]*Player, players 
 	})
 
 	rank = 1
+	offset = 0
 
 	for idx := 0; idx < len(*overallRankings); idx++ {
 		if idx == 0 {
@@ -74,7 +83,10 @@ func filterRankings(spRankings, mpRankings, overallRankings *[]*Player, players 
 			continue
 		}
 		if (*overallRankings)[idx-1].OverallScoreCount != (*overallRankings)[idx].OverallScoreCount {
-			rank++
+			rank = rank + offset + 1
+			offset = 0
+		} else {
+			offset++
 		}
 		(*overallRankings)[idx].OverallRank = rank
 	}
