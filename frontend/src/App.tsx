@@ -25,6 +25,8 @@ const App: React.FC = () => {
   const [profile, setProfile] = React.useState<UserProfile | undefined>(undefined);
   const [isModerator, setIsModerator] = React.useState<boolean>(false);
 
+  const [msgIsOpen, setMsgIsOpen] = React.useState<boolean>(false);
+
   const [games, setGames] = React.useState<Game[]>([]);
 
   const [uploadRunDialog, setUploadRunDialog] = React.useState<boolean>(false);

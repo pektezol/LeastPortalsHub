@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import ConfirmDialog from './ConfirmDialog';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 const useConfirm = ( title: string, subtitle: string ) => {
     const [isOpen, setIsOpen] = useState(false);

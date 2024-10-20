@@ -7,6 +7,8 @@ import { Game } from '../types/Game';
 import { Map } from '../types/Map';
 import { API } from '../api/Api';
 import { useNavigate } from 'react-router-dom';
+import useMessage from '../hooks/UseMessage';
+import useConfirm from '../hooks/UseConfirm';
 
 interface UploadRunDialogProps {
   token?: string;
@@ -16,6 +18,8 @@ interface UploadRunDialogProps {
 }
 
 const UploadRunDialog: React.FC<UploadRunDialogProps> = ({ token, open, onClose, games }) => {
+  const { message, MessageDialogComponent } = useMessage();
+  const { confirm, ConfirmDialogComponent } = useConfirm("Upload demo?", "Are you sure you want to upload this demo?");
 
   const navigate = useNavigate();
 
@@ -89,18 +93,18 @@ const UploadRunDialog: React.FC<UploadRunDialogProps> = ({ token, open, onClose,
     if (token) {
       if (games[selectedGameID].is_coop) {
         if (uploadRunContent.host_demo === null) {
-          alert("You must select a host demo to upload.")
+          message("Error", "You must select a host demo to upload.")
           return
         } else if (uploadRunContent.partner_demo === null) {
-          alert("You must select a partner demo to upload.")
+          message("Error", "You must select a partner demo to upload.")
           return
         } else if (uploadRunContent.partner_id === undefined) {
-          alert("You must specify your partner.")
+          message("Error", "You must specify your partner.")
           return
         }
       } else {
         if (uploadRunContent.host_demo === null) {
-          alert("You must select a demo to upload.")
+          message("Error", "You must select a demo to upload.")
           return
         }
       }
@@ -112,17 +116,22 @@ const UploadRunDialog: React.FC<UploadRunDialogProps> = ({ token, open, onClose,
       })
 
       if (!scoreboard) {
-        alert("Error while processing demo: Unable to get scoreboard result. Is this not a CM demo?")
+        message("Error", "Error while processing demo: Unable to get scoreboard result. Is this not a CM demo?")
         return
       }
       const { portalScore, timeScore } = scoreboard.userMessage?.as<ScoreboardTempUpdate>() ?? {};
       console.log(`Portal count: ${portalScore}. Ticks: ${timeScore}.`);
-      if (window.confirm("Are you sure you want to submit this run to LPHUB?")) {
-        const message = await API.post_record(token, uploadRunContent);
-        alert(message);
-        navigate(0);
-        onClose();
+      
+      const userConfirmed = await confirm();
+
+      if (!userConfirmed) {
+        return;
       }
+
+      const response = await API.post_record(token, uploadRunContent);
+      message("Message", response);
+      // navigate(0);
+      onClose();
     }
   };
 
@@ -136,6 +145,9 @@ const UploadRunDialog: React.FC<UploadRunDialogProps> = ({ token, open, onClose,
     return (
       <>
         <div id="upload-run-block" />
+        {MessageDialogComponent}
+        {ConfirmDialogComponent}
+        
         <div id='upload-run-menu'>
           <div id='upload-run-menu-add'>
             <div id='upload-run-route-category'>

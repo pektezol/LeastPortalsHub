@@ -95,9 +95,12 @@ button, input {
     transition: all 0.2s ease;
 }
 
+.upload-run-buttons-container button {
+    border-radius: 32px;
+}
+
 button:hover {
     background-color: #222538;
-    border-radius: 32px;
 }
 
 .upload-run-map-container {

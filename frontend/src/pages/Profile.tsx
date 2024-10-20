@@ -8,8 +8,8 @@ import { Map } from '../types/Map';
 import { ticks_to_time } from '../utils/Time';
 import "../css/Profile.css";
 import { API } from '../api/Api';
-import useConfirm from '../components/UseConfirm';
-import useMessage from '../components/UseMessage';
+import useConfirm from '../hooks/UseConfirm';
+import useMessage from '../hooks/UseMessage';
 
 interface ProfileProps {
   profile?: UserProfile;
