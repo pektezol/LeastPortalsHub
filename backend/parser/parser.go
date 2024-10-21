@@ -81,7 +81,8 @@ func ProcessDemo(filePath string) (Result, error) {
 				case 5:
 					packetReader.TryReadString()
 				case 6:
-					for count := 0; count < int(packetReader.TryReadUInt8()); count++ {
+					length := int(packetReader.TryReadUInt8())
+					for count := 0; count < length; count++ {
 						packetReader.TryReadString()
 						packetReader.TryReadString()
 					}
