@@ -65,8 +65,8 @@ func CreateRecordWithDemo(c *gin.Context) {
 	var gameName string
 	var isCoop bool
 	var isDisabled bool
-	sql := `SELECT g.name, m.is_disabled FROM maps m INNER JOIN games g ON m.game_id=g.id WHERE m.id = $1`
-	err = database.DB.QueryRow(sql, mapID).Scan(&gameName, &isDisabled)
+	sql := `SELECT g.name, g.is_coop, m.is_disabled FROM maps m INNER JOIN games g ON m.game_id=g.id WHERE m.id = $1`
+	err = database.DB.QueryRow(sql, mapID).Scan(&gameName, &isCoop, &isDisabled)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
@@ -74,9 +74,6 @@ func CreateRecordWithDemo(c *gin.Context) {
 	if isDisabled {
 		c.JSON(http.StatusOK, models.ErrorResponse("Map is not available for competitive boards."))
 		return
-	}
-	if gameName == "Portal 2 - Cooperative" {
-		isCoop = true
 	}
 	// Get record request
 	var record RecordRequest
