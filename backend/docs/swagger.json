@@ -1,8 +1,8 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "Backend API endpoints for the Least Portals Database.",
-        "title": "Least Portals Database API",
+        "description": "Backend API endpoints for Least Portals Hub.",
+        "title": "Least Portals Hub",
         "contact": {},
         "license": {
             "name": "GNU Affero General Public License, Version 3",
@@ -764,18 +764,6 @@
                         "type": "file",
                         "description": "Partner Demo",
                         "name": "partner_demo",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "Is Partner Orange",
-                        "name": "is_partner_orange",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Partner ID",
-                        "name": "partner_id",
                         "in": "formData"
                     }
                 ],

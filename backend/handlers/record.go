@@ -44,8 +44,6 @@ type RecordResponse struct {
 //	@Param			Authorization		header		string	true	"JWT Token"
 //	@Param			host_demo			formData	file	true	"Host Demo"
 //	@Param			partner_demo		formData	file	false	"Partner Demo"
-//	@Param			is_partner_orange	formData	boolean	false	"Is Partner Orange"
-//	@Param			partner_id			formData	string	false	"Partner ID"
 //	@Success		200					{object}	models.Response{data=RecordResponse}
 //	@Router			/maps/{mapid}/record [post]
 func CreateRecordWithDemo(c *gin.Context) {
@@ -82,9 +80,9 @@ func CreateRecordWithDemo(c *gin.Context) {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
 		return
 	}
-	if isCoop && (record.PartnerDemo == nil || record.PartnerID == "") {
+	if isCoop && record.PartnerDemo == nil {
 		CreateLog(user.(models.User).SteamID, LogTypeRecord, LogDescriptionCreateRecordInvalidRequestFail)
-		c.JSON(http.StatusOK, models.ErrorResponse("Invalid entry for coop record submission."))
+		c.JSON(http.StatusOK, models.ErrorResponse("Missing partner demo for coop submission."))
 		return
 	}
 	// Demo files
@@ -193,30 +191,41 @@ func CreateRecordWithDemo(c *gin.Context) {
 			return
 		}
 		convertedHostSteamID := strconv.FormatInt(convertSteamID64(hostSteamID), 10)
-		if convertedHostSteamID != user.(models.User).SteamID && convertedHostSteamID != record.PartnerID {
-			deleteFile(srv, hostDemoFileID)
-			deleteFile(srv, partnerDemoFileID)
-			c.JSON(http.StatusOK, models.ErrorResponse(fmt.Sprintf("Host SteamID from demo and request does not match! Check your submission and try again.\nDemo Host SteamID: %s\nRequest Host SteamID: %s", convertedHostSteamID, user.(models.User).SteamID)))
-			return
-		}
+		// if convertedHostSteamID != user.(models.User).SteamID && convertedHostSteamID != record.PartnerID {
+		// 	deleteFile(srv, hostDemoFileID)
+		// 	deleteFile(srv, partnerDemoFileID)
+		// 	c.JSON(http.StatusOK, models.ErrorResponse(fmt.Sprintf("Host SteamID from demo and request does not match! Check your submission and try again.\nDemo Host SteamID: %s\nRequest Host SteamID: %s", convertedHostSteamID, user.(models.User).SteamID)))
+		// 	return
+		// }
 		convertedPartnerSteamID := strconv.FormatInt(convertSteamID64(partnerSteamID), 10)
-		if convertedPartnerSteamID != record.PartnerID && convertedPartnerSteamID != user.(models.User).SteamID {
+		// if convertedPartnerSteamID != record.PartnerID && convertedPartnerSteamID != user.(models.User).SteamID {
+		// 	deleteFile(srv, hostDemoFileID)
+		// 	deleteFile(srv, partnerDemoFileID)
+		// 	c.JSON(http.StatusOK, models.ErrorResponse(fmt.Sprintf("Partner SteamID from demo and request does not match! Check your submission and try again.\nDemo Partner SteamID: %s\nRequest Partner SteamID: %s", convertedPartnerSteamID, record.PartnerID)))
+		// 	return
+		// }
+		if convertedHostSteamID != user.(models.User).SteamID || convertedPartnerSteamID != user.(models.User).SteamID {
 			deleteFile(srv, hostDemoFileID)
 			deleteFile(srv, partnerDemoFileID)
-			c.JSON(http.StatusOK, models.ErrorResponse(fmt.Sprintf("Partner SteamID from demo and request does not match! Check your submission and try again.\nDemo Partner SteamID: %s\nRequest Partner SteamID: %s", convertedPartnerSteamID, record.PartnerID)))
+			c.JSON(http.StatusOK, models.ErrorResponse("You are permitted to only upload your own runs!"))
 			return
 		}
-		var verifyPartnerSteamID string
-		database.DB.QueryRow("SELECT steam_id FROM users WHERE steam_id = $1", record.PartnerID).Scan(&verifyPartnerSteamID)
-		if verifyPartnerSteamID != record.PartnerID {
+		var checkPartnerSteamID, verifyPartnerSteamID string
+		if convertedHostSteamID == user.(models.User).SteamID {
+			checkPartnerSteamID = convertedPartnerSteamID
+		} else {
+			checkPartnerSteamID = convertedHostSteamID
+		}
+		database.DB.QueryRow("SELECT steam_id FROM users WHERE steam_id = $1", checkPartnerSteamID).Scan(&verifyPartnerSteamID)
+		if verifyPartnerSteamID != checkPartnerSteamID {
 			deleteFile(srv, hostDemoFileID)
 			deleteFile(srv, partnerDemoFileID)
-			c.JSON(http.StatusOK, models.ErrorResponse("Given partner SteamID does not match an account on LPHUB."))
+			c.JSON(http.StatusOK, models.ErrorResponse("Partner SteamID does not match an account on LPHUB."))
 			return
 		}
 		sql := `INSERT INTO records_mp(map_id,score_count,score_time,host_id,partner_id,host_demo_id,partner_demo_id) 
 		VALUES($1, $2, $3, $4, $5, $6, $7)`
-		_, err := tx.Exec(sql, mapID, hostDemoScoreCount, hostDemoScoreTime, strconv.FormatInt(convertSteamID64(hostSteamID), 10), strconv.FormatInt(convertSteamID64(partnerSteamID), 10), hostDemoUUID, partnerDemoUUID)
+		_, err := tx.Exec(sql, mapID, hostDemoScoreCount, hostDemoScoreTime, convertedHostSteamID, convertedPartnerSteamID, hostDemoUUID, partnerDemoUUID)
 		if err != nil {
 			deleteFile(srv, hostDemoFileID)
 			deleteFile(srv, partnerDemoFileID)

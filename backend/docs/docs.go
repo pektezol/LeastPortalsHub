@@ -771,18 +771,6 @@ const docTemplate = `{
                         "description": "Partner Demo",
                         "name": "partner_demo",
                         "in": "formData"
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "Is Partner Orange",
-                        "name": "is_partner_orange",
-                        "in": "formData"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Partner ID",
-                        "name": "partner_id",
-                        "in": "formData"
                     }
                 ],
                 "responses": {
@@ -2233,8 +2221,8 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "lp.ardapektezol.com",
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
-	Title:            "Least Portals Database API",
-	Description:      "Backend API endpoints for the Least Portals Database.",
+	Title:            "Least Portals Hub",
+	Description:      "Backend API endpoints for Least Portals Hub.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

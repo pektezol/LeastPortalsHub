@@ -548,11 +548,11 @@ definitions:
 host: lp.ardapektezol.com
 info:
   contact: {}
-  description: Backend API endpoints for the Least Portals Database.
+  description: Backend API endpoints for Least Portals Hub.
   license:
     name: GNU Affero General Public License, Version 3
     url: https://www.gnu.org/licenses/agpl-3.0.html
-  title: Least Portals Database API
+  title: Least Portals Hub
   version: "1.0"
 paths:
   /chapters/{chapterid}:
@@ -1007,14 +1007,6 @@ paths:
         in: formData
         name: partner_demo
         type: file
-      - description: Is Partner Orange
-        in: formData
-        name: is_partner_orange
-        type: boolean
-      - description: Partner ID
-        in: formData
-        name: partner_id
-        type: string
       produces:
       - application/json
       responses:
