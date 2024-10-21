@@ -18,8 +18,12 @@ interface UploadRunDialogProps {
 }
 
 const UploadRunDialog: React.FC<UploadRunDialogProps> = ({ token, open, onClose, games }) => {
+
+  const [confirmMessage, setConfirmMessage] = React.useState<string>("Are you sure you want to upload this demo?");
+
   const { message, MessageDialogComponent } = useMessage();
-  const { confirm, ConfirmDialogComponent } = useConfirm("Upload demo?", "Are you sure you want to upload this demo?");
+  const { confirm, ConfirmDialogComponent } = useConfirm("Upload demo?", confirmMessage);
+
 
   const navigate = useNavigate();
 
@@ -27,7 +31,6 @@ const UploadRunDialog: React.FC<UploadRunDialogProps> = ({ token, open, onClose,
     map_id: 0,
     host_demo: null,
     partner_demo: null,
-    partner_id: undefined,
   });
 
   const [currentMap, setCurrentMap] = React.useState<string>("");
@@ -65,7 +68,6 @@ const UploadRunDialog: React.FC<UploadRunDialogProps> = ({ token, open, onClose,
       map_id: gameMaps[0].id,
       host_demo: null,
       partner_demo: null,
-      partner_id: undefined,
     });
     _set_current_map(gameMaps[0].name);
     setSelectedGameID(parseInt(game_id) - 1);
@@ -98,9 +100,6 @@ const UploadRunDialog: React.FC<UploadRunDialogProps> = ({ token, open, onClose,
         } else if (uploadRunContent.partner_demo === null) {
           message("Error", "You must select a partner demo to upload.")
           return
-        } else if (uploadRunContent.partner_id === undefined) {
-          message("Error", "You must specify your partner.")
-          return
         }
       } else {
         if (uploadRunContent.host_demo === null) {
@@ -109,18 +108,20 @@ const UploadRunDialog: React.FC<UploadRunDialogProps> = ({ token, open, onClose,
         }
       }
       const demo = SourceDemoParser.default()
-        .setOptions({ packets: true })
+        .setOptions({ packets: true, header: true })
         .parse(await uploadRunContent.host_demo.arrayBuffer());
       const scoreboard = demo.findPacket<NetMessages.SvcUserMessage>((message) => {
         return message instanceof NetMessages.SvcUserMessage && message.userMessage instanceof ScoreboardTempUpdate;
       })
 
       if (!scoreboard) {
-        message("Error", "Error while processing demo: Unable to get scoreboard result. Is this not a CM demo?")
+        message("Error", "Error while processing demo: Unable to get scoreboard result. Either there is a demo that is corrupt or haven't been recorded in challenge mode.")
         return
       }
       const { portalScore, timeScore } = scoreboard.userMessage?.as<ScoreboardTempUpdate>() ?? {};
-      console.log(`Portal count: ${portalScore}. Ticks: ${timeScore}.`);
+      console.log(`Map Name: ${demo.mapName}. Portal count: ${portalScore}. Ticks: ${timeScore}.`);
+
+      setConfirmMessage(`Map Name: ${demo.mapName}\nPortal count: ${portalScore}\nTicks: ${timeScore}\n\nAre you sure you want to upload this demo?`)
       
       const userConfirmed = await confirm();
 
@@ -190,11 +191,6 @@ const UploadRunDialog: React.FC<UploadRunDialogProps> = ({ token, open, onClose,
                           <>
                             <span>Partner Demo</span>
                             <input type="file" name="partner_demo" id="partner_demo" accept=".dem" onChange={(e) => _handle_file_change(e, false)} />
-                            <span>Partner ID</span>
-                            <input type="text" name="partner_id" id="partner_id" onChange={(e) => setUploadRunContent({
-                              ...uploadRunContent,
-                              partner_id: e.target.value,
-                            })} />
                           </>
                         )
                       }

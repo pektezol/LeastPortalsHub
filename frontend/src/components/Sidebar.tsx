@@ -154,7 +154,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setToken, profile, setProfile, onUplo
 
           {
             profile && profile.profile ?
-              <button id='upload-run' className='submit-run-button' onClick={() => onUploadRun()}><img src={UploadIcon} alt="upload" /><span>Submit&nbsp;a&nbsp;Run</span></button>
+              <button id='upload-run' className='submit-run-button' onClick={() => onUploadRun()}><img src={UploadIcon} alt="upload" /><span>Upload&nbsp;Record</span></button>
               : 
               <span></span>
           }

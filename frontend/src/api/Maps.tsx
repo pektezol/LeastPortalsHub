@@ -76,11 +76,10 @@ export const delete_map_discussion = async (token: string, map_id: string, discu
 };
 
 export const post_record = async (token: string, run: UploadRunContent): Promise<string> => {
-  if (run.partner_demo && run.partner_id) {
+  if (run.partner_demo) {
     const response = await axios.postForm(url(`maps/${run.map_id}/record`), {
       "host_demo": run.host_demo,
       "partner_demo": run.partner_demo,
-      "partner_id": run.partner_id,
     }, {
       headers: {
         "Authorization": token,
