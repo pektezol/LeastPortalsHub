@@ -69,7 +69,7 @@ const UploadRunDialog: React.FC<UploadRunDialogProps> = ({ token, open, onClose,
       host_demo: null,
       partner_demo: null,
     });
-    _set_current_map(gameMaps[0].name);
+    _set_current_map(gameMaps.find((map) => !map.is_disabled)!.name);
     setSelectedGameID(parseInt(game_id) - 1);
     setSelectedGameName(game_name);
     setLoading(false);
