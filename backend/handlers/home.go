@@ -374,7 +374,7 @@ func SearchWithQuery(c *gin.Context) {
 		{ID: 99, Game: "Portal 2 - Cooperative", Chapter: "Course 5 - Mobility Gels", Map: "Turret Ninja"},
 		{ID: 100, Game: "Portal 2 - Cooperative", Chapter: "Course 5 - Mobility Gels", Map: "Propulsion Retrieval"},
 		{ID: 101, Game: "Portal 2 - Cooperative", Chapter: "Course 5 - Mobility Gels", Map: "Vault Entrance"},
-		{ID: 102, Game: "Portal 2 - Cooperative", Chapter: "Course 6 - Art Therapy", Map: "Seperation"},
+		{ID: 102, Game: "Portal 2 - Cooperative", Chapter: "Course 6 - Art Therapy", Map: "Separation"},
 		{ID: 103, Game: "Portal 2 - Cooperative", Chapter: "Course 6 - Art Therapy", Map: "Triple Axis"},
 		{ID: 104, Game: "Portal 2 - Cooperative", Chapter: "Course 6 - Art Therapy", Map: "Catapult Catch"},
 		{ID: 105, Game: "Portal 2 - Cooperative", Chapter: "Course 6 - Art Therapy", Map: "Bridge Gels"},
