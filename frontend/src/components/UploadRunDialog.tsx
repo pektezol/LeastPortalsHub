@@ -65,7 +65,7 @@ const UploadRunDialog: React.FC<UploadRunDialogProps> = ({ token, open, onClose,
     const gameMaps = await API.get_game_maps(game_id);
     setSelectedGameMaps(gameMaps);
     setUploadRunContent({
-      map_id: gameMaps[0].id,
+      map_id: gameMaps.find((map) => !map.is_disabled)!.id, //gameMaps[0].id,
       host_demo: null,
       partner_demo: null,
     });
