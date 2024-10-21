@@ -178,7 +178,7 @@ const UploadRunDialog: React.FC<UploadRunDialogProps> = ({ token, open, onClose,
                       </div>
                       <div>
                         <div id='dropdown2' className={dropdown2Vis ? "upload-run-dropdown" : "upload-run-dropdown hidden"}>
-                          {selectedGameMaps && selectedGameMaps.map((gameMap) => (
+                          {selectedGameMaps && selectedGameMaps.filter(gameMap => !gameMap.is_disabled).map((gameMap) => (
                             <div onClick={() => { setUploadRunContent({ ...uploadRunContent, map_id: gameMap.id }); _set_current_map(gameMap.name); _handle_dropdowns(2); }} key={gameMap.id}>{gameMap.name}</div>
                           ))}
                         </div>
