@@ -119,9 +119,9 @@ const UploadRunDialog: React.FC<UploadRunDialogProps> = ({ token, open, onClose,
         return
       }
       const { portalScore, timeScore } = scoreboard.userMessage?.as<ScoreboardTempUpdate>() ?? {};
-      console.log(`Map Name: ${demo.mapName}. Portal count: ${portalScore}. Ticks: ${timeScore}.`);
+      console.log(`Map Name: ${demo.mapName}. Portal Count: ${portalScore}. Ticks: ${timeScore}.`);
 
-      setConfirmMessage(`Map Name: ${demo.mapName}\nPortal count: ${portalScore}\nTicks: ${timeScore}\n\nAre you sure you want to upload this demo?`)
+      setConfirmMessage(`Map Name: ${demo.mapName}\nPortal Count: ${portalScore}\nTicks: ${timeScore}\n\nAre you sure you want to upload this demo?`)
       
       const userConfirmed = await confirm();
 
