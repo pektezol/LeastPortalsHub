@@ -45,10 +45,9 @@ const App: React.FC = () => {
     setGames(games);
   };
 
-  const _set_profile = async (user_id: string | undefined) => {
-    if (user_id) {
-      setProfile({} as UserProfile); // placeholder before we call actual user profile
-      const user = await API.get_profile(token!);
+  const _set_profile = async (user_id?: string) => {
+    if (user_id && token) {
+      const user = await API.get_profile(token);
       setProfile(user);
     }
   };
@@ -58,6 +57,7 @@ const App: React.FC = () => {
       setProfile(undefined);
       setIsModerator(false);
     } else {
+      setProfile({} as UserProfile); // placeholder before we call actual user profile
       _set_profile(get_user_id_from_token(token))
       const modStatus = get_user_mod_from_token(token)
       if (modStatus) {
@@ -83,7 +83,7 @@ const App: React.FC = () => {
     <>
       <UploadRunDialog token={token} open={uploadRunDialog} onClose={(updateProfile) => {
         setUploadRunDialog(false);
-        if (token) {
+        if (updateProfile && token) {
           _set_profile(get_user_id_from_token(token));
         }
       }} games={games} />
