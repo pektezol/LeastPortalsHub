@@ -19,6 +19,7 @@ const useMessage = () => {
     const handleClose = () => {
         setIsOpen(false);
         if (resolvePromise) {
+            resolvePromise();
             setResolvePromise(null);
         }
     };
