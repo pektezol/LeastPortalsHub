@@ -19,7 +19,7 @@ interface ProfileProps {
 }
 
 const Profile: React.FC<ProfileProps> = ({ profile, token, gameData, onDeleteRecord }) => {
-  const { confirm, ConfirmDialogComponent } = useConfirm("Delete record?", "This action cannot be undone");
+  const { confirm, ConfirmDialogComponent } = useConfirm();
   const { message, MessageDialogComponent } = useMessage();
   const [navState, setNavState] = React.useState(0);
   const [pageNumber, setPageNumber] = React.useState(1);
@@ -63,7 +63,7 @@ const Profile: React.FC<ProfileProps> = ({ profile, token, gameData, onDeleteRec
   };
 
   const _delete_submission = async (map_id: number, record_id: number) => {
-    const userConfirmed = await confirm();
+    const userConfirmed = await confirm("Delete record?", "This action cannot be undone");
 
     if (!userConfirmed) {
       return;

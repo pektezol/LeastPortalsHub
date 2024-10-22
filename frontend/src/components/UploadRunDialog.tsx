@@ -22,7 +22,7 @@ const UploadRunDialog: React.FC<UploadRunDialogProps> = ({ token, open, onClose,
   const [confirmMessage, setConfirmMessage] = React.useState<string>("Are you sure you want to upload this demo?");
 
   const { message, MessageDialogComponent } = useMessage();
-  const { confirm, ConfirmDialogComponent } = useConfirm("Upload demo?", confirmMessage);
+  const { confirm, ConfirmDialogComponent } = useConfirm();
 
 
   const navigate = useNavigate();
@@ -123,7 +123,7 @@ const UploadRunDialog: React.FC<UploadRunDialogProps> = ({ token, open, onClose,
 
       setConfirmMessage(`Map Name: ${demo.mapName}\nPortal Count: ${portalScore}\nTicks: ${timeScore}\n\nAre you sure you want to upload this demo?`)
       
-      const userConfirmed = await confirm();
+      const userConfirmed = await confirm("Upload demo?", confirmMessage);
 
       if (!userConfirmed) {
         return;
