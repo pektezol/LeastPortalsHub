@@ -125,6 +125,7 @@ const UploadRunDialog: React.FC<UploadRunDialogProps> = ({ token, open, onClose,
 
       const [ success, response ] = await API.post_record(token, uploadRunContent);
       await message("Upload Record", response);
+      console.log("weweew")
       onClose(success);
     }
   };
