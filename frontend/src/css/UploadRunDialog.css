@@ -13,7 +13,7 @@ div#upload-run{
     left: calc(50% + 160px); top: 130px;
     transform: translateX(-50%);
     background-color: #2b2e46;
-    z-index: 2; color: white;
+    z-index: 3; color: white;
     font-family: BarlowSemicondensed-SemiBold;
 }
 
