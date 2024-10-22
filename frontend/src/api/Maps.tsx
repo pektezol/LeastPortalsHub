@@ -85,7 +85,7 @@ export const post_record = async (token: string, run: UploadRunContent): Promise
         "Authorization": token,
       }
     });
-    return response.data.message;
+    return [ response.data.success, response.data.message ];
   } else {
     const response = await axios.postForm(url(`maps/${run.map_id}/record`), {
       "host_demo": run.host_demo,
