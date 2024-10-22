@@ -13,7 +13,7 @@ import useConfirm from '../hooks/UseConfirm';
 interface UploadRunDialogProps {
   token?: string;
   open: boolean;
-  onClose: () => void;
+  onClose: (updateProfile: boolean) => void;
   games: Game[];
 }
 
@@ -123,10 +123,9 @@ const UploadRunDialog: React.FC<UploadRunDialogProps> = ({ token, open, onClose,
         return;
       }
 
-      const response = await API.post_record(token, uploadRunContent);
+      const [ success, response ] = await API.post_record(token, uploadRunContent);
       await message("Upload Record", response);
-      // navigate(0);
-      onClose();
+      onClose(success);
     }
   };
 
@@ -193,7 +192,7 @@ const UploadRunDialog: React.FC<UploadRunDialogProps> = ({ token, open, onClose,
                       </div>
                       <div className='upload-run-buttons-container'>
                         <button onClick={_upload_run}>Submit</button>
-                        <button onClick={() => onClose()}>Cancel</button>
+                        <button onClick={() => onClose(false)}>Cancel</button>
                       </div>
                     </div>
                   </>

@@ -81,7 +81,6 @@ const App: React.FC = () => {
 
   return (
     <>
-      <UploadRunDialog token={token} open={uploadRunDialog} onClose={() => setUploadRunDialog(false)} games={games} />
       <Sidebar setToken={setToken} profile={profile} setProfile={setProfile} onUploadRun={() => setUploadRunDialog(true)} />
       <Routes>
         <Route path="/" element={<Homepage />} />
@@ -95,6 +94,12 @@ const App: React.FC = () => {
         <Route path='/rankings' element={<Rankings />}></Route>
         <Route path="*" element={"404"} />
       </Routes>
+      <UploadRunDialog token={token} open={uploadRunDialog} onClose={(updateProfile) => {
+        setUploadRunDialog(false);
+        if (token) {
+          _set_profile(get_user_id_from_token(token));
+        }
+      }} games={games} />
     </>
   );
 };
