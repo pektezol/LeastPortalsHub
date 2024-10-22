@@ -20,7 +20,7 @@ import (
 //	@license.name	GNU Affero General Public License, Version 3
 //	@license.url	https://www.gnu.org/licenses/agpl-3.0.html
 
-// @host		lp.ardapektezol.com
+// @host		lp.pektezol.dev
 // @BasePath	/api/v1
 func main() {
 	err := godotenv.Load()
