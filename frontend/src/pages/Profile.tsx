@@ -72,6 +72,7 @@ const Profile: React.FC<ProfileProps> = ({ profile, token, gameData, onDeleteRec
     const api_success = await API.delete_map_record(token!, map_id, record_id);
     if (api_success) {
       await message("Delete Record", "Successfully deleted record.");
+      onDeleteRecord();
     } else {
       await message("Delete Record", "Could not delete record.");
     }
