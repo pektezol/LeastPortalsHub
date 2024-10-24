@@ -98,19 +98,19 @@ func Profile(c *gin.Context) {
 	}
 	rankings.Overall.CompletionTotal = rankings.Singleplayer.CompletionTotal + rankings.Cooperative.CompletionTotal
 	// Get user completion count
-	sql = `SELECT 'records_sp' AS table_name, COUNT(sp.id)
-	FROM records_sp sp JOIN (
-    	SELECT mh.map_id, MIN(mh.score_count) AS min_score_count
-    	FROM public.map_history mh WHERE mh.category_id = 1 GROUP BY mh.map_id
-	) AS subquery_sp ON sp.map_id = subquery_sp.map_id AND sp.score_count = subquery_sp.min_score_count
-	WHERE sp.user_id = $1 AND sp.is_deleted = false
+	sql = `SELECT 'records_sp' AS table_name, COUNT(*) FROM (
+	    SELECT sp.map_id FROM records_sp sp JOIN (
+	        SELECT mh.map_id, MIN(mh.score_count) AS min_score_count FROM map_history mh WHERE mh.category_id = 1 GROUP BY mh.map_id
+	    ) AS subquery_sp ON sp.map_id = subquery_sp.map_id AND sp.score_count = subquery_sp.min_score_count
+	    WHERE sp.user_id = $1 AND sp.is_deleted = false GROUP BY sp.map_id
+	) AS unique_maps
 	UNION ALL
-	SELECT 'records_mp' AS table_name, COUNT(mp.id)
-	FROM public.records_mp mp JOIN (
-    	SELECT mh.map_id, MIN(mh.score_count) AS min_score_count
-    	FROM public.map_history mh WHERE mh.category_id = 1 GROUP BY mh.map_id
-	) AS subquery_mp ON mp.map_id = subquery_mp.map_id AND mp.score_count = subquery_mp.min_score_count
-	WHERE (mp.host_id = $1 OR mp.partner_id = $1) AND mp.is_deleted = false`
+	SELECT 'records_mp' AS table_name, COUNT(*) FROM (
+	    SELECT mp.map_id FROM records_mp mp JOIN (
+	        SELECT mh.map_id, MIN(mh.score_count) AS min_score_count FROM map_history mh WHERE mh.category_id = 1 GROUP BY mh.map_id
+	    ) AS subquery_mp ON mp.map_id = subquery_mp.map_id AND mp.score_count = subquery_mp.min_score_count
+	    WHERE (mp.host_id = $1 OR mp.partner_id = $1) AND mp.is_deleted = false GROUP BY mp.map_id
+	) AS unique_maps`
 	rows, err := database.DB.Query(sql, user.(models.User).SteamID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
@@ -476,19 +476,19 @@ func FetchUser(c *gin.Context) {
 	}
 	rankings.Overall.CompletionTotal = rankings.Singleplayer.CompletionTotal + rankings.Cooperative.CompletionTotal
 	// Get user completion count
-	sql = `SELECT 'records_sp' AS table_name, COUNT(sp.id)
-	FROM records_sp sp JOIN (
-    	SELECT mh.map_id, MIN(mh.score_count) AS min_score_count
-    	FROM public.map_history mh WHERE mh.category_id = 1 GROUP BY mh.map_id
-	) AS subquery_sp ON sp.map_id = subquery_sp.map_id AND sp.score_count = subquery_sp.min_score_count
-	WHERE sp.user_id = $1 AND sp.is_deleted = false
+	sql = `SELECT 'records_sp' AS table_name, COUNT(*) FROM (
+	    SELECT sp.map_id FROM records_sp sp JOIN (
+	        SELECT mh.map_id, MIN(mh.score_count) AS min_score_count FROM map_history mh WHERE mh.category_id = 1 GROUP BY mh.map_id
+	    ) AS subquery_sp ON sp.map_id = subquery_sp.map_id AND sp.score_count = subquery_sp.min_score_count
+	    WHERE sp.user_id = $1 AND sp.is_deleted = false GROUP BY sp.map_id
+	) AS unique_maps
 	UNION ALL
-	SELECT 'records_mp' AS table_name, COUNT(mp.id)
-	FROM public.records_mp mp JOIN (
-    	SELECT mh.map_id, MIN(mh.score_count) AS min_score_count
-    	FROM public.map_history mh WHERE mh.category_id = 1 GROUP BY mh.map_id
-	) AS subquery_mp ON mp.map_id = subquery_mp.map_id AND mp.score_count = subquery_mp.min_score_count
-	WHERE (mp.host_id = $1 OR mp.partner_id = $1) AND mp.is_deleted = false`
+	SELECT 'records_mp' AS table_name, COUNT(*) FROM (
+	    SELECT mp.map_id FROM records_mp mp JOIN (
+	        SELECT mh.map_id, MIN(mh.score_count) AS min_score_count FROM map_history mh WHERE mh.category_id = 1 GROUP BY mh.map_id
+	    ) AS subquery_mp ON mp.map_id = subquery_mp.map_id AND mp.score_count = subquery_mp.min_score_count
+	    WHERE (mp.host_id = $1 OR mp.partner_id = $1) AND mp.is_deleted = false GROUP BY mp.map_id
+	) AS unique_maps`
 	rows, err = database.DB.Query(sql, user.SteamID)
 	if err != nil {
 		c.JSON(http.StatusOK, models.ErrorResponse(err.Error()))
